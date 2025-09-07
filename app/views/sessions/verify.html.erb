@@ -1,0 +1,8 @@
+<article class="flex-1 max-w-[72ch] flex flex-col gap-4 text-tt-action">
+  <p>Runes were conjured and sent to <%= session[:awaiting_login] %></p>
+
+  <%= form_with url: validate_session_path do |f| %>
+    <%= f.text_field :code, required: true, placeholder: "000000" %>
+    <%= f.submit "Cast" %>
+  <% end %>
+</article>

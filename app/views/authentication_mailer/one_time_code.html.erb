@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>The doortal awaits! Your runes:</h1>
+    <p style="font-family: monospace; font-size: 2rem; font-weight: bold"><%= @code %></p>
+    <p style="font-style: italic">They must be cast within 5 minutes, or it will return to the rift!</p>
+    <br>
+    <br>
+    <p>If you need a new set of runes, <a href=<%= new_session_url %>>log in</a> again.</p>
+    <p style="opacity: 0.5">(If you did not request this, you can safely ignore this email.)</p>
+  </body>
+</html>

@@ -1,6 +1,10 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "rails/test_help"
+
+require "minitest/reporters"
+Minitest::Reporters.use!
 
 module ActiveSupport
   class TestCase
@@ -10,6 +14,15 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    def login_with_otp(email)
+      post session_path, params: { email: email }
+
+      user = User.find_by(email: email)
+      code = user.auth_code
+
+      post validate_session_path, params: { code: code }
+
+      user
+    end
   end
 end
