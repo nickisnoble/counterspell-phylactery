@@ -4,7 +4,7 @@ require "rails/test_help"
 require "rails/test_help"
 
 require "minitest/reporters"
-Minitest::Reporters.use!
+Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 module ActiveSupport
   class TestCase
