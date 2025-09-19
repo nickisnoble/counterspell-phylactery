@@ -22,9 +22,10 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="font-serif text-blue-900 min-h-screen flex flex-col gap-8 bg-amber-50 p-6">
+    <main>
       <%= yield %>
     </main>
+    <footer class="text-center text-xs mt-auto">&copy;2025 Counterspell Games LLC, all rights reserved.</footer>
   </body>
 </html>

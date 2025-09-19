@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+@theme {
+  --font-script: "Eagle Lake", theme(--font-script);
+  --font-serif: "adobe-jenson-pro", theme(--font-serif);
+}
