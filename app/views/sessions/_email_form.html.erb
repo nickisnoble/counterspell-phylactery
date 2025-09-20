@@ -1,0 +1,11 @@
+<%= turbo_frame_tag "signin" do %>
+  <%= form_with url: session_path, class: "contents" do |form| %>
+    <%= form.email_field :email,
+      required: true,
+      autofocus: true,
+      placeholder: "Enter your email address to begin your adventure",
+      value: params[:email],
+      class: "block border-0 text-center focus:outline-none rounded-md px-3 py-2 mt-2 w-full"
+    %>
+  <% end %>
+<% end %>
