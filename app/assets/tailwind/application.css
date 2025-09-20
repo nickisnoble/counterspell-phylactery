@@ -1,6 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  --font-script: "Eagle Lake", theme(--font-script);
-  --font-serif: "adobe-jenson-pro", theme(--font-serif);
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: "Fern", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+
+  --font-display: "GrenzeGotisch", var(--font-serif);
+}
+
+@font-face {
+  font-family: "Fern";
+  src: url("FernVariable-Roman-VF.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: "Fern";
+  src: url("FernVariable-Italic-VF.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: "GrenzeGotisch";
+  src: url("GrenzeGotisch.woff2") format("woff2");
+  font-weight: 100 900;
+}
+
+@layer base {
+  a:not([class]) {
+    @apply underline decoration-dotted underline-offset-3 hover:decoration-solid
+  }
 }
