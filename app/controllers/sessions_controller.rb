@@ -3,6 +3,7 @@ class SessionsController < ApplicationController
   rate_limit to: 5, within: 3.minutes, only: %i[create validate], with: -> { redirect_to new_session_url, alert: "Try again later." }
 
   def new
+    redirect_to root_path if authenticated?
   end
 
   def create

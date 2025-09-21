@@ -16,8 +16,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # test "should update user" do
-  #   patch user_url(@user), params: { user: { display_name: @user.display_name, referrer: @user.referrer, system_role: @user.system_role } }
-  #   assert_redirected_to user_url(@user)
-  # end
+  test "should update user" do
+    patch user_url(@user), params: { user: { display_name: "Kermit" } }
+    assert_redirected_to user_url(@user)
+  end
 end

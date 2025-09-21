@@ -82,11 +82,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should redirect from login when authenticated" do
-    skip("...Once there's something to redirect to.")
-    # Setup: login first using helper method
     login_with_otp(@user.email)
 
-    # Try to access login page
     get new_session_path
     assert_redirected_to root_path
   end

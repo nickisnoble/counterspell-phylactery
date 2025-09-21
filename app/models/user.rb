@@ -2,15 +2,20 @@ class User < ApplicationRecord
   include Sluggable
 
   has_many :sessions, dependent: :destroy
-  before_create :generate_otp_secret
 
+  before_create :generate_otp_secret
+  encrypts :otp_secret
+
+  normalizes :email, with: ->(e) { e.strip.downcase }
   validates :email,
     uniqueness: { case_sensitive: false },
     format: { with: URI::MailTo::EMAIL_REGEXP },
     nondisposable: true
 
-  normalizes :email, with: ->(e) { e.strip.downcase }
-  encrypts :otp_secret
+  normalizes :display_name, with: ->(e) { e.strip }
+  validates :display_name, length: { maximum: 40 }
+
+  enum :system_role, %w[ player gm staff admin ].index_by(&:itself)
 
   def auth_code
     totp.now
