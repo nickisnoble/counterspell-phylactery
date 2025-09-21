@@ -2,6 +2,7 @@ class User < ApplicationRecord
   include Sluggable
 
   has_many :sessions, dependent: :destroy
+  has_rich_text :bio
 
   before_create :generate_otp_secret
   encrypts :otp_secret
