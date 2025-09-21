@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :users, path: "players", except: %w[ index new create destroy ]
+
   resource :session do
     get :verify
     post :validate

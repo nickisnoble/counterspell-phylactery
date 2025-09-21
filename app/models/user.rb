@@ -1,6 +1,7 @@
 class User < ApplicationRecord
-  has_many :sessions, dependent: :destroy
+  include Sluggable
 
+  has_many :sessions, dependent: :destroy
   before_create :generate_otp_secret
 
   validates :email,

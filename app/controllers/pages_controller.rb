@@ -2,8 +2,11 @@ class PagesController < ApplicationController
   allow_unauthenticated_access
 
   def index
-    # TODO: Redirect to user dash if authed
-    render :home
+    unless authenticated?
+      render :home
+    else
+      redirect_to Current.user
+    end
   end
 
   def home

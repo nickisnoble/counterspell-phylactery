@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_162526) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_21_184119) do
   create_table "nondisposable_disposable_domains", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -32,7 +32,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_162526) do
     t.string "otp_secret", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "slug", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["slug"], name: "index_users_on_slug", unique: true
   end
 
   add_foreign_key "sessions", "users"
