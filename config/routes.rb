@@ -2,6 +2,11 @@ Rails.application.routes.draw do
   resources :heroes
   resources :users, path: "players", except: %w[ index new create destroy ]
 
+  # Dynamic routes for Hero::Descriptor types
+  %w[ancestries roles].each do |type|
+    resources type.to_sym, controller: "hero/descriptors", type: type.singularize, param: :id, path_names: { new: "new" }
+  end
+
   resource :session do
     get :verify
     post :validate

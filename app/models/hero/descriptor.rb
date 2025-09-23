@@ -6,6 +6,6 @@ class Hero::Descriptor < ApplicationRecord
   normalizes :name, :description, with: ->(f) { f.strip }
 
   def to_param
-    name
+    name.parameterize
   end
 end

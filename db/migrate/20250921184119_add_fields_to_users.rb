@@ -1,5 +1,8 @@
-class AddSlugToUsers < ActiveRecord::Migration[8.0]
+class AddFieldsToUsers < ActiveRecord::Migration[8.0]
   def up
+    add_column :users, :display_name, :string
+    add_column :users, :system_role, :string
+
     # add as nullable
     add_column :users, :slug, :string
 
@@ -20,6 +23,8 @@ class AddSlugToUsers < ActiveRecord::Migration[8.0]
   def down
     remove_index  :users, :slug
     remove_column :users, :slug
+    remove_column :users, :display_name
+    remove_column :users, :system_role
   end
 
   private
