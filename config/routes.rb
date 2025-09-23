@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :heroes
   resources :users, path: "players", except: %w[ index new create destroy ]
 
   resource :session do

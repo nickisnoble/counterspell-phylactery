@@ -16,7 +16,7 @@ class User < ApplicationRecord
   normalizes :display_name, with: ->(e) { e.strip }
   validates :display_name, length: { maximum: 40 }
 
-  enum :system_role, %w[ player gm staff admin ].index_by(&:itself)
+  enum :system_role, %w[ player gm staff admin ].index_by(&:itself), default: :player, validate: true
 
   def auth_code
     totp.now
