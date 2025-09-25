@@ -1,10 +1,12 @@
 Rails.application.routes.draw do
   root "pages#index"
   get "home", to: "pages#home"
+
   resources :users, path: "players", except: %w[ index new create destroy ]
+  resource :dashboard, only: :show
 
   resources :heroes
-  resource :dashboard, only: :show
+  resources :traits
 
   resource :session do
     get :verify

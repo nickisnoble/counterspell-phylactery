@@ -1,16 +1,37 @@
 class Hero < ApplicationRecord
   include FriendlyPathable
 
+  has_and_belongs_to_many :traits
+  REQUIRED_TRAIT_TYPES = [ "ANCESTRY", "BACKGROUND", "CLASS" ].freeze
+  validate :required_traits_present
+  validate :no_duplicate_traits
+
   has_rich_text :backstory
   has_one_attached :portrait
-
-  belongs_to :ancestry
-  belongs_to :background
-  belongs_to :character_class
 
   normalizes :ideal, :flaw, with: ->(f) { f.strip }
 
   enum :role, %w[ fighter protector strategist wild_card ].index_by(&:itself), validate: true
 
   enum :pronouns, [ "He/Him", "She/Her", "They/Them" ].index_by(&:itself), validate: true, scopes: false, instance_methods: false
+
+  private
+
+  def no_duplicate_traits
+    traits.group_by(&:type).each do |type, group|
+      if group.size > 1
+        errors.add(:traits, "duplicate #{type.titleize} traits. Pick one!")
+      end
+    end
+  end
+
+  def required_traits_present
+    present_types = traits.map(&:type)
+
+    REQUIRED_TRAIT_TYPES.each do |type|
+      unless present_types.include?(type)
+        errors.add(:traits, "must include #{type.titleize}")
+      end
+    end
+  end
 end

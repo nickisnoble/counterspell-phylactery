@@ -18,31 +18,13 @@
 
   <div class="my-5">
     <%= form.label :pronouns %>
-    <%= form.select :pronouns,
-        Hero.pronouns,
-        { prompt: 'Choose Pronouns' }
-    %>
+    <%= form.collection_radio_buttons :pronouns, Hero.pronouns, :second, :first %>
   </div>
 
   <div class="my-5">
-    <%= form.label :category %>
-    <%= form.select :category, Hero.categories,
-    { prompt: "Choose Category" } %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :role_id %>
-    <%= form.collection_select :role_id, Hero::Role.all, :id, :name, { prompt: 'Choose Role'} %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :ancestry_id %>
-    <%= form.collection_select :ancestry_id, Hero::Ancestry.all, :id, :name, { prompt: 'Choose Ancestry' } %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :backstory %>
-    <%= form.rich_textarea :backstory %>
+    <%= form.label :role %>
+    <%= form.select :role, Hero.roles.map{|r| [r[0].gsub("_", " ").titleize, r[1]]},
+    { prompt: "Choose Role" } %>
   </div>
 
   <div class="inline">
