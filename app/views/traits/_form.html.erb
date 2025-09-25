@@ -13,7 +13,12 @@
 
   <div class="my-5">
     <%= form.label :type %>
-    <%= form.text_field :type, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": trait.errors[:type].none?, "border-red-400 focus:outline-red-600": trait.errors[:type].any?}] %>
+    <%= form.text_field :type, list: "trait-types", class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": trait.errors[:type].none?, "border-red-400 focus:outline-red-600": trait.errors[:type].any?}] %>
+    <datalist id="trait-types">
+      <% Trait.distinct.pluck(:type).compact.sort.each do |trait_type| %>
+        <option value="<%= trait_type %>">
+      <% end %>
+    </datalist>
   </div>
 
   <div class="my-5">
@@ -21,14 +26,39 @@
     <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": trait.errors[:name].none?, "border-red-400 focus:outline-red-600": trait.errors[:name].any?}] %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :slug %>
-    <%= form.text_field :slug, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": trait.errors[:slug].none?, "border-red-400 focus:outline-red-600": trait.errors[:slug].any?}] %>
-  </div>
-
-  <div class="my-5">
+  <div class="my-5" data-controller="abilities-editor">
     <%= form.label :abilities %>
-    <%= form.textarea :abilities, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": trait.errors[:abilities].none?, "border-red-400 focus:outline-red-600": trait.errors[:abilities].any?}] %>
+    <%= form.hidden_field :abilities, value: trait.abilities.to_json %>
+    
+    <div class="mt-2">
+      <div data-abilities-editor-target="container" class="space-y-2"></div>
+      
+      <button type="button" 
+              data-action="click->abilities-editor#addAbility"
+              class="mt-2 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md">
+        + Add Ability
+      </button>
+    </div>
+    
+    <template data-abilities-editor-target="template">
+      <div class="ability-row flex gap-2 items-center">
+        <input type="text" 
+               placeholder="Ability name" 
+               class="ability-key flex-1 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600" 
+               data-action="input->abilities-editor#updateAbilities" 
+               required>
+        <input type="text" 
+               placeholder="Description" 
+               class="ability-value flex-2 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600" 
+               data-action="input->abilities-editor#updateAbilities" 
+               required>
+        <button type="button" 
+                data-action="click->abilities-editor#removeAbility"
+                class="px-2 py-1 text-sm bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 rounded-md">
+          Remove
+        </button>
+      </div>
+    </template>
   </div>
 
   <div class="inline">
