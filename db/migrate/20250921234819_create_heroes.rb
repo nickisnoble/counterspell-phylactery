@@ -1,13 +1,15 @@
 class CreateHeroes < ActiveRecord::Migration[8.0]
   def change
     create_table :heroes do |t|
-      t.string :name
+      t.string :name, null: false
       t.string :pronouns
-      t.string :category
-      t.references :role, null: false, foreign_key: { to_table: :hero_descriptors }
-      t.references :ancestry, null: false, foreign_key: { to_table: :hero_descriptors }
+
+      t.string :ideal
+      t.string :flaw
 
       t.timestamps
     end
+
+    add_index :heroes, :name, unique: true
   end
 end

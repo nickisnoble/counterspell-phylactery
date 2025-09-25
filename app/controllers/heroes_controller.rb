@@ -66,6 +66,6 @@ class HeroesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def hero_params
-      params.expect(hero: [ :name, :pronouns, :category, :role_id, :ancestry_id ])
+      params.expect(hero: [ :name, :pronouns, :category ])
     end
 end
