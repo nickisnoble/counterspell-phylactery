@@ -32,3 +32,28 @@
     @apply underline decoration-dotted underline-offset-3 hover:decoration-solid
   }
 }
+
+@layer components {
+  .btn {
+    @apply inline-block rounded px-3 py-2 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  textarea,
+  select {
+    @apply block w-full rounded border border-gray-300 px-3 py-2 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-950;
+  }
+
+  label {
+    @apply block text-sm font-medium opacity-75;
+  }
+}
