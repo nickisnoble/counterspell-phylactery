@@ -2,10 +2,14 @@ class PagesController < ApplicationController
   allow_unauthenticated_access
 
   def index
-    unless authenticated?
-      render :home
+    if authenticated?
+      if Current.user.admin?
+        redirect_to dashboard_path
+      else
+        redirect_to Current.user
+      end
     else
-      redirect_to Current.user
+      render :home
     end
   end
 
