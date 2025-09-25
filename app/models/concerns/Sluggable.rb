@@ -2,7 +2,8 @@ module Sluggable
   extend ActiveSupport::Concern
 
   included do
-    before_create :set_slug
+    before_validation :set_slug, on: :create
+    validates :slug, presence: true, uniqueness: { case_sensitive: false }
     def to_param = slug
   end
 

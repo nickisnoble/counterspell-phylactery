@@ -61,7 +61,7 @@ class HeroesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_hero
-      @hero = Hero.find(params.expect(:id))
+      @hero = Hero.find_by_slug!(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

@@ -2,6 +2,7 @@ class CreateHeroes < ActiveRecord::Migration[8.0]
   def change
     create_table :heroes do |t|
       t.string :name, null: false
+      t.string :slug, null: false
       t.string :pronouns
 
       t.string :ideal
@@ -10,6 +11,6 @@ class CreateHeroes < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :heroes, :name, unique: true
+    add_index :heroes, :slug, unique: true
   end
 end

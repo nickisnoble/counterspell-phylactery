@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+acolyte:
+  name: Acolyte
+  slug: acolyte
+  description: "You have spent your life in service to a temple."
+
+criminal:
+  name: Criminal
+  slug: criminal
+  description: "You are an experienced criminal with a history of breaking the law."

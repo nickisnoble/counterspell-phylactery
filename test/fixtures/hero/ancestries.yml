@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+human:
+  name: Human
+  slug: human
+  description: "Versatile and adaptable beings with endless potential."
+  abilities: '{"bonus_skill_points": 1, "bonus_feat": 1}'
+
+elf:
+  name: Elf
+  slug: elf
+  description: "Graceful beings with keen senses and magical affinity."
+  abilities: '{"darkvision": 60, "keen_senses": true, "fey_ancestry": true}'

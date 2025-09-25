@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_21_234819) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_25_180936) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -49,14 +49,50 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_21_234819) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "hero_ancestries", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.text "abilities"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_hero_ancestries_on_slug", unique: true
+  end
+
+  create_table "hero_backgrounds", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_hero_backgrounds_on_slug", unique: true
+  end
+
+  create_table "hero_character_classes", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_hero_character_classes_on_slug", unique: true
+  end
+
   create_table "heroes", force: :cascade do |t|
     t.string "name", null: false
+    t.string "slug", null: false
     t.string "pronouns"
     t.string "ideal"
     t.string "flaw"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_heroes_on_name", unique: true
+    t.string "role"
+    t.integer "ancestry_id", null: false
+    t.integer "background_id", null: false
+    t.integer "character_class_id", null: false
+    t.index ["ancestry_id"], name: "index_heroes_on_ancestry_id"
+    t.index ["background_id"], name: "index_heroes_on_background_id"
+    t.index ["character_class_id"], name: "index_heroes_on_character_class_id"
+    t.index ["slug"], name: "index_heroes_on_slug", unique: true
   end
 
   create_table "nondisposable_disposable_domains", force: :cascade do |t|
@@ -89,5 +125,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_21_234819) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "heroes", "hero_ancestries", column: "ancestry_id"
+  add_foreign_key "heroes", "hero_backgrounds", column: "background_id"
+  add_foreign_key "heroes", "hero_character_classes", column: "character_class_id"
   add_foreign_key "sessions", "users"
 end
