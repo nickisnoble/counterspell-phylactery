@@ -1,4 +1,4 @@
-<%= form_with(model: user, class: "contents") do |form| %>
+<%= form_with(model: user, class: "contents text-left") do |form| %>
   <% if user.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
       <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
@@ -11,29 +11,29 @@
     </div>
   <% end %>
 
-
-
   <div class="my-5">
-    <%= form.label :display_name %>
-    <%= form.text_field :display_name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": user.errors[:display_name].none?, "border-red-400 focus:outline-red-600": user.errors[:display_name].any?}] %>
+    <%= form.label :display_name, "Full Name" %>
+    <%= form.text_field :display_name %>
   </div>
 
   <div class="my-5">
     <%= form.label :email %>
-    <%= form.text_field :email, disabled: true, class: [
-      "block shadow-sm rounded-md border px-3 py-2 mt-2 w-full opacity-50",
-      {
-        "border-gray-400 focus:outline-blue-600": user.errors[:email].none?,
-        "border-red-400 focus:outline-red-600": user.errors[:email].any?
-      }] %>
+    <%= form.text_field :email, disabled: true, title: "Contact Nick or Marnie if you need to change your email!" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :bio %>
-    <%= form.rich_text_area :bio, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": user.errors[:bio].none?, "border-red-400 focus:outline-red-600": user.errors[:bio].any?}] %>
+    <%= form.label :bio,
+      "What would you like #{
+        Current.user.gm? ?
+            "players"
+          : "our team"
+      } to know about you?"
+
+    %>
+    <%= form.rich_text_area :bio %>
   </div>
 
   <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <%= form.submit "Save Preferences", class: "btn" %>
   </div>
 <% end %>

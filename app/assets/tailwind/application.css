@@ -33,7 +33,7 @@
 
 @layer components {
   .btn {
-    @apply inline-block rounded px-3 py-2 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50;
+    @apply inline-block w-full sm:w-auto rounded-md px-4 py-2.5 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50 cursor-pointer;
   }
 
   a:not([class]),
@@ -60,6 +60,11 @@
     /* &:invalid {
       @apply outline-2 outline-red-500;
     } */
+
+    &:disabled,
+    &[disabled] {
+      @apply opacity-50 rotate-0! scale-100! shadow-none! cursor-not-allowed;
+    }
   }
 }
 

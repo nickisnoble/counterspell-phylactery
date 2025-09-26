@@ -1,4 +1,4 @@
-<%= form_with(model: trait, class: "contents") do |form| %>
+<%= form_with(model: trait, class: "contents text-left") do |form| %>
   <% if trait.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
       <h2><%= pluralize(trait.errors.count, "error") %> prohibited this trait from being saved:</h2>
@@ -29,30 +29,30 @@
   <div class="my-5" data-controller="abilities-editor">
     <%= form.label :abilities %>
     <%= form.hidden_field :abilities, value: trait.abilities.to_json %>
-    
+
     <div class="mt-2">
       <div data-abilities-editor-target="container" class="space-y-2"></div>
-      
-      <button type="button" 
+
+      <button type="button"
               data-action="click->abilities-editor#addAbility"
               class="mt-2 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md">
         + Add Ability
       </button>
     </div>
-    
+
     <template data-abilities-editor-target="template">
       <div class="ability-row flex gap-2 items-center">
-        <input type="text" 
-               placeholder="Ability name" 
-               class="ability-key flex-1 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600" 
-               data-action="input->abilities-editor#updateAbilities" 
+        <input type="text"
+               placeholder="Ability name"
+               class="ability-key flex-1 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600"
+               data-action="input->abilities-editor#updateAbilities"
                required>
-        <input type="text" 
-               placeholder="Description" 
-               class="ability-value flex-2 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600" 
-               data-action="input->abilities-editor#updateAbilities" 
+        <input type="text"
+               placeholder="Description"
+               class="ability-value flex-2 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600"
+               data-action="input->abilities-editor#updateAbilities"
                required>
-        <button type="button" 
+        <button type="button"
                 data-action="click->abilities-editor#removeAbility"
                 class="px-2 py-1 text-sm bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 rounded-md">
           Remove
