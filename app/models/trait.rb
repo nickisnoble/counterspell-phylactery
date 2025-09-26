@@ -8,7 +8,7 @@ class Trait < ApplicationRecord
   validates :type, presence: :true, format: /[a-zA-Z]+/
   normalizes :type, with: ->(t) { t.strip.upcase }
 
-  validates :description, length: { maximum: 200 }
+  # validates :description, length: { maximum: 200 }
   normalizes :description, with: ->(t) { t.strip.squish }
 
   serialize :abilities, coder: JSON
