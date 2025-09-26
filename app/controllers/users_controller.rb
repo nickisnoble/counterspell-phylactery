@@ -11,7 +11,7 @@ class UsersController < ApplicationController
     @user = Current.user
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to @user, notice: "Profile was successfully updated.", status: :see_other }
+        format.html { redirect_to events_path, notice: "Profile was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit, status: :unprocessable_content }

@@ -27,28 +27,20 @@
   <body class="font-serif text-center text-blue-900 min-h-screen flex flex-col gap-8 bg-amber-50 p-6">
 
     <header class="flex flex-col justify-center items-center gap-2">
-      <%= link_to root_path, class: "block h-20" do %>
+      <%= link_to events_path, class: "block h-20" do %>
         <%= image_tag "counterspell-icon.svg", class: "h-full drop-shadow rotate-0 transition-transform transition-discrete transition-[filter] hover:rotate-3 hover:scale-110 hover:drop-shadow-lg" %>
       <% end %>
 
       <% if authenticated? %>
         <nav class="justify-self-end flex gap-4">
-          <%= link_to "Settings", edit_user_path(Current.user) %>
+          <%= link_to "Profile", edit_user_path(Current.user) %>
           <%= button_to "Logout", session_path, method: :delete, class: "inline link" %>
         </nav>
       <% end %>
     </header>
 
-    <% if flash.count %>
-      <ul class="fixed bottom-4 right-4 w-40">
-      <% flash.each do |flash_type, message| %>
-        <li
-          class="flash-<%= flash_type %>"
-        >
-          <%= message %>
-        </li>
-      <% end %>
-      </ul>
+    <% if notice.present? %>
+      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block self-center" id="notice"><%= notice %></p>
     <% end %>
 
     <%= yield %>
