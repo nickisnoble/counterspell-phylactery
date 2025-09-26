@@ -6,10 +6,8 @@ class SessionsController < ApplicationController
     if authenticated?
       if !Current.user.display_name
         redirect_to edit_user_path(Current.user)
-      elsif Current.user.admin?
-        redirect_to dashboard_path
       else
-        redirect_to user_path(Current.user)
+        redirect_to root_path
       end
     end
   end

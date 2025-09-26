@@ -33,6 +33,7 @@
 
       <% if authenticated? %>
         <nav class="justify-self-end flex gap-4">
+          <%= link_to "Admin Dash", dashboard_path if Current.user.admin? %>
           <%= link_to "Profile", edit_user_path(Current.user) %>
           <%= button_to "Logout", session_path, method: :delete, class: "inline link" %>
         </nav>
