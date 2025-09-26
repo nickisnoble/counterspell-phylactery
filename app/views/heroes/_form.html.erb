@@ -1,4 +1,4 @@
-<%= form_with(model: hero, class: "contents") do |form| %>
+<%= form_with(model: hero, class: "contents", data: { controller: "hero-traits" }) do |form| %>
   <% if hero.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
       <h2><%= pluralize(hero.errors.count, "error") %> prohibited this hero from being saved:</h2>
@@ -13,21 +13,164 @@
 
   <div class="my-5">
     <%= form.label :name %>
-    <%= form.text_field :name, class: {"border-red-400 focus:border-red-500": hero.errors[:name].any?} %>
+    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-red-400 focus:outline-red-600": hero.errors[:name].any?, "border-gray-400 focus:outline-blue-600": hero.errors[:name].none?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :pronouns %>
-    <%= form.collection_radio_buttons :pronouns, Hero.pronouns, :first, :first %>
+    <div class="mt-2">
+      <%= form.collection_radio_buttons :pronouns, Hero.pronouns, :first, :first do |b| %>
+        <div class="flex items-center">
+          <%= b.radio_button(class: "mr-2") %>
+          <%= b.label(class: "text-sm") %>
+        </div>
+      <% end %>
+    </div>
   </div>
 
   <div class="my-5">
     <%= form.label :role %>
     <%= form.select :role, Hero.roles.map{|r| [r[0].gsub("_", " ").titleize, r[1]]},
-    { prompt: "Choose Role" } %>
+    { prompt: "Choose Role" }, { class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full focus:outline-blue-600" } %>
   </div>
+
+  <!-- Required Traits Section -->
+  <div class="my-8">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Required Traits</h3>
+    <% Hero::REQUIRED_TRAIT_TYPES.each do |trait_type| %>
+      <div class="my-5" data-hero-traits-target="traitSection" data-trait-type="<%= trait_type.downcase %>">
+        <h4 class="text-md font-medium text-gray-700 mb-3"><%= trait_type.titleize %></h4>
+        
+        <% existing_trait = hero.traits.find { |t| t.type == trait_type } %>
+        <% if existing_trait %>
+          <!-- Show selected trait -->
+          <div class="selected-trait bg-gray-50 p-4 rounded-md border" data-hero-traits-target="selectedTrait">
+            <%= render 'traits/trait', trait: existing_trait %>
+            <div class="mt-3">
+              <button type="button" 
+                      class="px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 rounded-md"
+                      data-action="click->hero-traits#removeTrait"
+                      data-trait-type="<%= trait_type.downcase %>">
+                Remove
+              </button>
+            </div>
+            <%= form.hidden_field "trait_ids_#{trait_type.downcase}", value: existing_trait.id %>
+          </div>
+        <% else %>
+          <!-- Show selection options -->
+          <div class="trait-selection" data-hero-traits-target="traitSelection">
+            <% traits_for_type = Trait.where(type: trait_type).order(:name) %>
+            
+            <div class="flex gap-2 mb-3">
+              <select class="flex-1 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600"
+                      data-hero-traits-target="traitSelect"
+                      data-trait-type="<%= trait_type.downcase %>"
+                      data-action="change->hero-traits#selectTrait">
+                <option value="">Select <%= trait_type.titleize %>...</option>
+                <% traits_for_type.each do |trait| %>
+                  <option value="<%= trait.id %>" data-trait-json="<%= trait.to_json.html_safe %>">
+                    <%= trait.name %>
+                  </option>
+                <% end %>
+              </select>
+              
+              <button type="button" 
+                      class="px-3 py-2 text-sm bg-green-100 hover:bg-green-200 text-green-700 border border-green-300 rounded-md"
+                      data-action="click->hero-traits#showNewTraitForm"
+                      data-trait-type="<%= trait_type %>">
+                + New
+              </button>
+            </div>
+            
+            <!-- Inline new trait form (hidden by default) -->
+            <div class="new-trait-form hidden bg-blue-50 p-4 rounded-md border" data-hero-traits-target="newTraitForm">
+              <h5 class="font-medium text-gray-700 mb-3">Create New <%= trait_type.titleize %></h5>
+              
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Type</label>
+                  <input type="text" 
+                         value="<%= trait_type %>" 
+                         readonly
+                         class="mt-1 block w-full shadow-sm rounded-md border border-gray-400 px-3 py-2 bg-gray-100"
+                         data-hero-traits-target="newTraitType">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Name</label>
+                  <input type="text" 
+                         class="mt-1 block w-full shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600"
+                         data-hero-traits-target="newTraitName"
+                         required>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea rows="3"
+                            class="mt-1 block w-full shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600"
+                            data-hero-traits-target="newTraitDescription"></textarea>
+                </div>
+                
+                <div data-controller="abilities-editor">
+                  <label class="block text-sm font-medium text-gray-700">Abilities</label>
+                  <input type="hidden" 
+                         value="{}"
+                         data-hero-traits-target="newTraitAbilities">
+                  
+                  <div class="mt-2">
+                    <div data-abilities-editor-target="container" class="space-y-2"></div>
+                    
+                    <button type="button" 
+                            data-action="click->abilities-editor#addAbility"
+                            class="mt-2 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md">
+                      + Add Ability
+                    </button>
+                  </div>
+                  
+                  <template data-abilities-editor-target="template">
+                    <div class="ability-row flex gap-2 items-center">
+                      <input type="text" 
+                             placeholder="Ability name" 
+                             class="ability-key flex-1 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600" 
+                             data-action="input->abilities-editor#updateAbilities" 
+                             required>
+                      <input type="text" 
+                             placeholder="Description" 
+                             class="ability-value flex-2 shadow-sm rounded-md border border-gray-400 px-3 py-2 focus:outline-blue-600" 
+                             data-action="input->abilities-editor#updateAbilities" 
+                             required>
+                      <button type="button" 
+                              data-action="click->abilities-editor#removeAbility"
+                              class="px-2 py-1 text-sm bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 rounded-md">
+                        Remove
+                      </button>
+                    </div>
+                  </template>
+                </div>
+                
+                <div class="flex gap-2">
+                  <button type="button" 
+                          class="px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-md"
+                          data-action="click->hero-traits#createAndSelectTrait">
+                    Create & Use
+                  </button>
+                  <button type="button" 
+                          class="px-3 py-2 text-sm bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md"
+                          data-action="click->hero-traits#hideNewTraitForm">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
 
   <div class="inline">
     <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
   </div>
 <% end %>
+

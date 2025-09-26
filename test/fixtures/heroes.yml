@@ -1,19 +1,19 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+one:
+  name: Test Hero
+  slug: test-hero
+  pronouns: "They/Them"
+  role: fighter
+
 denn:
   name: Denn
   slug: denn
   pronouns: "They/Them"
   role: fighter
-  ancestry: human
-  background: criminal
-  character_class: fighter
 
 carina:
   name: Carina Croftblade
   slug: carina-croftblade
   pronouns: "She/Her"
   role: strategist
-  ancestry: elf
-  background: acolyte
-  character_class: wizard

@@ -22,10 +22,24 @@ class TraitsController < ApplicationController
     respond_to do |format|
       if @trait.save
         format.html { redirect_to @trait, notice: "Trait was successfully created." }
-        format.json { render :show, status: :created, location: @trait }
+        format.json { 
+          render json: { 
+            success: true, 
+            trait: { 
+              id: @trait.id, 
+              name: @trait.name, 
+              type: @trait.type 
+            }
+          }, status: :created 
+        }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @trait.errors, status: :unprocessable_entity }
+        format.json { 
+          render json: { 
+            success: false, 
+            errors: @trait.errors.full_messages 
+          }, status: :unprocessable_entity 
+        }
       end
     end
   end

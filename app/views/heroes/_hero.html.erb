@@ -8,15 +8,11 @@
     <%= hero.pronouns %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Category:</strong>
-    <%= hero.category %>
-  </div>
-  <div>
     <strong class="block font-medium mb-1">Role:</strong>
-    <%= hero.role_id %>
+    <%= hero.role %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Ancestry:</strong>
-    <%= hero.ancestry_id %>
+    <strong class="block font-medium mb-1">Traits:</strong>
+    <%= hero.traits.map(&:name).join(", ") %>
   </div>
 </div>

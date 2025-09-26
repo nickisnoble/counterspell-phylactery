@@ -3,6 +3,10 @@ require "test_helper"
 class TraitsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @trait = traits(:one)
+    
+    # Set up authentication using the helper
+    @admin_user = User.create!(email: "admin@example.com", system_role: "admin")
+    login_with_otp("admin@example.com")
   end
 
   test "should get index" do
@@ -17,7 +21,14 @@ class TraitsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create trait" do
     assert_difference("Trait.count") do
-      post traits_url, params: { trait: { abilities: @trait.abilities, name: @trait.name, slug: @trait.slug, type: @trait.type } }
+      post traits_url, params: { 
+        trait: { 
+          abilities: '{"Test Ability": "Test description"}', 
+          name: "Unique Test Trait", 
+          type: "ANCESTRY",
+          description: "A test trait for testing"
+        } 
+      }
     end
 
     assert_redirected_to trait_url(Trait.last)

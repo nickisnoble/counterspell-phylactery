@@ -1,0 +1,13 @@
+# Heroes-Traits join table fixtures
+
+hero_one_ancestry:
+  hero_id: <%= ActiveRecord::FixtureSet.identify(:one, :heroes) %>
+  trait_id: <%= ActiveRecord::FixtureSet.identify(:ancestry, :traits) %>
+
+hero_one_background:
+  hero_id: <%= ActiveRecord::FixtureSet.identify(:one, :heroes) %>  
+  trait_id: <%= ActiveRecord::FixtureSet.identify(:background, :traits) %>
+
+hero_one_class:
+  hero_id: <%= ActiveRecord::FixtureSet.identify(:one, :heroes) %>
+  trait_id: <%= ActiveRecord::FixtureSet.identify(:class_trait, :traits) %>

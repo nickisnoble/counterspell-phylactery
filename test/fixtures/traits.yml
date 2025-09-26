@@ -1,13 +1,31 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  type: 
-  name: MyString
-  slug: MyString
-  abilities: MyText
+  type: ANCESTRY
+  name: Human
+  slug: human
+  abilities: '{"Versatile": "Gain +1 to two different ability scores"}'
 
 two:
-  type: 
-  name: MyString
-  slug: MyString
-  abilities: MyText
+  type: BACKGROUND
+  name: Soldier
+  slug: soldier
+  abilities: '{"Military Training": "Proficiency with all armor and shields"}'
+
+ancestry:
+  type: ANCESTRY
+  name: Elf
+  slug: elf
+  abilities: '{"Darkvision": "See in darkness up to 60 feet", "Keen Senses": "Proficiency in Perception"}'
+
+background:
+  type: BACKGROUND
+  name: Scholar
+  slug: scholar
+  abilities: '{"Research": "Extensive knowledge of history and lore"}'
+
+class_trait:
+  type: CLASS
+  name: Fighter
+  slug: fighter
+  abilities: '{"Fighting Style": "Choose a fighting style", "Second Wind": "Regain hit points as a bonus action"}'
