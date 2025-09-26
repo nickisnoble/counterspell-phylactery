@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-  root "pages#index"
-  get "home", to: "pages#home"
+  root "sessions#new"
 
   resources :users, path: "players", except: %w[ index new create destroy ]
   resource :dashboard, only: :show

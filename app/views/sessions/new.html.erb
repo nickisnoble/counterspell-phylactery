@@ -1,13 +1,23 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <% if alert = flash[:alert] %>
-    <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
-  <% end %>
+<main class="flex flex-col justify-center items-center gap-8">
+  <%= image_tag "counterspell-logo.svg", class: "max-h-40 max-w-full my-8" %>
 
-  <% if notice = flash[:notice] %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
-  <% end %>
+  <div class="space-y-4 max-w-[36ch] text-center *:text-balance">
+    <h1 class="font-display text-3xl mb-8">Welcome to Counterspell Games</h1>
+    <p>
+      In October, we're bringing the magic of Table-Top RPGs to beginners.
+    </p>
 
-  <h1 class="font-bold text-4xl">Sign in</h1>
+    <p>
+      People like you, who've always wanted to play a game like <a href="https://en.wikipedia.org/wiki/Dungeons_%26_Dragons">D&amp;D</a> or <a href="https://en.wikipedia.org/wiki/Daggerheart">Daggerheart</a>, but have never had the time, the place, or a guide to light their way.
+    </p>
+    <p>
+      We've built a whole new world for you to adventure within, and we can't wait to share it with you.
+    </p>
 
-  <%= render "email_form" %>
-</div>
+    <div class="mt-8">
+      <p class="text-xl text-center">What will be <em>your</em> story?</p>
+
+      <%= render "email_form" %>
+    </div>
+  </div>
+</main>

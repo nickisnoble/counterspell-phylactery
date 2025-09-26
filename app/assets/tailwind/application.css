@@ -28,14 +28,17 @@
 }
 
 @layer base {
-  a:not([class]) {
-    @apply underline decoration-dotted underline-offset-3 hover:decoration-solid
-  }
+
 }
 
 @layer components {
   .btn {
     @apply inline-block rounded px-3 py-2 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50;
+  }
+
+  a:not([class]),
+  .link {
+    @apply underline decoration-dotted underline-offset-3 hover:decoration-solid cursor-pointer;
   }
 
   input[type="text"],
