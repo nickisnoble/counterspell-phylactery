@@ -25,6 +25,19 @@
   </head>
 
   <body class="font-serif text-blue-900 min-h-screen flex flex-col gap-8 bg-amber-50 p-6">
+
+    <%= if flash.count %>
+      <ul class="fixed bottom-4 right-4 w-40">
+      <% flash.each do |flash_type, message| %>
+        <li
+          class="flash-<%= flash_type %>"
+        >
+          <%= message %>
+        </li>
+      <% end %>
+      </ul>
+    <% end %>
+
     <main class="flex-1">
       <%= yield %>
     </main>

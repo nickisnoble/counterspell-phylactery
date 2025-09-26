@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "signin" do %>
   <p class="text-balance">Runes were conjured and sent to <%= session[:awaiting_login] %> — please cast them hence: </p>
-  <%= form_with url: validate_session_path do |f| %>
+  <%= form_with url: validate_session_path, data: { turbo_frame: "_top" } do |f| %>
     <%= f.text_field :code, required: true, placeholder: "000000", class: "block border-0 text-center focus:outline-none rounded-md px-3 py-2 mt-2 w-full" %>
   <% end %>
 <% end %>

@@ -5,9 +5,9 @@ class SessionsController < ApplicationController
   def new
     if authenticated?
       unless Current.user.admin?
-        redirect_to user_path(Current.user)
+        redirect_to user_path(Current.user), status: :see_other
       else
-        redirect_to dashboard_path
+        redirect_to dashboard_path, status: :see_other
       end
     end
   end
@@ -44,7 +44,7 @@ class SessionsController < ApplicationController
 
       redirect_to root_path
     else
-      redirect_to verify_session_path, alert: "Invalid code"
+      redirect_to new_session_path, error: "Dissonant weave. Try requesting new runes!"
     end
   end
 
