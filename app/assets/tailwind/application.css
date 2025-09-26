@@ -41,6 +41,16 @@
     @apply underline decoration-dotted underline-offset-3 hover:decoration-solid cursor-pointer;
   }
 
+  label {
+    @apply font-medium;
+  }
+
+  label:has( + input),
+  label:has( + select),
+  label:has( + textarea), {
+    @apply ml-5 mb-1;
+  }
+
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -52,10 +62,12 @@
   input[type="time"],
   input[type="datetime-local"],
   textarea,
-  select {
+  select,
+  lexxy-editor {
     @apply block w-full rounded px-3 py-2 bg-white border border-black/10 transition
-      hover:scale-110 hover:-rotate-1 hover:shadow-xl
-      focus:scale-105 focus:rotate-0 focus:shadow-lg focus:border-white focus:outline-none focus:ring-1 focus:ring-yellow-500;
+      hover:shadow-xl focus:shadow-lg focus:border-white focus:outline-none focus:ring-1 focus:ring-yellow-500
+      focus-within:shadow-lg focus-within:border-white focus-within:outline-none focus-within:ring-1 focus-within:ring-yellow-500
+      font-normal;
 
     /* &:invalid {
       @apply outline-2 outline-red-500;
@@ -65,6 +77,15 @@
     &[disabled] {
       @apply opacity-50 rotate-0! scale-100! shadow-none! cursor-not-allowed;
     }
+  }
+
+  .fun-interactive {
+    @apply transition hover:scale-110 hover:-rotate-1 hover:shadow-xl focus:scale-105 focus:rotate-0;
+  }
+
+
+  lexxy-editor {
+    @apply p-0 transition;
   }
 }
 
