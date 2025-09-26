@@ -1,18 +1,19 @@
-<div id="<%= dom_id trait %>" class="w-full sm:w-auto my-5 space-y-5">
+<div id="<%= dom_id trait %>" class="space-y-3">
   <div>
-    <strong class="block font-medium mb-1">Type:</strong>
-    <%= trait.type %>
+    <h3 class="font-semibold text-lg text-gray-900"><%= trait.name %></h3>
+    <p class="text-sm text-gray-500"><%= trait.slug %></p>
   </div>
-  <div>
-    <strong class="block font-medium mb-1">Name:</strong>
-    <%= trait.name %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Slug:</strong>
-    <%= trait.slug %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Abilities:</strong>
-    <%= trait.abilities %>
-  </div>
+  <% if trait.abilities.present? && trait.abilities.any? %>
+    <div>
+      <p class="text-sm font-medium text-gray-700 mb-2">Abilities:</p>
+      <div class="space-y-1">
+        <% trait.abilities.each do |name, description| %>
+          <div class="text-sm">
+            <span class="font-medium text-gray-900"><%= name %>:</span>
+            <span class="text-gray-600"><%= description %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 </div>

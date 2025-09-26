@@ -1,5 +1,8 @@
 require "test_helper"
 
+# These tests are kept for future reference but AJAX trait creation
+# has been removed from the hero form to simplify the UI.
+# Traits should now be created through the standard traits form.
 class TraitsAjaxTest < ActionDispatch::IntegrationTest
   setup do
     # Set up authentication using the helper
@@ -7,7 +10,9 @@ class TraitsAjaxTest < ActionDispatch::IntegrationTest
     login_with_otp("admin@example.com")
   end
 
-  test "should create trait via AJAX and return success JSON" do
+  # Note: This JSON API is kept for potential future use but is no longer
+  # used by the hero form which now uses dropdown selection only
+  test "JSON API still works for trait creation" do
     assert_difference("Trait.count") do
       post traits_url,
            params: {
@@ -40,7 +45,7 @@ class TraitsAjaxTest < ActionDispatch::IntegrationTest
     assert_not_nil trait.abilities
   end
 
-  test "should return error JSON when trait creation fails" do
+  test "JSON API returns error when trait creation fails" do
     assert_no_difference("Trait.count") do
       post traits_url,
            params: {
@@ -62,7 +67,7 @@ class TraitsAjaxTest < ActionDispatch::IntegrationTest
     assert response_data["errors"].any? { |error| error.include?("Type") }
   end
 
-  test "should handle malformed JSON in abilities gracefully" do
+  test "JSON API handles malformed JSON in abilities gracefully" do
     assert_difference("Trait.count") do
       post traits_url,
            params: {

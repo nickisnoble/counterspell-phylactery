@@ -1,15 +1,79 @@
-<% content_for :title, "Showing trait" %>
+<% content_for :title, @trait.name %>
 
-<div class="md:w-2/3 w-full mx-auto">
+<main class="w-full max-w-4xl mx-auto">
   <% if notice.present? %>
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing trait</h1>
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <%= link_to traits_path, class: "text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center gap-1" do %>
+        ← Back to Traits
+      <% end %>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-gray-200 p-8">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-md uppercase tracking-wide">
+          <%= @trait.type %>
+        </span>
+      </div>
+      
+      <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @trait.name %></h1>
+      <p class="text-lg text-gray-500 mb-6"><%= @trait.slug %></p>
+      
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap gap-3">
+        <%= link_to "Edit", edit_trait_path(@trait), class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors" %>
+        <%= button_to "Delete", @trait, method: :delete, class: "px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium cursor-pointer transition-colors", data: { turbo_confirm: "Are you sure you want to delete #{@trait.name}?" } %>
+      </div>
+    </div>
+  </div>
 
-  <%= render @trait %>
+  <!-- Abilities Section -->
+  <% if @trait.abilities.present? && @trait.abilities.any? %>
+    <div class="bg-white rounded-lg border border-gray-200 p-8 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Abilities</h2>
+      
+      <div class="space-y-4">
+        <% @trait.abilities.each do |name, description| %>
+          <div class="bg-gray-50 rounded-lg p-6 border border-gray-100">
+            <h3 class="font-semibold text-lg text-gray-900 mb-2"><%= name %></h3>
+            <p class="text-gray-700 leading-relaxed"><%= description %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center mb-8">
+      <p class="text-gray-500">This trait has no abilities defined.</p>
+    </div>
+  <% end %>
 
-  <%= link_to "Edit this trait", edit_trait_path(@trait), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to traits", traits_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this trait", @trait, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-</div>
+  <!-- Heroes using this trait -->
+  <% heroes_with_trait = Hero.joins(:traits).where(traits: { id: @trait.id }) %>
+  <% if heroes_with_trait.any? %>
+    <div class="bg-white rounded-lg border border-gray-200 p-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Heroes with this trait</h2>
+      
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <% heroes_with_trait.each do |hero| %>
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-medium text-gray-900"><%= hero.name %></h3>
+                <p class="text-sm text-gray-600"><%= hero.pronouns %> • <%= hero.role.humanize %></p>
+              </div>
+              <%= link_to "View", hero, class: "text-sm text-blue-600 hover:text-blue-800 font-medium" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
+      <p class="text-gray-500">No heroes currently have this trait.</p>
+    </div>
+  <% end %>
+</main>
