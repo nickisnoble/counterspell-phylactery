@@ -102,6 +102,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_25_203959) do
     t.datetime "updated_at", null: false
     t.string "display_name"
     t.string "system_role"
+    t.string "pronouns"
+    t.boolean "newsletter", default: true
     t.string "slug", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["slug"], name: "index_users_on_slug", unique: true

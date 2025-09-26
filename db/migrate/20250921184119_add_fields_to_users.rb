@@ -1,7 +1,9 @@
 class AddFieldsToUsers < ActiveRecord::Migration[8.0]
   def up
     add_column :users, :display_name, :string
-    add_column :users, :system_role, :string
+    add_column :users, :system_role,  :string
+    add_column :users, :pronouns,     :string
+    add_column :users, :newsletter,   :boolean, default: true
 
     # add as nullable
     add_column :users, :slug, :string
@@ -25,6 +27,8 @@ class AddFieldsToUsers < ActiveRecord::Migration[8.0]
     remove_column :users, :slug
     remove_column :users, :display_name
     remove_column :users, :system_role
+    remove_column :users, :pronouns
+    remove_column :users, :newsletter
   end
 
   private

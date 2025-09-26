@@ -1,9 +1,7 @@
 <% content_for :title, "Editing user" %>
 
-<main class="md:w-2/3 w-full mx-auto">
-  <h1 class="font-bold text-4xl">Settings</h1>
+<main class="max-w-screen-sm mx-auto">
+  <h1 class="font-bold text-4xl text-balance"><%= @user.display_name.present? ? "Settings" : "Introducing our newest #{@user.system_role}:" %></h1>
 
   <%= render "form", user: @user %>
-
-  <%= link_to "View Profile", @user, class: "btn bg-purple-500/20 text-inherit hover:bg-purple-500/30" %>
 </main>

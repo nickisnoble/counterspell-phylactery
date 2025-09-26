@@ -4,10 +4,12 @@ class SessionsController < ApplicationController
 
   def new
     if authenticated?
-      unless Current.user.admin?
-        redirect_to user_path(Current.user), status: :see_other
+      if !Current.user.display_name
+        redirect_to edit_user_path(Current.user)
+      elsif Current.user.admin?
+        redirect_to dashboard_path
       else
-        redirect_to dashboard_path, status: :see_other
+        redirect_to user_path(Current.user)
       end
     end
   end

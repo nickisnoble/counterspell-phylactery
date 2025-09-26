@@ -1,9 +1,6 @@
 class UsersController < ApplicationController
   def show
     @user = User.find_by_slug!(params.expect(:id))
-    if Current.user.id === @user.id && !Current.user.display_name
-      redirect_to edit_user_path(Current.user)
-    end
   end
 
   def edit
@@ -14,7 +11,7 @@ class UsersController < ApplicationController
     @user = Current.user
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to @user, notice: "User was successfully updated.", status: :see_other }
+        format.html { redirect_to @user, notice: "Profile was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit, status: :unprocessable_content }
@@ -25,6 +22,6 @@ class UsersController < ApplicationController
 
   private
     def user_params
-      params.require(:user).permit(:display_name, :bio)
+      params.require(:user).permit(:display_name, :bio, :pronouns, :newsletters)
     end
 end
