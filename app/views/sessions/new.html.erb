@@ -1,6 +1,4 @@
-<main class="flex flex-col justify-center items-center gap-8">
-  <%= image_tag "counterspell-logo.svg", class: "max-h-40 max-w-full my-8" %>
-
+<main class="flex-1 flex flex-col justify-center items-center gap-8">
   <div class="space-y-4 max-w-[36ch] text-center *:text-balance">
     <h1 class="font-display text-3xl mb-8">Welcome to Counterspell Games</h1>
     <p>
@@ -14,7 +12,7 @@
       We've built a whole new world for you to adventure within, and we can't wait to share it with you.
     </p>
 
-    <div class="mt-8">
+    <div class="mt-8 space-y-2">
       <p class="text-xl text-center">What will be <em>your</em> story?</p>
 
       <%= render "email_form" %>

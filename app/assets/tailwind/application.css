@@ -53,7 +53,13 @@
   input[type="datetime-local"],
   textarea,
   select {
-    @apply block w-full rounded border border-gray-300 px-3 py-2 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-950;
+    @apply block w-full rounded px-3 py-2 bg-white border border-black/10 transition
+      hover:scale-110 hover:-rotate-1 hover:shadow-xl
+      focus:scale-105 focus:rotate-0 focus:shadow-lg focus:border-white focus:outline-none focus:ring-1 focus:ring-yellow-500;
+
+    /* &:invalid {
+      @apply outline-2 outline-red-500;
+    } */
   }
 }
 

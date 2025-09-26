@@ -1,6 +1,9 @@
 class UsersController < ApplicationController
   def show
     @user = User.find_by_slug!(params.expect(:id))
+    if Current.user.id === @user.id && !Current.user.display_name
+      redirect_to edit_user_path(Current.user)
+    end
   end
 
   def edit
