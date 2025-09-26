@@ -56,3 +56,17 @@
     @apply block w-full rounded border border-gray-300 px-3 py-2 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-950;
   }
 }
+
+@layer utilities {
+  .animate-appear-then-fade {
+    animation: appear-then-fade 4s both;
+  }
+  @keyframes appear-then-fade {
+    0%, 100% {
+      opacity:0
+    }
+    5%, 60% {
+      opacity:1
+    }
+  }
+}

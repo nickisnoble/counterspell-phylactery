@@ -22,23 +22,23 @@ class TraitsController < ApplicationController
     respond_to do |format|
       if @trait.save
         format.html { redirect_to @trait, notice: "Trait was successfully created." }
-        format.json { 
-          render json: { 
-            success: true, 
-            trait: { 
-              id: @trait.id, 
-              name: @trait.name, 
-              type: @trait.type 
+        format.json {
+          render json: {
+            success: true,
+            trait: {
+              id: @trait.id,
+              name: @trait.name,
+              type: @trait.type
             }
-          }, status: :created 
+          }, status: :created
         }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { 
-          render json: { 
-            success: false, 
-            errors: @trait.errors.full_messages 
-          }, status: :unprocessable_entity 
+        format.html { render :new, status: :unprocessable_content }
+        format.json {
+          render json: {
+            success: false,
+            errors: @trait.errors.full_messages
+          }, status: :unprocessable_content
         }
       end
     end
@@ -50,8 +50,8 @@ class TraitsController < ApplicationController
         format.html { redirect_to @trait, notice: "Trait was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @trait }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @trait.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @trait.errors, status: :unprocessable_content }
       end
     end
   end
@@ -63,8 +63,8 @@ class TraitsController < ApplicationController
         format.json { head :no_content }
       else
         @trait.errors.add(:heroes, "still referenced by #{@trait.heroes.map(&:name).join(", ")}")
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @trait.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @trait.errors, status: :unprocessable_content }
       end
     end
   end

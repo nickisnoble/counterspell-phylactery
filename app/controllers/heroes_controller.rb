@@ -29,8 +29,8 @@ class HeroesController < ApplicationController
         format.html { redirect_to @hero, notice: "Hero was successfully created." }
         format.json { render :show, status: :created, location: @hero }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @hero.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @hero.errors, status: :unprocessable_content }
       end
     end
   end
@@ -42,8 +42,8 @@ class HeroesController < ApplicationController
         format.html { redirect_to @hero, notice: "Hero was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @hero }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @hero.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @hero.errors, status: :unprocessable_content }
       end
     end
   end
@@ -67,26 +67,26 @@ class HeroesController < ApplicationController
     # Only allow a list of trusted parameters through.
     def hero_params
       permitted_params = params.expect(hero: [ :name, :pronouns, :role ])
-      
+
       # Handle required trait assignments
       trait_ids = []
-      
+
       trait_type_mappings = {
         "ANCESTRY" => "trait_ids_ancestry",
-        "BACKGROUND" => "trait_ids_background", 
+        "BACKGROUND" => "trait_ids_background",
         "CLASS" => "trait_ids_class"
       }
-      
+
       Hero::REQUIRED_TRAIT_TYPES.each do |trait_type|
         trait_id_param = trait_type_mappings[trait_type]
         if params[trait_id_param].present?
           trait_ids << params[trait_id_param]
         end
       end
-      
+
       # Add trait_ids to permitted params if any were selected
       permitted_params[:trait_ids] = trait_ids if trait_ids.any?
-      
+
       permitted_params
     end
 end

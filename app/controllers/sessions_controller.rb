@@ -44,7 +44,7 @@ class SessionsController < ApplicationController
 
       redirect_to root_path
     else
-      redirect_to new_session_path, error: "Dissonant weave. Try requesting new runes!"
+      redirect_to new_session_path, status: :unauthorized, error: "Dissonant weave. Try requesting new runes!"
     end
   end
 
