@@ -43,6 +43,10 @@ group :test do
   gem "minitest-reporters", "~> 1.7"
 end
 
+group :production do
+  gem "resend", "~> 0.25.0"
+end
+
 gem "rotp", "~> 6.3"
 gem "rack-attack", "~> 6.7"
 gem "nondisposable", "~> 0.1.0"
