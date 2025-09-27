@@ -25,9 +25,14 @@ module ActiveSupport
       user
     end
 
-    def be_authenticated
+    def be_authenticated!
       @user = User.create(email: "nick@miniware.team")
       login_with_otp(@user.email)
+    end
+
+    def be_authenticated_as_admin!
+      be_authenticated!
+      @user.admin!
     end
   end
 end

@@ -2,8 +2,10 @@ require "test_helper"
 
 class PagesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    be_authenticated
+    be_authenticated_as_admin!
     @page = pages(:one)
+    @page.body = "Sample body content"
+    @page.save!
   end
 
   test "should get index" do
@@ -18,7 +20,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create page" do
     assert_difference("Page.count") do
-      post pages_url, params: { page: { title: @page.title, body: "hello" } }
+      post pages_url, params: { page: { title: "New Page", body: "hello" } }
     end
 
     assert_redirected_to page_url(Page.last)
@@ -35,7 +37,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update page" do
-    patch page_url(@page), params: { page: { title: @page.title + "1" } }
+    patch page_url(@page), params: { page: { title: @page.title + "1", body: "updated content" } }
     assert_redirected_to page_url(@page)
   end
 
