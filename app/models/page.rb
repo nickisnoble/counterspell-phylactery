@@ -1,4 +1,4 @@
-class Term < ApplicationRecord
+class Page < ApplicationRecord
   include Sluggable
 
   normalizes :name, with: ->(f) { f.strip.squish }

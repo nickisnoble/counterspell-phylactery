@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_27_185415) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_27_222845) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -75,6 +75,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_27_185415) do
     t.index ["name"], name: "index_nondisposable_disposable_domains_on_name", unique: true
   end
 
+  create_table "pages", force: :cascade do |t|
+    t.string "title"
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -82,13 +89,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_27_185415) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
-  end
-
-  create_table "terms", force: :cascade do |t|
-    t.string "title"
-    t.string "slug"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "traits", force: :cascade do |t|
