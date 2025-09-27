@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :terms
   root "events#index"
 
   resources :events, only: :index

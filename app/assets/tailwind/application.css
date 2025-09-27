@@ -79,7 +79,7 @@
     }
   }
 
-  .fun-interactive {
+  .fun-interaction {
     @apply transition hover:scale-110 hover:-rotate-1 hover:shadow-xl focus:scale-105 focus:rotate-0;
   }
 
