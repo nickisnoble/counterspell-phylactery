@@ -1,12 +1,21 @@
 <main class="space-y-6">
   <h1 class="font-bold text-4xl">Hello, <%= Current.user.display_name %>!</h1>
 
-  <section>
-    <h2 class="font-bold text-2xl mb-4">General</h2>
-    <nav class="space-y-2">
-      <%= link_to "Heroes", heroes_path, class: "block btn" %>
-      <%= link_to "Traits", traits_path, class: "block btn" %>
-      <%= link_to "Pages", pages_path, class: "block btn" %>
-    </nav>
-  </section>
+  <div class="grid gap-2 md:grid-cols-2">
+    <section>
+      <h2 class="font-bold text-2xl mb-4">Content</h2>
+      <nav class="space-y-2 *:block">
+        <%= link_to "Heroes", heroes_path %>
+        <%= link_to "Traits", traits_path %>
+        <%= link_to "Pages", pages_path %>
+      </nav>
+    </section>
+
+    <section>
+      <h2 class="font-bold text-2xl mb-4">Site</h2>
+      <nav class="space-y-2 *:block">
+        <a href="https://counterspell.pirsch.io/" target="_blank">Analytics</a>
+      </nav>
+    </section>
+  </div>
 </main>
