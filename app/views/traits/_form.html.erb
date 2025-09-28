@@ -26,9 +26,8 @@
     <%= form.text_field :name %>
   </div>
 
-  <div class="my-5" data-controller="abilities-editor">
+  <div class="my-5" data-controller="abilities-editor" data-abilities="<%= trait.abilities.to_json %>">
     <%= form.label :abilities %>
-    <%= form.hidden_field :abilities, value: trait.abilities.to_json %>
 
     <div class="mt-2">
       <div data-abilities-editor-target="container" class="space-y-2"></div>
@@ -44,12 +43,10 @@
         <input type="text"
                placeholder="Ability name"
                class="ability-key"
-               data-action="input->abilities-editor#updateAbilities"
                required>
         <input type="text"
                placeholder="Description"
                class="ability-value"
-               data-action="input->abilities-editor#updateAbilities"
                required>
         <button type="button"
                 data-action="click->abilities-editor#removeAbility">

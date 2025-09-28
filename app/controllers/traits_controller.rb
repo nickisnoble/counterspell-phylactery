@@ -75,6 +75,6 @@ class TraitsController < ApplicationController
     end
 
     def trait_params
-      params.expect(trait: [ :type, :name, :description, :abilities ])
+      params.expect(trait: [ :type, :name, :description, abilities: {} ])
     end
 end

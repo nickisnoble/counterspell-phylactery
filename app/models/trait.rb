@@ -11,5 +11,5 @@ class Trait < ApplicationRecord
   # validates :description, length: { maximum: 200 }
   normalizes :description, with: ->(t) { t.strip.squish }
 
-  serialize :abilities, coder: JSON
+  serialize :abilities, coder: JSON, type: Hash, default: {}
 end

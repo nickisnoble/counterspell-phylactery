@@ -8,21 +8,30 @@ export default class extends Controller {
   }
 
   initializeAbilities() {
-    const hiddenInput = this.element.querySelector('input[type="hidden"]')
-    if (hiddenInput && hiddenInput.value) {
-      try {
-        const abilities = JSON.parse(hiddenInput.value)
-        Object.entries(abilities).forEach(([key, value]) => {
-          this.addAbilityRow(key, value)
-        })
-      } catch (e) {
-        // If parsing fails, start with empty abilities
-        this.addAbilityRow()
-      }
+    // Look for existing abilities data from data attribute or server
+    const abilities = this.getExistingAbilities()
+    
+    if (abilities && Object.keys(abilities).length > 0) {
+      Object.entries(abilities).forEach(([key, value]) => {
+        this.addAbilityRow(key, value)
+      })
     } else {
       // Start with one empty row
       this.addAbilityRow()
     }
+  }
+
+  getExistingAbilities() {
+    // Try to extract abilities from data attribute
+    const abilitiesData = this.element.dataset.abilities
+    if (abilitiesData) {
+      try {
+        return JSON.parse(abilitiesData)
+      } catch (e) {
+        console.warn('Failed to parse abilities data:', e)
+      }
+    }
+    return {}
   }
 
   addAbility(event) {
@@ -38,8 +47,22 @@ export default class extends Controller {
     keyInput.value = key
     valueInput.value = value
     
+    // Add event listeners to update the input names when the key changes
+    keyInput.addEventListener('input', () => this.updateInputNames(keyInput, valueInput))
+    
     this.containerTarget.appendChild(template)
-    this.updateHiddenInput()
+    this.updateInputNames(keyInput, valueInput)
+  }
+
+  updateInputNames(keyInput, valueInput) {
+    const abilityName = keyInput.value.trim()
+    if (abilityName) {
+      // Use the ability name as the Rails parameter key
+      valueInput.name = `trait[abilities][${abilityName}]`
+    } else {
+      // Clear the name if no ability name is set
+      valueInput.name = ""
+    }
   }
 
   removeAbility(event) {
@@ -55,32 +78,10 @@ export default class extends Controller {
     }
     
     row.remove()
-    this.updateHiddenInput()
     
     // Ensure at least one row exists
     if (this.containerTarget.children.length === 0) {
       this.addAbilityRow()
     }
-  }
-
-  updateAbilities() {
-    this.updateHiddenInput()
-  }
-
-  updateHiddenInput() {
-    const rows = this.containerTarget.querySelectorAll('.ability-row')
-    const abilities = {}
-    
-    rows.forEach(row => {
-      const key = row.querySelector('.ability-key').value.trim()
-      const value = row.querySelector('.ability-value').value.trim()
-      
-      if (key && value) {
-        abilities[key] = value
-      }
-    })
-    
-    const hiddenInput = this.element.querySelector('input[type="hidden"]')
-    hiddenInput.value = JSON.stringify(abilities)
   }
 }
