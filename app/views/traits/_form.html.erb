@@ -29,7 +29,7 @@
 
   <div class="my-5">
     <%= form.label :description %>
-    <%= form.rich_text_area :description, toolbar: false %>
+    <%= form.textarea :description, toolbar: false %>
   </div>
 
   <div class="my-5" data-controller="abilities-editor" data-abilities="<%= trait.abilities.to_json %>">

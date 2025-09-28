@@ -71,6 +71,10 @@ a:not([class]),
     }
   }
 
+  textarea {
+    @apply field-sizing-content;
+  }
+
   lexxy-editor {
     @apply p-0 transition relative overflow-clip!;
   }

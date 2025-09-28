@@ -2,6 +2,8 @@
   <div>
     <h3 class="font-semibold text-lg text-gray-900"><%= trait.name %></h3>
     <p class="text-sm text-gray-500"><%= trait.slug %></p>
+
+    <%= trait.description %>
   </div>
   <% if trait.abilities.present? && trait.abilities.any? %>
     <div>
