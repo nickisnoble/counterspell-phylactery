@@ -1,26 +1,26 @@
 <% content_for :title, @hero.name %>
 
 <main class="w-full max-w-4xl mx-auto">
-  <div class="mb-8">
-    <div class="flex items-center justify-between mb-4">
-      <%= link_to heroes_path, class: "text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center gap-1" do %>
-        ← Back to Heroes
-      <% end %>
-    </div>
+  <nav class="flex justify-center gap-3 p-4">
+    <%= link_to "← Back to Heroes", heroes_path %>
+    <%= link_to "Edit", edit_hero_path(@hero) if Current.user.admin? %>
+    <%= button_to "Delete", @hero, class: "link", method: :delete, data: { turbo_confirm: "Are you sure you want to delete #{@hero.name}?" } if Current.user.admin? %>
+  </nav>
 
-    <div class="bg-white rounded-lg border border-gray-200 p-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @hero.name %></h1>
-      <p class="text-lg text-gray-600 mb-6"><%= @hero.pronouns %> • <%= @hero.role.humanize %></p>
+  <article class="paper">
+    <div class="text-left gap-6 flex max-sm:flex-col">
+      <figure class="md:flex-1 w-full h-64 bg-stone-100 border-4 border-white shadow-md"></figure>
 
-      <!-- Action Buttons -->
-      <div class="flex flex-wrap gap-3">
-        <%= link_to "Edit", edit_hero_path(@hero), class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors" %>
-        <%= button_to "Delete", @hero, method: :delete, class: "px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium cursor-pointer transition-colors", data: { turbo_confirm: "Are you sure you want to delete #{@hero.name}?" } %>
+      <div class="md:flex-[2] space-y-4">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @hero.name %></h1>
+        <p class="text-sm text-stone-500"><%= @hero.pronouns %> • <%= @hero.traits.map(&:name).join(" • ") %> • <%= @hero.role.humanize %></p>
+
+        <%= @hero.backstory %>
       </div>
     </div>
-  </div>
 
-  <div class="grid grid-cols-3 justify-center gap-4">
-    <%= render @hero.traits %>
-  </div>
+    <div class="grid sm:grid-cols-3 justify-center border-t-2 border-current/20 pt-4 *:first:-rotate-1 *:last:rotate-1 *:last:-z-[1] *:shadow-md">
+      <%= render @hero.traits %>
+    </div>
+  </article>
 </main>

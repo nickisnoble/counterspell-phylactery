@@ -88,6 +88,21 @@ a:not([class]),
   .fun-interaction {
     @apply transition hover:scale-110 hover:-rotate-1 hover:shadow-xl focus:scale-105 focus:rotate-0;
   }
+
+  .paper {
+    @apply bg-white border border-black/10 px-4 py-8 md:px-8 md:py-16 relative shadow z-0 rotate-1 *:-rotate-1
+    flex flex-col gap-12
+    ;
+
+    &:before,
+    &:after {
+      content: "";
+      @apply absolute inset-0 bg-white border border-black/10 shadow -z-10;
+    }
+
+    &:before { @apply rotate-1 }
+    &:after { @apply -rotate-1 }
+  }
 }
 
 @layer utilities {
