@@ -16,22 +16,20 @@
     <%= form.text_field :name %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :pronouns %>
-    <div class="mt-2">
-      <%= form.collection_radio_buttons :pronouns, Hero.pronouns, :first, :first do |b| %>
-        <div>
-          <%= b.radio_button %>
-          <%= b.label %>
-        </div>
-      <% end %>
-    </div>
+    <div class="my-5">
+    <%= form.label :pronouns, "Pronouns" %>
+    <%= form.text_field :pronouns, list: "default-pronouns" %>
+    <datalist id="default-pronouns">
+      <option value="They/Them"></option>
+      <option value="She/Her"></option>
+      <option value="He/Him"></option>
+    </datalist>
   </div>
 
   <div class="my-5">
     <%= form.label :role %>
     <div class="mt-2">
-      <%= form.collection_radio_buttons :role, Hero.roles, :first, :first do |b| %>
+      <%= form.collection_radio_buttons :role, Hero.roles.keys, :to_s, ->(r){ r.titleize }  do |b| %>
         <div>
           <%= b.radio_button %>
           <%= b.label %>
@@ -40,19 +38,31 @@
     </div>
   </div>
 
+
+
+    <div class="my-5">
+    <%= form.label :summary %>
+    <%= form.rich_text_area :summary, toolbar: false %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :backstory %>
+    <%= form.rich_text_area :backstory %>
+  </div>
+
   <!-- Required Traits Section -->
   <div class="my-8">
     <h3 class="text-lg font-medium text-gray-900 mb-4">Required Traits</h3>
-    
+
     <% Hero::REQUIRED_TRAIT_TYPES.each do |trait_type| %>
       <div class="my-5">
         <%= label_tag "trait_ids_#{trait_type.downcase}", trait_type.titleize %>
-        
+
         <% traits_for_type = Trait.where(type: trait_type).order(:name) %>
         <% existing_trait = hero.traits.find { |t| t.type == trait_type } %>
         <% selected_value = existing_trait&.id %>
-        
-        <%= select_tag "trait_ids_#{trait_type.downcase}", 
+
+        <%= select_tag "trait_ids_#{trait_type.downcase}",
                        options_from_collection_for_select(traits_for_type, :id, :name, selected_value),
                        { prompt: "Select #{trait_type.titleize}..." } %>
       </div>
@@ -61,6 +71,6 @@
 
 
   <div>
-    <%= form.submit %>
+    <%= form.submit class: "btn" %>
   </div>
 <% end %>

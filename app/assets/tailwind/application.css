@@ -28,15 +28,7 @@
 }
 
 @layer base {
-
-}
-
-@layer components {
-  .btn {
-    @apply inline-block w-full sm:w-auto rounded-md px-4 py-2.5 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50 cursor-pointer;
-  }
-
-  a:not([class]),
+a:not([class]),
   .link {
     @apply underline decoration-dotted underline-offset-3 hover:decoration-solid cursor-pointer;
   }
@@ -79,13 +71,22 @@
     }
   }
 
-  .fun-interaction {
-    @apply transition hover:scale-110 hover:-rotate-1 hover:shadow-xl focus:scale-105 focus:rotate-0;
+  lexxy-editor {
+    @apply p-0 transition relative overflow-clip!;
   }
 
+  lexxy-toolbar {
+    @apply sticky! top-0 bg-inherit;
+  }
+}
 
-  lexxy-editor {
-    @apply p-0 transition;
+@layer components {
+  .btn {
+    @apply inline-block w-full sm:w-auto rounded-md px-4 py-2.5 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50 cursor-pointer;
+  }
+
+  .fun-interaction {
+    @apply transition hover:scale-110 hover:-rotate-1 hover:shadow-xl focus:scale-105 focus:rotate-0;
   }
 }
 
