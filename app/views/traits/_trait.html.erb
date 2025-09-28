@@ -1,21 +1,22 @@
-<div id="<%= dom_id trait %>" class="space-y-3">
-  <div>
-    <h3 class="font-semibold text-lg text-gray-900"><%= trait.name %></h3>
-    <p class="text-sm text-gray-500"><%= trait.slug %></p>
-
-    <%= trait.description %>
-  </div>
-  <% if trait.abilities.present? && trait.abilities.any? %>
-    <div>
-      <p class="text-sm font-medium text-gray-700 mb-2">Abilities:</p>
-      <div class="space-y-1">
-        <% trait.abilities.each do |name, description| %>
-          <div class="text-sm">
-            <span class="font-medium text-gray-900"><%= name %>:</span>
-            <span class="text-gray-600"><%= description %></span>
-          </div>
-        <% end %>
-      </div>
+<article id="<%= dom_id trait %>" class="rounded-2xl bg-white border-black/20 shadow max-w-[32ch] w-full aspect-[4/6] flex flex-col overflow-clip">
+  <header class="flex-[2] flex flex-col justify-end bg-stone-200">
+    <div class="flex justify-between items-end px-3 py-1">
+      <h3 class="text-left font-semibold text-2xl text-balance"><%= trait.name %></h3>
+      <p class="text-xs font-bold inline-block rounded px-1 py-px bg-yellow-500 my-1"><%= trait.type %></p>
     </div>
-  <% end %>
-</div>
+  </header>
+
+  <div class="p-3 flex-[3] flex flex-col gap-4 text-left">
+    <p class="italic text-pretty leading-snug font-light"><%= trait.description %></p>
+
+    <% if trait.abilities.present? && trait.abilities.any? %>
+      <ul class="space-y-2">
+          <% trait.abilities.each do |name, description| %>
+            <li class="text-sm">
+              <strong class="font-black uppercase text-xs"><%= name %>:</strong> <%= description %>
+            </li>
+          <% end %>
+      </ul>
+    <% end %>
+  </div>
+</article>

@@ -61,10 +61,6 @@ a:not([class]),
       focus-within:shadow-lg focus-within:border-white focus-within:outline-none focus-within:ring-1 focus-within:ring-yellow-500
       font-normal;
 
-    /* &:invalid {
-      @apply outline-2 outline-red-500;
-    } */
-
     &:disabled,
     &[disabled] {
       @apply opacity-50 rotate-0! scale-100! shadow-none! cursor-not-allowed;

@@ -13,23 +13,11 @@
   <div id="traits">
     <% if @traits.any? %>
       <% @traits.group_by(&:type).sort.each do |trait_type, traits_of_type| %>
-        <div class="mb-12">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-6 pb-2 border-b border-gray-200">
-            <%= trait_type.titleize %>
-          </h2>
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <% traits_of_type.each do |trait| %>
-              <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                <%= render trait %>
-                <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
-                  <%= link_to "Show", trait, class: "text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md font-medium transition-colors" %>
-                  <%= link_to "Edit", edit_trait_path(trait), class: "text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md font-medium transition-colors" %>
-                  <%= button_to "Destroy", trait, method: :delete, class: "text-sm px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium cursor-pointer transition-colors", data: { turbo_confirm: "Are you sure?" } %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        </div>
+        <h2 class="p-4 font-bold text-4xl border-b border-black/20 mb-8 mt-8"><%= trait_type.titleize.pluralize %></h2>
+
+        <ul class="flex flex-wrap gap-4 justify-center">
+          <%= render traits_of_type %>
+        </ul>
       <% end %>
     <% else %>
       <div class="text-center py-16">
