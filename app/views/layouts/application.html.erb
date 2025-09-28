@@ -22,6 +22,10 @@
     <%= stylesheet_link_tag "lexxy" %>
 
     <%= javascript_importmap_tags %>
+
+    <% if Rails.env.production? %>
+      <script defer src="https://api.pirsch.io/pa.js" id="pianjs" data-code="oKRec8iQLQgKJr21uIOfvES9jNpmrB3P"></script>
+    <% end %>
   </head>
 
   <body class="font-serif text-center text-blue-900 min-h-screen flex flex-col gap-8 bg-amber-50 p-6">
