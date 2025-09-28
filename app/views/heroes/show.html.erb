@@ -1,22 +1,17 @@
 <% content_for :title, @hero.name %>
 
 <main class="w-full max-w-4xl mx-auto">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
-
-  <!-- Header -->
   <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
       <%= link_to heroes_path, class: "text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center gap-1" do %>
         ← Back to Heroes
       <% end %>
     </div>
-    
+
     <div class="bg-white rounded-lg border border-gray-200 p-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @hero.name %></h1>
       <p class="text-lg text-gray-600 mb-6"><%= @hero.pronouns %> • <%= @hero.role.humanize %></p>
-      
+
       <!-- Action Buttons -->
       <div class="flex flex-wrap gap-3">
         <%= link_to "Edit", edit_hero_path(@hero), class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors" %>
@@ -25,42 +20,7 @@
     </div>
   </div>
 
-  <!-- Traits Section -->
-  <% if @hero.traits.any? %>
-    <div class="bg-white rounded-lg border border-gray-200 p-8">
-      <h2 class="text-xl font-semibold text-gray-900 mb-6">Traits</h2>
-      
-      <div class="grid gap-6 md:grid-cols-2">
-        <% @hero.traits.group_by(&:type).sort.each do |trait_type, traits_of_type| %>
-          <div>
-            <h3 class="text-lg font-medium text-gray-800 mb-3 pb-2 border-b border-gray-100">
-              <%= trait_type.titleize %>
-            </h3>
-            <% traits_of_type.each do |trait| %>
-              <div class="mb-4 last:mb-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h4 class="font-medium text-gray-900"><%= trait.name %></h4>
-                  <%= link_to "View", trait, class: "text-sm text-blue-600 hover:text-blue-800 font-medium" %>
-                </div>
-                <% if trait.abilities.present? && trait.abilities.any? %>
-                  <div class="space-y-2">
-                    <% trait.abilities.each do |name, description| %>
-                      <div class="bg-gray-50 rounded-md p-3">
-                        <div class="font-medium text-gray-800 text-sm"><%= name %></div>
-                        <div class="text-gray-600 text-sm mt-1"><%= description %></div>
-                      </div>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% else %>
-    <div class="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
-      <p class="text-gray-500">This hero has no traits assigned.</p>
-    </div>
-  <% end %>
+  <div class="grid grid-cols-3 justify-center gap-4">
+    <%= render @hero.traits %>
+  </div>
 </main>

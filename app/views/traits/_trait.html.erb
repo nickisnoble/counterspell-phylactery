@@ -1,4 +1,4 @@
-<article id="<%= dom_id trait %>" class="rounded-2xl bg-white border-black/20 shadow max-w-[32ch] w-full aspect-[4/6] flex flex-col overflow-clip">
+<article id="<%= dom_id trait %>" class="rounded-2xl bg-white border-black/20 shadow w-full aspect-[4/6] flex flex-col overflow-clip">
   <header class="flex-[2] flex flex-col justify-end bg-stone-200">
     <div class="flex justify-between items-end px-3 py-1">
       <h3 class="text-left font-semibold text-2xl text-balance"><%= trait.name %></h3>
@@ -6,14 +6,14 @@
     </div>
   </header>
 
-  <div class="p-3 flex-[3] flex flex-col gap-4 text-left">
+  <div class="p-3 flex-[3] flex flex-col gap-4 text-left text-sm">
     <p class="italic text-pretty leading-snug font-light"><%= trait.description %></p>
 
     <% if trait.abilities.present? && trait.abilities.any? %>
-      <ul class="space-y-2">
+      <ul class="space-y-2 text-xs">
           <% trait.abilities.each do |name, description| %>
-            <li class="text-sm">
-              <strong class="font-black uppercase text-xs"><%= name %>:</strong> <%= description %>
+            <li>
+              <strong class="font-black uppercase text-[0.8em]"><%= name %>:</strong> <%= description %>
             </li>
           <% end %>
       </ul>
