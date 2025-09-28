@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   resources :pages
-  root "events#index"
+
+  root "sessions#new"
 
   resources :events, only: :index
   resources :users, path: "players", except: %w[ index new create destroy ]

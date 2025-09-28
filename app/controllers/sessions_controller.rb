@@ -4,10 +4,10 @@ class SessionsController < ApplicationController
 
   def new
     if authenticated?
-      if !Current.user.display_name
+      if !Current.user.display_name.present?
         redirect_to edit_user_path(Current.user)
       else
-        redirect_to root_path
+        redirect_to events_path
       end
     end
   end
