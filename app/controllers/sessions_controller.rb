@@ -1,6 +1,14 @@
 class SessionsController < ApplicationController
+  rate_limit to: 3,
+             within: 5.minutes,
+             only: :create,
+             with: -> { redirect_to new_session_url, alert: "Try again later." }
+
+  include ActiveHashcash
+  before_action :check_hashcash, only: :create
+
   allow_unauthenticated_access only: %i[ new create verify validate ]
-  rate_limit to: 2, within: 5.minutes, only: %i[create validate], with: -> { redirect_to new_session_url, alert: "Try again later." }
+
 
   def new
     if authenticated?
@@ -59,5 +67,9 @@ class SessionsController < ApplicationController
 
     def redirect_if_authenticated
       redirect_to root_path if authenticated?
+    end
+
+    def hashcash_after_failure
+      redirect_back_or_to new_session_path, alert: "You might be a bot."
     end
 end

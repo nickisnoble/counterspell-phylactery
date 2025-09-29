@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_29_025709) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_29_032450) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -19,6 +19,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_025709) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+  end
+
+  create_table "active_hashcash_stamps", force: :cascade do |t|
+    t.string "version", null: false
+    t.integer "bits", null: false
+    t.date "date", null: false
+    t.string "resource", null: false
+    t.string "ext", null: false
+    t.string "rand", null: false
+    t.string "counter", null: false
+    t.string "request_path"
+    t.string "ip_address"
+    t.json "context"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.index ["counter", "rand", "date", "resource", "bits", "version", "ext"], name: "index_active_hashcash_stamps_unique", unique: true
+    t.index ["ip_address", "created_at"], name: "index_active_hashcash_stamps_on_ip_address_and_created_at", where: "ip_address IS NOT NULL"
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|

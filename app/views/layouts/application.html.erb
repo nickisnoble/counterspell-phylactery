@@ -38,6 +38,7 @@
     <%= stylesheet_link_tag "lexxy" %>
 
     <%= javascript_importmap_tags %>
+    <%= javascript_include_tag "hashcash", "data-turbo-track": "reload", defer: true %>
 
     <% if Rails.env.production? %>
       <script defer src="https://api.pirsch.io/pa.js" id="pianjs" data-code="oKRec8iQLQgKJr21uIOfvES9jNpmrB3P"></script>
@@ -59,6 +60,10 @@
         </nav>
       <% end %>
     </header>
+
+     <% if alert.present? %>
+      <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-md inline-block self-center" id="notice"><%= alert %></p>
+    <% end %>
 
     <% if notice.present? %>
       <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block self-center" id="notice"><%= notice %></p>

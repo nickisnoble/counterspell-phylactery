@@ -1,9 +1,0 @@
-<%= turbo_frame_tag "signin" do %>
-  <%= form_with url: session_path, class: "contents text-left" do |form| %>
-    <%= form.email_field :email,
-      required: true,
-      placeholder: "Enter your email address",
-      class: "text-center fun-interaction"
-    %>
-  <% end %>
-<% end %>

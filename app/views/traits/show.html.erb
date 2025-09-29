@@ -1,10 +1,6 @@
 <% content_for :title, @trait.name %>
 
 <main class="w-full max-w-4xl mx-auto">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
-
   <!-- Header -->
   <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
@@ -12,17 +8,17 @@
         ← Back to Traits
       <% end %>
     </div>
-    
+
     <div class="bg-white rounded-lg border border-gray-200 p-8">
       <div class="flex items-center gap-3 mb-4">
         <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-md uppercase tracking-wide">
           <%= @trait.type %>
         </span>
       </div>
-      
-      <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @trait.name %></h1>
+
+      <h1 class="text-3xl font-bold mb-2"><%= @trait.name %></h1>
       <p class="text-lg text-gray-500 mb-6"><%= @trait.slug %></p>
-      
+
       <!-- Action Buttons -->
       <div class="flex flex-wrap gap-3">
         <%= link_to "Edit", edit_trait_path(@trait), class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors" %>
@@ -35,7 +31,7 @@
   <% if @trait.abilities.present? && @trait.abilities.any? %>
     <div class="bg-white rounded-lg border border-gray-200 p-8 mb-8">
       <h2 class="text-xl font-semibold text-gray-900 mb-6">Abilities</h2>
-      
+
       <div class="space-y-4">
         <% @trait.abilities.each do |name, description| %>
           <div class="bg-gray-50 rounded-lg p-6 border border-gray-100">
@@ -56,7 +52,7 @@
   <% if heroes_with_trait.any? %>
     <div class="bg-white rounded-lg border border-gray-200 p-8">
       <h2 class="text-xl font-semibold text-gray-900 mb-6">Heroes with this trait</h2>
-      
+
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <% heroes_with_trait.each do |hero| %>
           <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
