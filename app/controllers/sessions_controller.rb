@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   allow_unauthenticated_access only: %i[ new create verify validate ]
-  rate_limit to: 5, within: 3.minutes, only: %i[create validate], with: -> { redirect_to new_session_url, alert: "Try again later." }
+  rate_limit to: 2, within: 5.minutes, only: %i[create validate], with: -> { redirect_to new_session_url, alert: "Try again later." }
 
   def new
     if authenticated?
