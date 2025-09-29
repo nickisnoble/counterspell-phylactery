@@ -31,6 +31,10 @@ class User < ApplicationRecord
     totp.verify(code, drift_behind: 60 * 5).present?
   end
 
+  def verify!
+    self.verified ||= true
+  end
+
   private
 
     def generate_otp_secret

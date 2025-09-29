@@ -39,6 +39,7 @@ class SessionsController < ApplicationController
     code = params.require(:code)
 
     if user = User.authenticate_by(email:, code:)
+      user.verify!
       start_new_session_for user
       session.delete(:awaiting_login)
 
