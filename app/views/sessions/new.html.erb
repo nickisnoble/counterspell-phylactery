@@ -16,7 +16,7 @@
       <p class="text-xl text-center">What will be <em>your</em> story?</p>
 
       <%= form_with url: session_path, class: "contents text-left" do |form| %>
-        <%#= hashcash_hidden_field_tag %>
+        <%= hashcash_hidden_field_tag %>
         <%= form.email_field :email,
           required: true,
           placeholder: "Enter your email address",
