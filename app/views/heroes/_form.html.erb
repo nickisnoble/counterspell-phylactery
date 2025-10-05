@@ -38,7 +38,23 @@
     </div>
   </div>
 
-
+  <%= form.label :portrait,
+      data: {
+        controller: "asset-preview",
+        action: "dragover->asset-preview#onDragOver dragleave->asset-preview#onDragLeave drop->asset-preview#onDrop paste->asset-preview#onPaste"
+    },
+    class: "my-5" do %>
+    <%= form.file_field :portrait,
+      direct_upload: true,
+      data: {
+        action: "change->asset-preview#update"
+      },
+      class: "w-full p-4 border border-dashed border-blue-500 bg-blue-500/5 hover:bg-blue-500/10 cursor-pointer#{(hero.portrait.attached? ? ' sr-only' : "")}" %>
+    <%= image_tag(url_for(hero.portrait),
+      id: "hero_portrait_preview",
+      class: "h-auto w-full object-cover") if hero.portrait.present?
+    %>
+  <% end %>
 
   <div class="my-5">
     <%= form.label :summary %>
