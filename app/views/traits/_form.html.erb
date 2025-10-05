@@ -21,6 +21,22 @@
     </datalist>
   </div>
 
+  <%= form.label :cover,
+      data: {
+        controller: "asset-preview",
+        action: "dragover->asset-preview#onDragOver dragleave->asset-preview#onDragLeave drop->asset-preview#onDrop paste->asset-preview#onPaste"
+    }, class: "block" do %>
+    <span class="text-left">Cover</span>
+    <%= form.file_field :cover,
+      direct_upload: true,
+      data: {
+        action: "change->asset-preview#update"
+      },
+      class: "w-full p-4 border border-dashed border-blue-500 bg-blue-500/5 hover:bg-blue-500/10 cursor-pointer#{(trait.cover.attached? ? ' sr-only' : "")}" %>
+
+     <%= image_tag(url_for(trait.cover), id: "trait_cover_preview", class: "h-auto w-full object-cover") if trait.cover.present? %>
+  <% end %>
+
   <div class="my-5">
     <%= form.label :name %>
     <%= form.text_field :name %>

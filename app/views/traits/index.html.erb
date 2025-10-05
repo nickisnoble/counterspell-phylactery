@@ -15,10 +15,10 @@
       <% @traits.group_by(&:type).sort.each do |trait_type, traits_of_type| %>
         <h2 class="p-4 font-bold text-4xl border-b border-black/20 mb-8 mt-8"><%= trait_type.titleize.pluralize %></h2>
 
-        <ul class="grid grid-cols-4 gap-6">
+        <ul class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
 
           <% traits_of_type.each do |trait| %>
-            <li class="rounded-xl bg-amber-100">
+            <li class="rounded-xl bg-amber-100 block w-max">
               <nav class="flex gap-2 px-2 py-1 opacity-50">
                 <%= link_to "Edit", edit_trait_path(trait) %>
                 <%= link_to "View", trait_path(trait) %>

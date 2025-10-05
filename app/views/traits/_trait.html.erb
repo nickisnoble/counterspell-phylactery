@@ -1,5 +1,5 @@
-<article id="<%= dom_id trait %>" class="rounded-2xl bg-white border-black/20 shadow w-full aspect-[4/6] flex flex-col overflow-clip">
-  <header class="flex-[2] flex flex-col justify-end bg-stone-200">
+<article id="<%= dom_id trait %>" class="rounded-2xl bg-white border-black/20 shadow w-full max-w-[3in] aspect-[4/6] flex flex-col overflow-clip">
+  <header class="flex-[2] flex flex-col justify-end bg-stone-200 bg-cover bg-center">
     <div class="flex justify-between items-start md:items-end px-3 py-1 max-sm:flex-col">
       <h3 class="text-left font-semibold text-2xl text-balance"><%= trait.name %></h3>
       <p class="text-xs font-bold inline-block rounded px-1 py-px bg-yellow-500 my-1 max-sm:-order-1"><%= trait.type %></p>
@@ -19,4 +19,12 @@
       </ul>
     <% end %>
   </div>
+
+  <% if trait.cover.attached? %>
+    <style>
+      #<%= dom_id trait%> header {
+        background-image: url(<%= url_for trait.cover %>);
+      }
+    </style>
+    <% end %>
 </article>

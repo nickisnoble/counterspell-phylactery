@@ -4,6 +4,7 @@ class Trait < ApplicationRecord
   include FriendlyPathable
 
   has_and_belongs_to_many :heroes
+  has_one_attached :cover
 
   validates :type, presence: :true, format: /[a-zA-Z]+/
   normalizes :type, with: ->(t) { t.strip.upcase }

@@ -10,19 +10,15 @@ import { Controller } from "@hotwired/stimulus"
       data: {
         controller: "asset-preview",
         action: "dragover->asset-preview#onDragOver dragleave->asset-preview#onDragLeave drop->asset-preview#onDrop paste->asset-preview#onPaste"
-    } do %>
+    }, class: "block" do %>
     <%= form.file_field :asset_field,
       direct_upload: true,
       data: {
         action: "change->asset-preview#update"
-      }
-
+      },
       class: "w-full p-4 border border-dashed border-blue-500 bg-blue-500/5 hover:bg-blue-500/10 cursor-pointer#{(record.asset_field.attached? ? ' sr-only' : "")}" %>
 
-     <%= image_tag(url_for(record.asset_field),
-      id: "record_asset_field_preview",
-      class: "h-auto w-full object-cover") if record.asset_field.present?
-    %>
+     <%= image_tag(url_for(record.asset_field), id: "record_asset_field_preview", class: "h-auto w-full object-cover") if record.asset_field.present? %>
   <% end %>
 */
 
