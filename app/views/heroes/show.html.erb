@@ -9,7 +9,9 @@
 
   <article class="paper">
     <div class="text-left gap-6 flex max-sm:flex-col">
-      <figure class="md:flex-1 w-full h-64 bg-stone-100 border-4 border-white shadow-md"></figure>
+      <figure class="md:flex-1 w-full h-64 bg-stone-100 border-4 border-white shadow-md">
+         <%= image_tag(url_for(@hero.portrait), class: "h-full w-full object-cover") if @hero.portrait.present? %>
+      </figure>
 
       <div class="md:flex-[2] space-y-4">
         <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @hero.name %></h1>

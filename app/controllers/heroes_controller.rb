@@ -66,7 +66,7 @@ class HeroesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def hero_params
-      permitted_params = params.expect(hero: [ :name, :pronouns, :role, :summary, :backstory ])
+      permitted_params = params.expect(hero: [ :name, :pronouns, :role, :summary, :backstory, :portrait ])
 
       # Handle required trait assignments
       trait_ids = []
