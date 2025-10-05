@@ -7,7 +7,7 @@ require "yaml"
 # Create admins
 admins = [ "nick", "marnie" ]
 admins.each do |name|
-  u = User.find_or_create_by(email: "#{name}@counterspell.games")
+  u = User.find_or_create_by(email: "#{name}@counterspell.games", display_name: name)
   u.admin!
 end
 
