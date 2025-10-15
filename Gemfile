@@ -48,7 +48,7 @@ group :production do
 end
 
 gem "rotp", "~> 6.3"
-gem "rack-attack", "~> 6.7"
+gem "rack-attack", "~> 6.8"
 gem "nondisposable", "~> 0.1.0"
 
 gem "dockerfile-rails", ">= 1.7", group: :development
