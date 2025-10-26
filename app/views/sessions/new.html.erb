@@ -54,13 +54,11 @@
 
         <label for="agree_to_terms" class="flex justify-center items-center gap-2 font-light italic">
           <%= checkbox_tag :agree_to_terms, "yes", true, required: true, class: "accent-purple-700 size-4" %>
-          <span>I agree to Counterspell’s <%= link_to "Terms", page_path("terms")  %> and <%= link_to "Privacy Policy", page_path("privacy-policy") %>.</span>
+          <span>I agree to Counterspell’s <%= link_to "Privacy Policy", page_path("privacy-policy") %>.</span>
         </label>
 
         <%= form.submit "Start your Journey", class: "btn mt-4" %>
-
       <% end %>
-
     </div>
   </div>
 </main>
