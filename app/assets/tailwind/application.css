@@ -27,6 +27,10 @@
   font-weight: 100 900;
 }
 
+@utility smallcaps {
+  font-variant: small-caps;
+}
+
 @layer base {
 a:not([class]),
   .link {
@@ -36,6 +40,48 @@ a:not([class]),
   label {
     @apply font-medium;
   }
+
+  *:disabled {
+    @apply opacity-80 cursor-not-allowed;
+  }
+
+  abbr {
+    @apply smallcaps;
+  }
+
+  [title] {
+    @apply cursor-help;
+  }
+
+  i {
+    @apply inline-block text-3xl leading-loose;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-block w-full sm:w-auto rounded-md px-4 py-2.5 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50 cursor-pointer;
+  }
+
+  .fun-interaction {
+    @apply transition hover:scale-110 hover:-rotate-1 hover:shadow-xl focus:scale-105 focus:rotate-0;
+  }
+
+  .paper {
+    @apply bg-white border border-black/10 px-4 py-8 md:px-8 md:py-16 relative shadow z-0 rotate-1 *:-rotate-1
+    flex flex-col gap-12
+    ;
+
+    &:before,
+    &:after {
+      content: "";
+      @apply absolute inset-0 bg-white border border-black/10 shadow -z-10;
+    }
+
+    &:before { @apply rotate-1 }
+    &:after { @apply -rotate-1 }
+  }
+
 
   label:has( + input),
   label:has( + select),
@@ -77,31 +123,6 @@ a:not([class]),
 
   lexxy-toolbar {
     @apply sticky! top-0 bg-inherit;
-  }
-}
-
-@layer components {
-  .btn {
-    @apply inline-block w-full sm:w-auto rounded-md px-4 py-2.5 text-center font-medium bg-purple-900 hover:opacity-90 active:opacity-100 text-amber-50 cursor-pointer;
-  }
-
-  .fun-interaction {
-    @apply transition hover:scale-110 hover:-rotate-1 hover:shadow-xl focus:scale-105 focus:rotate-0;
-  }
-
-  .paper {
-    @apply bg-white border border-black/10 px-4 py-8 md:px-8 md:py-16 relative shadow z-0 rotate-1 *:-rotate-1
-    flex flex-col gap-12
-    ;
-
-    &:before,
-    &:after {
-      content: "";
-      @apply absolute inset-0 bg-white border border-black/10 shadow -z-10;
-    }
-
-    &:before { @apply rotate-1 }
-    &:after { @apply -rotate-1 }
   }
 }
 

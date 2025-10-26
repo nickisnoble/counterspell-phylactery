@@ -1,11 +1,11 @@
 class SessionsController < ApplicationController
+  include ActiveHashcash
+  before_action :check_hashcash, only: :create
+
   rate_limit to: 3,
              within: 5.minutes,
              only: :create,
              with: -> { redirect_to new_session_url, alert: "Try again later." }
-
-  include ActiveHashcash
-  before_action :check_hashcash, only: :create
 
   allow_unauthenticated_access only: %i[ new create verify validate ]
 

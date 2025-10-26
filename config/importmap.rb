@@ -9,3 +9,5 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 pin "lexxy", to: "lexxy.js"
 pin "@rails/activestorage", to: "activestorage.esm.js" # to support attachments
 pin "@rails/actiontext", to: "actiontext.esm.js"
+
+pin "hashcash", to: "hashcash.js"

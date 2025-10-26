@@ -38,14 +38,14 @@
     <%= stylesheet_link_tag "lexxy" %>
 
     <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "hashcash", "data-turbo-track": "reload", defer: true %>
+    <script src="https://kit.fontawesome.com/8bcb00a03e.js" crossorigin="anonymous"></script>
 
     <% if Rails.env.production? %>
       <script defer src="https://api.pirsch.io/pa.js" id="pianjs" data-code="oKRec8iQLQgKJr21uIOfvES9jNpmrB3P"></script>
     <% end %>
   </head>
 
-  <body class="font-serif text-center text-blue-900 min-h-screen flex flex-col gap-8 bg-amber-50 p-6">
+  <body class="flex flex-col gap-8 bg-amber-50 p-6 min-h-screen font-serif text-blue-900 text-center">
 
     <header class="flex flex-col justify-center items-center gap-2">
       <%= link_to events_path, class: "block h-20" do %>
@@ -53,7 +53,7 @@
       <% end %>
 
       <% if authenticated? %>
-        <nav class="justify-self-end flex gap-4">
+        <nav class="flex justify-self-end gap-4">
           <%= link_to "Admin Dash", dashboard_path if Current.user.admin? %>
           <%= link_to "Preferences", edit_user_path(Current.user) %>
           <%= button_to "Logout", session_path, method: :delete, class: "inline link" %>
@@ -62,16 +62,16 @@
     </header>
 
      <% if alert.present? %>
-      <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-md inline-block self-center" id="notice"><%= alert %></p>
+      <p class="inline-block self-center bg-red-50 mb-5 px-3 py-2 rounded-md font-medium text-red-500" id="notice"><%= alert %></p>
     <% end %>
 
     <% if notice.present? %>
-      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block self-center" id="notice"><%= notice %></p>
+      <p class="inline-block self-center bg-green-50 mb-5 px-3 py-2 rounded-md font-medium text-green-500" id="notice"><%= notice %></p>
     <% end %>
 
     <%= yield %>
 
-    <footer class="text-center text-xs mt-auto flex max-sm:flex-col justify-center items-center gap-2">
+    <footer class="flex max-sm:flex-col justify-center items-center gap-2 mt-auto text-xs text-center">
       <p class="text-balance">&copy;2025 Counterspell Games LLC, all rights reserved.</p>
       <nav class="flex justify-center items-center gap-1.5">
         <% Page.all.each do |t| %>
