@@ -1,6 +1,6 @@
 <% content_for :title, @hero.name %>
 
-<main class="w-full max-w-4xl mx-auto">
+<main class="mx-auto w-full max-w-4xl">
   <nav class="flex justify-center gap-3 p-4">
     <%= link_to "← Back to Heroes", heroes_path %>
     <%= link_to "Edit", edit_hero_path(@hero) if Current.user.admin? %>
@@ -8,20 +8,20 @@
   </nav>
 
   <article class="paper">
-    <div class="text-left gap-6 flex max-sm:flex-col">
-      <figure class="md:flex-1 w-full h-64 bg-stone-100 border-4 border-white shadow-md">
-         <%= image_tag(url_for(@hero.portrait), class: "h-full w-full object-cover") if @hero.portrait.present? %>
+    <div class="flex max-sm:flex-col items-start gap-6 text-left">
+      <figure class="md:flex-1 bg-stone-100 shadow-md border-4 border-white w-full h-64">
+         <%= image_tag(url_for(@hero.portrait)) if @hero.portrait.present? %>
       </figure>
 
-      <div class="md:flex-[2] space-y-4">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @hero.name %></h1>
-        <p class="text-sm text-stone-500"><%= @hero.pronouns %> • <%= @hero.traits.map(&:name).join(" • ") %> • <%= @hero.role.humanize %></p>
+      <div class="md:flex-2 space-y-4">
+        <h1 class="mb-2 font-bold text-gray-900 text-3xl"><%= @hero.name %></h1>
+        <p class="text-stone-500 text-sm"><%= @hero.pronouns %> • <%= @hero.traits.map(&:name).join(" • ") %> • <%= @hero.role.humanize %></p>
 
         <%= @hero.backstory %>
       </div>
     </div>
 
-    <div class="grid sm:grid-cols-3 justify-center border-t-2 border-current/20 pt-4 *:first:-rotate-1 *:last:rotate-1 *:last:-z-[1] *:shadow-md">
+    <div class="*:last:-z-1 justify-center grid sm:grid-cols-3 *:shadow-md pt-4 border-current/20 border-t-2 *:first:-rotate-1 *:last:rotate-1">
       <%= render @hero.traits %>
     </div>
   </article>
