@@ -5,16 +5,20 @@ class PagesController < ApplicationController
 
   def index
     @pages = Page.all
+    render Pages::Index.new(pages: @pages)
   end
 
   def show
+    render Pages::Show.new(page: @page)
   end
 
   def new
     @page = Page.new
+    render Pages::New.new(page: @page)
   end
 
   def edit
+    render Pages::Edit.new(page: @page)
   end
 
   def create
@@ -25,7 +29,7 @@ class PagesController < ApplicationController
         format.html { redirect_to @page, notice: "Page was successfully created." }
         format.json { render :show, status: :created, location: @page }
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render Pages::New.new(page: @page), status: :unprocessable_entity }
         format.json { render json: @page.errors, status: :unprocessable_entity }
       end
     end
@@ -38,7 +42,7 @@ class PagesController < ApplicationController
         format.html { redirect_to @page, notice: "Page was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @page }
       else
-        format.html { render :edit, status: :unprocessable_entity }
+        format.html { render Pages::Edit.new(page: @page), status: :unprocessable_entity }
         format.json { render json: @page.errors, status: :unprocessable_entity }
       end
     end

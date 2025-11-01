@@ -4,16 +4,20 @@ class TraitsController < ApplicationController
 
   def index
     @traits = Trait.all
+    render Traits::Index.new(traits: @traits)
   end
 
   def show
+    render Traits::Show.new(trait: @trait, current_user: Current.user)
   end
 
   def new
     @trait = Trait.new
+    render Traits::New.new(trait: @trait)
   end
 
   def edit
+    render Traits::Edit.new(trait: @trait)
   end
 
   def create
@@ -33,7 +37,7 @@ class TraitsController < ApplicationController
           }, status: :created
         }
       else
-        format.html { render :new, status: :unprocessable_content }
+        format.html { render Traits::New.new(trait: @trait), status: :unprocessable_content }
         format.json {
           render json: {
             success: false,
@@ -50,7 +54,7 @@ class TraitsController < ApplicationController
         format.html { redirect_to @trait, notice: "Trait was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @trait }
       else
-        format.html { render :edit, status: :unprocessable_content }
+        format.html { render Traits::Edit.new(trait: @trait), status: :unprocessable_content }
         format.json { render json: @trait.errors, status: :unprocessable_content }
       end
     end
@@ -63,7 +67,7 @@ class TraitsController < ApplicationController
         format.json { head :no_content }
       else
         @trait.errors.add(:heroes, "still referenced by #{@trait.heroes.map(&:name).join(", ")}")
-        format.html { render :edit, status: :unprocessable_content }
+        format.html { render Traits::Edit.new(trait: @trait), status: :unprocessable_content }
         format.json { render json: @trait.errors, status: :unprocessable_content }
       end
     end

@@ -17,6 +17,8 @@ class SessionsController < ApplicationController
       else
         redirect_to events_path
       end
+    else
+      render Sessions::New.new
     end
   end
 
@@ -24,7 +26,7 @@ class SessionsController < ApplicationController
     @user = User.find_or_initialize_by(email: params.require(:email))
 
     if @user.new_record? && !@user.save
-      render :new, status: :unprocessable_content, alert: @user.errors.full_messages.to_sentence
+      render Sessions::New.new, status: :unprocessable_content, alert: @user.errors.full_messages.to_sentence
       return
     end
 
@@ -40,6 +42,7 @@ class SessionsController < ApplicationController
   end
 
   def verify
+    render Sessions::Verify.new(awaiting_login: session[:awaiting_login])
   end
 
   def validate

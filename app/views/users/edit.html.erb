@@ -1,7 +1,0 @@
-<% content_for :title, "Editing user" %>
-
-<main class="w-full max-w-screen-sm mx-auto">
-  <h1 class="font-bold text-4xl text-balance"><%= @user.display_name.present? ? "Settings" : "Introducing our newest #{@user.system_role}:" %></h1>
-
-  <%= render "form", user: @user %>
-</main>
