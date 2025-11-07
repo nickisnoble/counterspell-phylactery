@@ -44,7 +44,7 @@ group :test do
 end
 
 group :production do
-  gem "resend", "~> 0.27.0"
+  gem "resend", "~> 1.0.0"
 end
 
 gem "rotp", "~> 6.3"
