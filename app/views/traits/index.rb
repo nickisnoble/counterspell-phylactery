@@ -27,7 +27,7 @@ class Views::Traits::Index < Views::Base
                     link_to "View", trait_path(trait)
                   end
 
-                  render Components::TraitCard.new(trait: trait)
+                  TraitCard(trait: trait)
                 end
               end
             end

@@ -14,7 +14,7 @@ class Views::Traits::Show < Views::Base
           link_to "Edit", edit_trait_path(@trait) if @current_user.admin?
         end
 
-        render Components::TraitCard.new(trait: @trait)
+        TraitCard(trait: @trait)
       end
     end
   end

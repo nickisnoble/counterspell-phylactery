@@ -16,7 +16,7 @@ class Views::Pages::Index < Views::Base
         if @pages.any?
           @pages.each do |page|
             div class: "flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0" do
-              render Components::PageCard.new(page: page)
+              PageCard(page: page)
 
               div class: "w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2" do
                 link_to "Show", page, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium"

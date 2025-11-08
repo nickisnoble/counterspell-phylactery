@@ -7,7 +7,7 @@ class Views::Pages::Show < Views::Base
     content_for :title, "Showing page"
 
     main class: "md:w-2/3 w-full mx-auto" do
-      render Components::PageCard.new(page: @page)
+      PageCard(page: @page)
     end
   end
 end

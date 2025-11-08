@@ -17,7 +17,7 @@ class Views::Heroes::Index < Views::Base
           div class: "grid gap-6 md:grid-cols-2 lg:grid-cols-3" do
             @heroes.each do |hero|
               div class: "bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow" do
-                render Components::HeroCard.new(hero: hero)
+                HeroCard(hero: hero)
 
                 div class: "flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100" do
                   link_to "Show", hero, class: "text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md font-medium transition-colors"

@@ -17,7 +17,7 @@ class Views::Heroes::Show < Views::Base
         end
       end
 
-      render Components::Paper.new do
+      Paper do
         div class: "flex max-sm:flex-col items-start gap-6 text-left" do
           figure class: "md:flex-1 bg-stone-100 shadow-md border-4 border-white w-full h-64" do
             if @hero.portrait.present?
@@ -41,7 +41,7 @@ class Views::Heroes::Show < Views::Base
 
         div class: "*:last:-z-1 justify-center grid sm:grid-cols-3 *:shadow-md pt-4 border-current/20 border-t-2 *:first:-rotate-1 *:last:rotate-1" do
           @hero.traits.each do |trait|
-            render Components::TraitCard.new(trait: trait)
+            TraitCard(trait: trait)
           end
         end
       end
