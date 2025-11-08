@@ -45,9 +45,9 @@ class Views::Users::FormComponent < Views::Base
   private
 
   def bio_label_text
-    if helpers.Current.user.admin?
+    if Current.user.admin?
       "What would you like our players to know about you?"
-    elsif helpers.Current.user.gm?
+    elsif Current.user.gm?
       "What would you like players to know about you?"
     else
       "What would you like our event staff to know about you?"

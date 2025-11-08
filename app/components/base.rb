@@ -16,6 +16,14 @@ class Components::Base < Phlex::HTML
 
   if respond_to?(:register_value_helper)
     register_value_helper :content_for
+    register_value_helper :Current
+    register_value_helper :authenticated?
+    register_value_helper :alert
+    register_value_helper :notice
+  end
+
+  if respond_to?(:register_output_helper)
+    register_output_helper :hashcash_hidden_field_tag
   end
 
   if Rails.env.development?

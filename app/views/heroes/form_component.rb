@@ -77,9 +77,9 @@ class Views::Heroes::FormComponent < Views::Base
             existing_trait = @hero.traits.find { |t| t.type == trait_type }
             selected_value = existing_trait&.id
 
-            select_tag "trait_ids_#{trait_type.downcase}",
-              options_from_collection_for_select(traits_for_type, :id, :name, selected_value),
-              { prompt: "Select #{trait_type.titleize}..." }
+            select_tag "trait_ids_#{trait_type.downcase}", { prompt: "Select #{trait_type.titleize}..." } do
+              options_from_collection_for_select(traits_for_type, :id, :name, selected_value)
+            end
           end
         end
       end

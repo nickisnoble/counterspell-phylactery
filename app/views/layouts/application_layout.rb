@@ -63,10 +63,10 @@ class Views::Layouts::ApplicationLayout < Views::Base
         image_tag "counterspell-icon.svg", class: "h-full drop-shadow rotate-0 transition-transform transition-discrete transition-[filter] hover:rotate-3 hover:scale-110 hover:drop-shadow-lg"
       end
 
-      if helpers.authenticated?
+      if authenticated?
         nav class: "flex justify-self-end gap-4" do
-          link_to "Admin Dash", dashboard_path if helpers.Current.user.admin?
-          link_to "Preferences", edit_user_path(helpers.Current.user)
+          link_to "Admin Dash", dashboard_path if Current.user.admin?
+          link_to "Preferences", edit_user_path(Current.user)
           button_to "Logout", session_path, method: :delete, class: "inline link"
         end
       end
@@ -74,15 +74,15 @@ class Views::Layouts::ApplicationLayout < Views::Base
   end
 
   def render_flash
-    if helpers.alert.present?
+    if alert.present?
       p class: "inline-block self-center bg-red-50 mb-5 px-3 py-2 rounded-md font-medium text-red-500", id: "notice" do
-        helpers.alert
+        alert
       end
     end
 
-    if helpers.notice.present?
+    if notice.present?
       p class: "inline-block self-center bg-green-50 mb-5 px-3 py-2 rounded-md font-medium text-green-500", id: "notice" do
-        helpers.notice
+        notice
       end
     end
   end

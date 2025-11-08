@@ -6,9 +6,9 @@ class Views::Layouts::MailerLayout < Views::Base
 
     html do
       head do
-        meta "http-equiv": "Content-Type", content: "text/html; charset=utf-8"
+        meta charset: "UTF-8"
         style do
-          raw "/* Email styles need to be inline */"
+          plain "/* Email styles need to be inline */"
         end
       end
 

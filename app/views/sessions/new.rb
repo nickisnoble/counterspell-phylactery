@@ -70,7 +70,7 @@ class Views::Sessions::New < Views::Base
         end
 
         form_with url: session_path, class: "space-y-2" do |form|
-          raw helpers.hashcash_hidden_field_tag
+          hashcash_hidden_field_tag
 
           form.email_field :email,
             required: true,

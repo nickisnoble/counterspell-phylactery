@@ -8,7 +8,7 @@ class Views::AuthenticationMailer::OneTimeCode < Views::Base
 
     html do
       head do
-        meta content: "text/html; charset=UTF-8", "http-equiv": "Content-Type"
+        meta charset: "UTF-8"
       end
 
       body do
