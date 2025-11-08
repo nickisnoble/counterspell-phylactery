@@ -1,4 +1,4 @@
-class Sessions::New < ApplicationComponent
+class Views::Sessions::New < Views::Base
   include Phlex::Rails::Helpers::CheckboxTag
   include Phlex::Rails::Helpers::JavascriptIncludeTag
 
@@ -62,7 +62,7 @@ class Sessions::New < ApplicationComponent
         end
       end
 
-      scection class: "space-y-6 text-center" do
+      section class: "space-y-6 text-center" do
         p class: "text-xl text-center" do
           plain "The Rift awaits. What will be "
           em { "your" }
@@ -70,7 +70,7 @@ class Sessions::New < ApplicationComponent
         end
 
         form_with url: session_path, class: "space-y-2" do |form|
-          unsafe_raw helpers.hashcash_hidden_field_tag
+          raw helpers.hashcash_hidden_field_tag
 
           form.email_field :email,
             required: true,

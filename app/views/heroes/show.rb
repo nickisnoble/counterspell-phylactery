@@ -1,4 +1,4 @@
-class Heroes::Show < ApplicationComponent
+class Views::Heroes::Show < Views::Base
   def initialize(hero:, current_user:)
     @hero = hero
     @current_user = current_user
@@ -35,7 +35,7 @@ class Heroes::Show < ApplicationComponent
               plain @hero.role.humanize
             end
 
-            unsafe_raw @hero.backstory
+            raw @hero.backstory.to_s
           end
         end
 

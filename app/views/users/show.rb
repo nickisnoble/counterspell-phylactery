@@ -1,4 +1,4 @@
-class Users::Show < ApplicationComponent
+class Views::Users::Show < Views::Base
   def initialize(user:)
     @user = user
   end
@@ -11,7 +11,7 @@ class Users::Show < ApplicationComponent
         h2(class: "font-bold text-4xl") { @user.display_name }
 
         div class: "text-left" do
-          unsafe_raw @user.bio
+          raw @user.bio.to_s
         end
       end
     end

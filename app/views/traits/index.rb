@@ -1,4 +1,4 @@
-class Traits::Index < ApplicationComponent
+class Views::Traits::Index < Views::Base
   def initialize(traits:)
     @traits = traits
   end

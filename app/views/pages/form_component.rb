@@ -1,4 +1,4 @@
-class Pages::FormComponent < ApplicationComponent
+class Views::Pages::FormComponent < Views::Base
   def initialize(page:)
     @page = page
   end

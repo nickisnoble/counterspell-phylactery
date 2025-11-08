@@ -1,4 +1,4 @@
-class ActiveStorage::Blobs::Blob < ApplicationComponent
+class Views::ActiveStorage::Blobs::Blob < Views::Base
   include Phlex::Rails::Helpers::NumberToHumanSize
 
   def initialize(blob:, in_gallery: false)

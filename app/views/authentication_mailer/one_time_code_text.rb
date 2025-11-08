@@ -1,4 +1,4 @@
-class AuthenticationMailer::OneTimeCodeText < ApplicationComponent
+class Views::AuthenticationMailer::OneTimeCodeText < Views::Base
   def initialize(code:)
     @code = code
   end

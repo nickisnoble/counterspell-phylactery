@@ -1,4 +1,4 @@
-class Heroes::New < ApplicationComponent
+class Views::Heroes::New < Views::Base
   def initialize(hero:)
     @hero = hero
   end

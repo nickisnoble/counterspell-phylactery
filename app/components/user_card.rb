@@ -1,4 +1,4 @@
-class Components::UserCard < ApplicationComponent
+class Components::UserCard < Views::Base
   def initialize(user:)
     @user = user
   end

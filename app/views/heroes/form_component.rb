@@ -1,4 +1,4 @@
-class Heroes::FormComponent < ApplicationComponent
+class Views::Heroes::FormComponent < Views::Base
   include Phlex::Rails::Helpers::CollectionRadioButtons
   include Phlex::Rails::Helpers::SelectTag
   include Phlex::Rails::Helpers::OptionsFromCollectionForSelect

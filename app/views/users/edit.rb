@@ -1,4 +1,4 @@
-class Users::Edit < ApplicationComponent
+class Views::Users::Edit < Views::Base
   def initialize(user:)
     @user = user
   end

@@ -1,4 +1,4 @@
-class Traits::Show < ApplicationComponent
+class Views::Traits::Show < Views::Base
   def initialize(trait:, current_user:)
     @trait = trait
     @current_user = current_user
@@ -10,7 +10,7 @@ class Traits::Show < ApplicationComponent
     main class: "flex justify-center items-center" do
       div class: "max-w-[3in]" do
         nav class: "flex gap-2 px-2 py-1 opacity-50" do
-          unsafe_raw link_to("&larr; back to traits", traits_path)
+          raw link_to("&larr; back to traits", traits_path)
           link_to "Edit", edit_trait_path(@trait) if @current_user.admin?
         end
 

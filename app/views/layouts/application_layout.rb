@@ -1,4 +1,4 @@
-class Layouts::ApplicationLayout < ApplicationComponent
+class Views::Layouts::ApplicationLayout < Views::Base
   include Phlex::Rails::Layout
 
   def view_template(&block)
@@ -29,7 +29,7 @@ class Layouts::ApplicationLayout < ApplicationComponent
         meta name: "twitter:description", content: "Play table top adventures irl, whether you're a complete beginner or new to the hobby, there's a place in our world for you."
         meta name: "twitter:image", content: "https://counterspell.games/og-image.jpg"
 
-        unsafe_raw content_for(:head)
+        raw content_for(:head)
 
         link rel: "icon", href: "/icon.png", type: "image/png"
         link rel: "icon", href: "/icon.svg", type: "image/svg+xml"

@@ -1,4 +1,4 @@
-class Layouts::ActionText::Contents::Content < ApplicationComponent
+class Views::Layouts::ActionText::Contents::Content < Views::Base
   def view_template(&block)
     div class: "lexxy-content" do
       yield_content(&block)

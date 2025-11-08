@@ -1,4 +1,4 @@
-class Sessions::Verify < ApplicationComponent
+class Views::Sessions::Verify < Views::Base
   def initialize(awaiting_login:)
     @awaiting_login = awaiting_login
   end

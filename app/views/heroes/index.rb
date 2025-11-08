@@ -1,4 +1,4 @@
-class Heroes::Index < ApplicationComponent
+class Views::Heroes::Index < Views::Base
   def initialize(heroes:)
     @heroes = heroes
   end

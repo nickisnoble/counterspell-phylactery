@@ -1,4 +1,4 @@
-class Users::FormComponent < ApplicationComponent
+class Views::Users::FormComponent < Views::Base
   def initialize(user:)
     @user = user
   end

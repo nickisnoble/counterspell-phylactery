@@ -1,4 +1,4 @@
-class Traits::Edit < ApplicationComponent
+class Views::Traits::Edit < Views::Base
   def initialize(trait:)
     @trait = trait
   end

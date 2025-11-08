@@ -1,4 +1,4 @@
-class Traits::FormComponent < ApplicationComponent
+class Views::Traits::FormComponent < Views::Base
   def initialize(trait:)
     @trait = trait
   end

@@ -1,4 +1,4 @@
-class Events::Index < ApplicationComponent
+class Views::Events::Index < Views::Base
   def view_template
     main class: "flex-1 flex flex-col gap-8" do
       h1(class: "font-bold text-3xl") { "Upcoming Sessions" }

@@ -1,4 +1,4 @@
-class Components::HeroCard < ApplicationComponent
+class Components::HeroCard < Views::Base
   def initialize(hero:)
     @hero = hero
   end
@@ -15,7 +15,7 @@ class Components::HeroCard < ApplicationComponent
           plain " • "
           plain @hero.role.humanize
         end
-        unsafe_raw @hero.summary
+        raw @hero.summary.to_s
       end
 
       div do

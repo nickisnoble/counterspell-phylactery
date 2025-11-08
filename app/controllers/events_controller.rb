@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
   def index
-    render Events::Index.new
+    render Views::Events::Index.new
   end
 end

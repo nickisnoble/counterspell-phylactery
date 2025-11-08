@@ -1,4 +1,4 @@
-class Components::TraitCard < ApplicationComponent
+class Components::TraitCard < Views::Base
   def initialize(trait:)
     @trait = trait
   end
@@ -33,7 +33,7 @@ class Components::TraitCard < ApplicationComponent
       # Inline style for cover image background
       if @trait.cover.attached?
         style do
-          unsafe_raw "##{dom_id(@trait)} header { background-image: url(#{url_for(@trait.cover)}); }"
+          raw "##{dom_id(@trait)} header { background-image: url(#{url_for(@trait.cover)}); }"
         end
       end
     end
