@@ -74,17 +74,10 @@ class Views::Layouts::ApplicationLayout < Views::Base
   end
 
   def render_flash
-    if alert.present?
-      p class: "inline-block self-center bg-red-50 mb-5 px-3 py-2 rounded-md font-medium text-red-500", id: "notice" do
-        alert
-      end
-    end
-
-    if notice.present?
-      p class: "inline-block self-center bg-green-50 mb-5 px-3 py-2 rounded-md font-medium text-green-500", id: "notice" do
-        notice
-      end
-    end
+    # Render flash messages as separate components
+    # Using render? method encapsulates the conditional logic
+    render FlashMessage.new(message: alert, type: :alert)
+    render FlashMessage.new(message: notice, type: :notice)
   end
 
   def render_footer

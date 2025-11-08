@@ -32,4 +32,10 @@ class Components::Base < Phlex::HTML
       super
     end
   end
+
+  # Configure cache store for fragment caching
+  # Uses Rails.cache by default, which is compatible with Phlex
+  def cache_store
+    Rails.cache
+  end
 end
