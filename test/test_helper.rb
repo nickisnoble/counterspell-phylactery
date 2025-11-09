@@ -1,7 +1,6 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
-require "rails/test_help"
 
 require "minitest/reporters"
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
@@ -26,7 +25,7 @@ module ActiveSupport
     end
 
     def be_authenticated!
-      @user = User.create(email: "nick@miniware.team")
+      @user = User.create(email: "test@example.com")
       login_with_otp(@user.email)
     end
 

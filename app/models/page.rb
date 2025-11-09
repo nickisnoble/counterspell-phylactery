@@ -1,7 +1,6 @@
 class Page < ApplicationRecord
   include Sluggable
 
-  normalizes :name, with: ->(f) { f.strip.squish }
   validates :title, presence: true, uniqueness: { case_sensitive: false }
 
   has_rich_text :body

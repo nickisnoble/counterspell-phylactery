@@ -44,6 +44,12 @@ class SessionsController < ApplicationController
 
   def validate
     email = session[:awaiting_login]
+
+    unless email.present?
+      redirect_to new_session_path, alert: "Session expired. Please try again."
+      return
+    end
+
     code = params.require(:code)
 
     if user = User.authenticate_by(email:, code:)
@@ -64,10 +70,6 @@ class SessionsController < ApplicationController
 
 
   private
-
-    def redirect_if_authenticated
-      redirect_to root_path if authenticated?
-    end
 
     def hashcash_after_failure
       redirect_back_or_to new_session_path, alert: "You might be a bot."

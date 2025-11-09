@@ -25,8 +25,8 @@ class PagesController < ApplicationController
         format.html { redirect_to @page, notice: "Page was successfully created." }
         format.json { render :show, status: :created, location: @page }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @page.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @page.errors, status: :unprocessable_content }
       end
     end
   end
@@ -38,8 +38,8 @@ class PagesController < ApplicationController
         format.html { redirect_to @page, notice: "Page was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @page }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @page.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @page.errors, status: :unprocessable_content }
       end
     end
   end
