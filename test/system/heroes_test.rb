@@ -131,14 +131,14 @@ class HeroesTest < ApplicationSystemTestCase
 
   def login_as_admin
     visit new_session_path
-    fill_in "Email", with: "admin@example.com"
-    click_button "Send Login Code"
-    
+    fill_in "email", with: "admin@example.com"
+    click_button "Start your Journey"
+
     # Find the user and get their OTP code
     user = User.find_by(email: "admin@example.com")
-    otp = user.auth_code
-    
-    fill_in "Code", with: otp
-    click_button "Sign In"
+    otp = user.reload.auth_code
+
+    fill_in "code", with: otp
+    click_button "Verify"
   end
 end

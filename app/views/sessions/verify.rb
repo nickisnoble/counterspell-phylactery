@@ -10,8 +10,9 @@ class Views::Sessions::Verify < Views::Base
         plain "Runes were conjured and sent to #{@awaiting_login} — please cast them hence:"
       end
 
-      form_with url: validate_session_path, data: { turbo_frame: "_top" } do |f|
+      form_with url: validate_session_path, data: { turbo_frame: "_top" }, class: "space-y-4" do |f|
         f.text_field :code, required: true, placeholder: "000000", class: "text-center fun-interaction"
+        f.submit "Verify", class: "btn"
       end
     end
   end

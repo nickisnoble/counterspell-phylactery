@@ -11,7 +11,7 @@ class TurboFlashTest < ApplicationSystemTestCase
     click_on "Start your Journey"
 
     # Complete OTP verification
-    code = @admin.auth_code
+    code = @admin.reload.auth_code
     fill_in "code", with: code
     click_on "Verify"
   end
