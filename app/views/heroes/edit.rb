@@ -9,7 +9,7 @@ class Views::Heroes::Edit < Views::Base
     main class: "md:w-2/3 w-full mx-auto" do
       h1(class: "font-bold text-4xl") { "Editing hero" }
 
-      turbo_frame_tag :hero_form do
+      turbo_frame_tag dom_id(@hero), data: { turbo_action: "advance" } do
         render Views::Heroes::FormComponent.new(hero: @hero)
       end
 

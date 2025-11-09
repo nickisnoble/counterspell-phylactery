@@ -6,7 +6,7 @@ class Views::Heroes::FormFrame < Views::Base
   end
 
   def view_template
-    turbo_frame_tag :hero_form do
+    turbo_frame_tag dom_id(@hero) do
       render Views::Heroes::FormComponent.new(hero: @hero)
     end
   end

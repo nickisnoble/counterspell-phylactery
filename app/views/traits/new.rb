@@ -9,7 +9,7 @@ class Views::Traits::New < Views::Base
     div class: "md:w-2/3 w-full mx-auto" do
       h1(class: "font-bold text-4xl") { "New trait" }
 
-      turbo_frame_tag :trait_form do
+      turbo_frame_tag dom_id(@trait), data: { turbo_action: "advance" } do
         render Views::Traits::FormComponent.new(trait: @trait)
       end
 

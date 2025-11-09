@@ -9,7 +9,7 @@ class Views::Pages::Edit < Views::Base
     main class: "w-full max-w-screen-sm mx-auto" do
       h1(class: "font-bold text-4xl") { "Editing page" }
 
-      turbo_frame_tag :page_form do
+      turbo_frame_tag dom_id(@page), data: { turbo_action: "advance" } do
         render Views::Pages::FormComponent.new(page: @page)
       end
 

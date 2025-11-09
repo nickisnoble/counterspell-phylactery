@@ -6,7 +6,7 @@ class Views::Users::FormFrame < Views::Base
   end
 
   def view_template
-    turbo_frame_tag :user_form do
+    turbo_frame_tag dom_id(@user) do
       render Views::Users::FormComponent.new(user: @user)
     end
   end

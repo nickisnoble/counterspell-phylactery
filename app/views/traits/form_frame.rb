@@ -6,7 +6,7 @@ class Views::Traits::FormFrame < Views::Base
   end
 
   def view_template
-    turbo_frame_tag :trait_form do
+    turbo_frame_tag dom_id(@trait) do
       render Views::Traits::FormComponent.new(trait: @trait)
     end
   end

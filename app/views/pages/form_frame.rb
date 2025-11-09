@@ -6,7 +6,7 @@ class Views::Pages::FormFrame < Views::Base
   end
 
   def view_template
-    turbo_frame_tag :page_form do
+    turbo_frame_tag dom_id(@page) do
       render Views::Pages::FormComponent.new(page: @page)
     end
   end

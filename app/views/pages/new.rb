@@ -9,7 +9,7 @@ class Views::Pages::New < Views::Base
     main class: "md:w-2/3 mx-auto" do
       h1(class: "font-bold text-4xl") { "New page" }
 
-      turbo_frame_tag :page_form do
+      turbo_frame_tag dom_id(@page), data: { turbo_action: "advance" } do
         render Views::Pages::FormComponent.new(page: @page)
       end
 

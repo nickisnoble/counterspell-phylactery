@@ -11,7 +11,7 @@ class Views::Users::Edit < Views::Base
         @user.display_name.present? ? "Settings" : "Introducing our newest #{@user.system_role}:"
       end
 
-      turbo_frame_tag :user_form do
+      turbo_frame_tag dom_id(@user), data: { turbo_action: "advance" } do
         render Views::Users::FormComponent.new(user: @user)
       end
     end
