@@ -14,6 +14,12 @@ class ApplicationController < ActionController::Base
     authenticated? && Current.user.admin?
   end
 
+  # Detect if this is a Turbo Frame request
+  # Turbo Frame requests include a "Turbo-Frame" header with the frame ID
+  def turbo_frame_request?
+    request.headers["Turbo-Frame"].present?
+  end
+
   # Render flash messages as a Turbo Stream response
   # Use this when responding to Turbo Frame/Stream requests
   def render_turbo_stream_flash_now
