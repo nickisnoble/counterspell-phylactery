@@ -11,7 +11,9 @@ class Views::Users::Edit < Views::Base
         @user.display_name.present? ? "Settings" : "Introducing our newest #{@user.system_role}:"
       end
 
-      render Users::FormComponent.new(user: @user)
+      turbo_frame_tag :user_form do
+        render Views::Users::FormComponent.new(user: @user)
+      end
     end
   end
 end

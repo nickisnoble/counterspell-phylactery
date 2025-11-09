@@ -48,7 +48,8 @@ class Views::Layouts::ApplicationLayout < Views::Base
 
       body class: "flex flex-col gap-8 bg-amber-50 p-6 min-h-screen font-serif text-blue-900 text-center" do
         render_header
-        render_flash
+        # Turbo Stream target for flash messages
+        div(id: "flash-messages") { render_flash }
         yield_content(&block)
         render_footer
       end

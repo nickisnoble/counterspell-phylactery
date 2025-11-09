@@ -13,6 +13,8 @@ class Components::Base < Phlex::HTML
   include Phlex::Rails::Helpers::Pluralize
   include Phlex::Rails::Helpers::URLFor
   include Phlex::Rails::Helpers::NumberToHumanSize
+  include Phlex::Rails::Helpers::TurboFrameTag
+  include Phlex::Rails::Helpers::TurboStream
 
   if respond_to?(:register_value_helper)
     register_value_helper :content_for
