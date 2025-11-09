@@ -33,7 +33,14 @@ class HeroesController < ApplicationController
         format.html { redirect_to @hero, notice: "Hero was successfully created." }
         format.json { render :show, status: :created, location: @hero }
       else
-        format.html { render Views::Heroes::New.new(hero: @hero), status: :unprocessable_content }
+        format.html do
+          # If Turbo Frame request, render just the form frame (no layout)
+          if turbo_frame_request?
+            render Views::Heroes::FormFrame.new(hero: @hero), status: :unprocessable_content, layout: false
+          else
+            render Views::Heroes::New.new(hero: @hero), status: :unprocessable_content
+          end
+        end
         format.json { render json: @hero.errors, status: :unprocessable_content }
       end
     end
@@ -46,7 +53,14 @@ class HeroesController < ApplicationController
         format.html { redirect_to @hero, notice: "Hero was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @hero }
       else
-        format.html { render Views::Heroes::Edit.new(hero: @hero), status: :unprocessable_content }
+        format.html do
+          # If Turbo Frame request, render just the form frame (no layout)
+          if turbo_frame_request?
+            render Views::Heroes::FormFrame.new(hero: @hero), status: :unprocessable_content, layout: false
+          else
+            render Views::Heroes::Edit.new(hero: @hero), status: :unprocessable_content
+          end
+        end
         format.json { render json: @hero.errors, status: :unprocessable_content }
       end
     end

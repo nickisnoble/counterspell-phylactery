@@ -36,7 +36,7 @@ class Components::TraitCard < Views::Base
         # Inline style for cover image background
         if @trait.cover.attached?
           style do
-            raw "##{dom_id(@trait)} header { background-image: url(#{url_for(@trait.cover)}); }"
+            raw safe("##{dom_id(@trait)} header { background-image: url(#{url_for(@trait.cover)}); }")
           end
         end
       end

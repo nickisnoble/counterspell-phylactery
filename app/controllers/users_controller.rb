@@ -16,7 +16,13 @@ class UsersController < ApplicationController
         format.html { redirect_to events_path, notice: "Profile was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @user }
       else
-        format.html { render Views::Users::Edit.new(user: @user), status: :unprocessable_content }
+        format.html do
+          if turbo_frame_request?
+            render Views::Users::FormFrame.new(user: @user), status: :unprocessable_content, layout: false
+          else
+            render Views::Users::Edit.new(user: @user), status: :unprocessable_content
+          end
+        end
         format.json { render json: @user.errors, status: :unprocessable_content }
       end
     end

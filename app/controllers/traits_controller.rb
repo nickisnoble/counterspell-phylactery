@@ -37,7 +37,13 @@ class TraitsController < ApplicationController
           }, status: :created
         }
       else
-        format.html { render Views::Traits::New.new(trait: @trait), status: :unprocessable_content }
+        format.html do
+          if turbo_frame_request?
+            render Views::Traits::FormFrame.new(trait: @trait), status: :unprocessable_content, layout: false
+          else
+            render Views::Traits::New.new(trait: @trait), status: :unprocessable_content
+          end
+        end
         format.json {
           render json: {
             success: false,
@@ -54,7 +60,13 @@ class TraitsController < ApplicationController
         format.html { redirect_to @trait, notice: "Trait was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @trait }
       else
-        format.html { render Views::Traits::Edit.new(trait: @trait), status: :unprocessable_content }
+        format.html do
+          if turbo_frame_request?
+            render Views::Traits::FormFrame.new(trait: @trait), status: :unprocessable_content, layout: false
+          else
+            render Views::Traits::Edit.new(trait: @trait), status: :unprocessable_content
+          end
+        end
         format.json { render json: @trait.errors, status: :unprocessable_content }
       end
     end
