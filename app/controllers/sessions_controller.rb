@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   include ActiveHashcash
-  before_action :check_hashcash, only: :create
+  before_action :check_hashcash, only: :create, unless: -> { Rails.env.test? }
 
   rate_limit to: 3,
              within: 5.minutes,

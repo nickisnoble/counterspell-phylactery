@@ -73,12 +73,12 @@ class HeroTest < ActiveSupport::TestCase
   end
 
   test "normalizes ideal and flaw by stripping whitespace" do
-    ancestry = Trait.create!(type: "ANCESTRY", name: "Ancestry")
-    background = Trait.create!(type: "BACKGROUND", name: "Background")
-    class_trait = Trait.create!(type: "CLASS", name: "Class Trait")
+    ancestry = Trait.create!(type: "ANCESTRY", name: "Ancestry For Normalization Test")
+    background = Trait.create!(type: "BACKGROUND", name: "Background For Normalization Test")
+    class_trait = Trait.create!(type: "CLASS", name: "Class For Normalization Test")
 
     hero = Hero.create!(
-      name: "Test Hero",
+      name: "Hero With Whitespace Fields",
       role: "fighter",
       ideal: "  Justice  ",
       flaw: "  Stubborn  ",
