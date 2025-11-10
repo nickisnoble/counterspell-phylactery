@@ -3,10 +3,9 @@ require "test_helper"
 class TraitsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @trait = traits(:one)
-    
+
     # Set up authentication using the helper
-    @admin_user = User.create!(email: "admin@example.com", system_role: "admin")
-    login_with_otp("admin@example.com")
+    be_authenticated_as_admin!
   end
 
   test "should get index" do

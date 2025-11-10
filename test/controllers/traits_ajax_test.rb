@@ -6,8 +6,7 @@ require "test_helper"
 class TraitsAjaxTest < ActionDispatch::IntegrationTest
   setup do
     # Set up authentication using the helper
-    @admin_user = User.create!(email: "admin@example.com", system_role: "admin")
-    login_with_otp("admin@example.com")
+    be_authenticated_as_admin!
   end
 
   # Note: This JSON API is kept for potential future use but is no longer

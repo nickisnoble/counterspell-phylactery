@@ -10,6 +10,12 @@ module ActiveSupport
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 
+    # Setup unique test data for each parallel worker
+    parallelize_setup do |worker|
+      # Each worker gets a unique namespace to avoid collisions
+      @worker_id = worker
+    end
+
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
@@ -25,13 +31,17 @@ module ActiveSupport
     end
 
     def be_authenticated!
-      @user = User.create(email: "test@example.com")
+      # Use unique email per parallel worker to avoid collisions
+      worker_suffix = defined?(@worker_id) ? @worker_id : 0
+      @user = User.create!(email: "test-#{worker_suffix}-#{SecureRandom.hex(4)}@example.com")
       login_with_otp(@user.email)
     end
 
     def be_authenticated_as_admin!
-      be_authenticated!
-      @user.admin!
+      # Use unique email per parallel worker to avoid collisions
+      worker_suffix = defined?(@worker_id) ? @worker_id : 0
+      @user = User.create!(email: "admin-#{worker_suffix}-#{SecureRandom.hex(4)}@example.com", system_role: "admin")
+      login_with_otp(@user.email)
     end
   end
 end
