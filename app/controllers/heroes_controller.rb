@@ -4,7 +4,7 @@ class HeroesController < ApplicationController
 
   # GET /heroes or /heroes.json
   def index
-    @heroes = Hero.all
+    @heroes = Hero.includes(:traits).all
     render Views::Heroes::Index.new(heroes: @heroes)
   end
 

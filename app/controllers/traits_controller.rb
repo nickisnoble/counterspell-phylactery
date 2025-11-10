@@ -62,13 +62,14 @@ class TraitsController < ApplicationController
 
   def destroy
     respond_to do |format|
-      if 0 == @trait.heroes.count && @trait.destroy!
+      if @trait.heroes.any?
+        hero_names = @trait.heroes.pluck(:name).join(", ")
+        format.html { redirect_to @trait, alert: "Cannot delete: still referenced by #{hero_names}", status: :unprocessable_content }
+        format.json { render json: { error: "Trait still in use by heroes: #{hero_names}" }, status: :unprocessable_content }
+      else
+        @trait.destroy!
         format.html { redirect_to traits_path, notice: "Trait was successfully destroyed.", status: :see_other }
         format.json { head :no_content }
-      else
-        @trait.errors.add(:heroes, "still referenced by #{@trait.heroes.map(&:name).join(", ")}")
-        format.html { render Views::Traits::Edit.new(trait: @trait), status: :unprocessable_content }
-        format.json { render json: @trait.errors, status: :unprocessable_content }
       end
     end
   end
