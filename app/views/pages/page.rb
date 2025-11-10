@@ -9,7 +9,7 @@ class Views::Pages::Page < Views::Base
     article(id: dom_id(@page), class: "w-full sm:w-auto space-y-6") do
       h1(class: "font-bold text-4xl") { @page.title }
       div(class: "text-left") do
-        unsafe_raw @page.body.to_s
+        raw @page.body.to_s
       end
     end
   end

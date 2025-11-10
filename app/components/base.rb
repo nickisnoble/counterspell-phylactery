@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class Components::Base < Phlex::HTML
-  # Include any helpers you want to be available across all components
+  include ActionView::RecordIdentifier
   include Phlex::Rails::Helpers::Routes
-  include Phlex::Rails::Helpers::DOMId
 
   if Rails.env.development?
     def before_template

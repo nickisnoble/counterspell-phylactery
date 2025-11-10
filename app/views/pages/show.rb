@@ -2,7 +2,6 @@
 
 class Views::Pages::Show < Views::Base
   include Phlex::Rails::Helpers::ContentFor
-  include Phlex::Rails::Helpers::Render
 
   def initialize(page:)
     @page = page

@@ -5,6 +5,7 @@ class Views::Sessions::New < Views::Base
   include Phlex::Rails::Helpers::LinkTo
   include Phlex::Rails::Helpers::CheckboxTag
   include Phlex::Rails::Helpers::JavascriptIncludeTag
+  include Phlex::Rails::Helpers::HiddenFieldTag
 
   def initialize
   end
@@ -77,7 +78,7 @@ class Views::Sessions::New < Views::Base
         end
 
         form_with url: session_path, class: "space-y-2" do |form|
-          unsafe_raw hashcash_hidden_field_tag
+          raw hashcash_hidden_field_tag
 
           form.email_field :email,
             required: true,
@@ -85,10 +86,10 @@ class Views::Sessions::New < Views::Base
             class: "text-center fun-interaction"
 
           label(for: "agree_to_terms", class: "flex justify-center items-center gap-2 font-light italic") do
-            unsafe_raw checkbox_tag(:agree_to_terms, "yes", true, required: true, class: "accent-purple-700 size-4")
+            raw checkbox_tag(:agree_to_terms, "yes", true, required: true, class: "accent-purple-700 size-4")
             span do
               plain "I agree to Counterspell's "
-              unsafe_raw link_to("Privacy Policy", page_path("privacy-policy"))
+              raw link_to("Privacy Policy", page_path("privacy-policy"))
               plain "."
             end
           end
@@ -98,14 +99,13 @@ class Views::Sessions::New < Views::Base
       end
     end
 
-    unsafe_raw javascript_include_tag("hashcash", defer: true)
+    raw javascript_include_tag("hashcash", defer: true)
   end
 
   private
 
   def hashcash_hidden_field_tag
-    helpers = Phlex::Rails.helpers
-    helpers.hidden_field_tag(
+    hidden_field_tag(
       "hashcash",
       "",
       data: {

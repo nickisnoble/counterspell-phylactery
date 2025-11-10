@@ -16,7 +16,7 @@ class Views::Heroes::Hero < Views::Base
         end
         h3(class: "font-semibold text-gray-900 text-lg") { @hero.name }
         p(class: "mt-1 text-gray-600 text-sm") { "#{@hero.pronouns} • #{@hero.role.humanize}" }
-        unsafe_raw @hero.summary.to_s
+        raw @hero.summary.to_s
       end
       div do
         p(class: "mb-1 font-medium text-gray-700 text-sm") { "Traits:" }

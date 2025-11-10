@@ -2,7 +2,6 @@
 
 class Views::Users::Edit < Views::Base
   include Phlex::Rails::Helpers::ContentFor
-  include Phlex::Rails::Helpers::Render
 
   def initialize(user:)
     @user = user

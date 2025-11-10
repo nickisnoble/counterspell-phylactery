@@ -4,7 +4,6 @@ class Views::Pages::Index < Views::Base
   include Phlex::Rails::Helpers::ContentFor
   include Phlex::Rails::Helpers::LinkTo
   include Phlex::Rails::Helpers::ButtonTo
-  include Phlex::Rails::Helpers::Render
 
   def initialize(pages:)
     @pages = pages

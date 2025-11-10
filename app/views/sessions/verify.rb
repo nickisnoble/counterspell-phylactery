@@ -3,14 +3,15 @@
 class Views::Sessions::Verify < Views::Base
   include Phlex::Rails::Helpers::FormWith
 
-  def initialize
+  def initialize(email:)
+    @email = email
   end
 
   def view_template
     main(class: "flex-1 flex flex-col justify-center items-center") do
       h1(class: "text-3xl font-bold mb-2") { "The Doortal Awaits..." }
       p(class: "text-balance mb-2 max-w-[36ch]") do
-        plain "Runes were conjured and sent to #{session[:awaiting_login]} — please cast them hence:"
+        plain "Runes were conjured and sent to #{@email} — please cast them hence:"
       end
 
       form_with url: validate_session_path, data: { turbo_frame: "_top" } do |f|

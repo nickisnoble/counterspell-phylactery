@@ -3,7 +3,6 @@
 class Views::Traits::Index < Views::Base
   include Phlex::Rails::Helpers::ContentFor
   include Phlex::Rails::Helpers::LinkTo
-  include Phlex::Rails::Helpers::Render
 
   def initialize(traits:)
     @traits = traits

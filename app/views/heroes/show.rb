@@ -41,7 +41,7 @@ class Views::Heroes::Show < Views::Base
               plain "#{@hero.pronouns} • #{@hero.traits.map(&:name).join(' • ')} • #{@hero.role.humanize}"
             end
 
-            unsafe_raw @hero.backstory.to_s
+            raw @hero.backstory.to_s
           end
         end
 

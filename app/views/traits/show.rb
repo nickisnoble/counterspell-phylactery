@@ -3,7 +3,6 @@
 class Views::Traits::Show < Views::Base
   include Phlex::Rails::Helpers::ContentFor
   include Phlex::Rails::Helpers::LinkTo
-  include Phlex::Rails::Helpers::Render
 
   def initialize(trait:)
     @trait = trait
@@ -15,7 +14,7 @@ class Views::Traits::Show < Views::Base
     main(class: "flex justify-center items-center") do
       div(class: "max-w-[3in]") do
         nav(class: "flex gap-2 px-2 py-1 opacity-50") do
-          unsafe_raw link_to("&larr; back to traits", traits_path)
+          raw link_to("&larr; back to traits", traits_path)
           link_to("Edit", edit_trait_path(@trait)) if Current.user.admin?
         end
 

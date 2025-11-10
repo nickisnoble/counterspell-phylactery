@@ -47,8 +47,8 @@ class Views::Heroes::Form < Views::Base
         div(class: "mt-2") do
           form.collection_radio_buttons :role, Hero.roles.keys, :to_s, ->(r) { r.titleize } do |b|
             div do
-              unsafe_raw b.radio_button
-              unsafe_raw b.label
+              raw b.radio_button
+              raw b.label
             end
           end
         end
@@ -90,17 +90,15 @@ class Views::Heroes::Form < Views::Base
 
         Hero::REQUIRED_TRAIT_TYPES.each do |trait_type|
           div(class: "my-5") do
-            unsafe_raw label_tag("trait_ids_#{trait_type.downcase}", trait_type.titleize)
+            raw label_tag("trait_ids_#{trait_type.downcase}", trait_type.titleize)
 
             traits_for_type = Trait.where(type: trait_type).order(:name)
             existing_trait = @hero.traits.find { |t| t.type == trait_type }
             selected_value = existing_trait&.id
 
-            unsafe_raw select_tag(
-              "trait_ids_#{trait_type.downcase}",
-              options_from_collection_for_select(traits_for_type, :id, :name, selected_value),
-              { prompt: "Select #{trait_type.titleize}..." }
-            )
+            select_tag "trait_ids_#{trait_type.downcase}", prompt: "Select #{trait_type.titleize}..." do
+              options_from_collection_for_select(traits_for_type, :id, :name, selected_value)
+            end
           end
         end
       end

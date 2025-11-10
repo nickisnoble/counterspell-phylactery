@@ -61,7 +61,7 @@ class Components::Card < Components::Base
 
       if @cover_image
         style do
-          unsafe_raw "##{@dom_id} header { background-image: url(#{@cover_image}); }"
+          raw "##{@dom_id} header { background-image: url(#{@cover_image}); }"
         end
       end
     end
@@ -69,13 +69,15 @@ class Components::Card < Components::Base
 
   # Convenience class methods for creating cards from models
   class << self
+    include ActionView::RecordIdentifier
+
     def from_trait(trait)
       new(
         title: trait.name,
         description: trait.description,
-        cover_image: trait.cover.attached? ? Phlex::Rails.helpers.url_for(trait.cover) : nil,
+        cover_image: trait.cover.attached? ? Rails.application.routes.url_helpers.url_for(trait.cover) : nil,
         abilities: trait.abilities || {},
-        dom_id: Phlex::Rails.helpers.dom_id(trait),
+        dom_id: dom_id(trait),
         badge: trait.type
       )
     end
@@ -85,9 +87,9 @@ class Components::Card < Components::Base
         title: hero.name,
         subtitle: "#{hero.pronouns} • #{hero.role.humanize}",
         description: hero.summary&.to_plain_text,
-        cover_image: hero.portrait.attached? ? Phlex::Rails.helpers.url_for(hero.portrait) : nil,
+        cover_image: hero.portrait.attached? ? Rails.application.routes.url_helpers.url_for(hero.portrait) : nil,
         abilities: hero.traits.map { |t| [t.name, t.type] }.to_h,
-        dom_id: Phlex::Rails.helpers.dom_id(hero)
+        dom_id: dom_id(hero)
       )
     end
   end
