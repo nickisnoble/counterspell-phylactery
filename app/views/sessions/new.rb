@@ -5,7 +5,6 @@ class Views::Sessions::New < Views::Base
   include Phlex::Rails::Helpers::LinkTo
   include Phlex::Rails::Helpers::CheckboxTag
   include Phlex::Rails::Helpers::JavascriptIncludeTag
-  include Phlex::Rails::Helpers::HiddenFieldTag
 
   def initialize
   end
@@ -78,7 +77,7 @@ class Views::Sessions::New < Views::Base
         end
 
         form_with url: session_path, class: "space-y-2" do |form|
-          raw hashcash_hidden_field_tag
+          raw helpers.hashcash_hidden_field_tag
 
           form.email_field :email,
             required: true,
@@ -100,18 +99,5 @@ class Views::Sessions::New < Views::Base
     end
 
     raw javascript_include_tag("hashcash", defer: true)
-  end
-
-  private
-
-  def hashcash_hidden_field_tag
-    hidden_field_tag(
-      "hashcash",
-      "",
-      data: {
-        controller: "hashcash",
-        hashcash_target: "field"
-      }
-    )
   end
 end
