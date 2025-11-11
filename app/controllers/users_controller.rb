@@ -1,10 +1,12 @@
 class UsersController < ApplicationController
   def show
     @user = User.find_by_slug!(params.expect(:id))
+    render Views::Users::Show.new(user: @user)
   end
 
   def edit
     @user = Current.user
+    render Views::Users::Edit.new(user: @user)
   end
 
   def update
@@ -14,7 +16,7 @@ class UsersController < ApplicationController
         format.html { redirect_to events_path, notice: "Profile was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @user }
       else
-        format.html { render :edit, status: :unprocessable_content }
+        format.html { render Views::Users::Edit.new(user: @user), status: :unprocessable_content }
         format.json { render json: @user.errors, status: :unprocessable_content }
       end
     end

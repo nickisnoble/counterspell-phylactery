@@ -4,20 +4,24 @@ class HeroesController < ApplicationController
 
   # GET /heroes or /heroes.json
   def index
-    @heroes = Hero.all
+    @heroes = Hero.includes(:traits).all
+    render Views::Heroes::Index.new(heroes: @heroes)
   end
 
   # GET /heroes/1 or /heroes/1.json
   def show
+    render Views::Heroes::Show.new(hero: @hero)
   end
 
   # GET /heroes/new
   def new
     @hero = Hero.new
+    render Views::Heroes::New.new(hero: @hero)
   end
 
   # GET /heroes/1/edit
   def edit
+    render Views::Heroes::Edit.new(hero: @hero)
   end
 
   # POST /heroes or /heroes.json
@@ -29,7 +33,7 @@ class HeroesController < ApplicationController
         format.html { redirect_to @hero, notice: "Hero was successfully created." }
         format.json { render :show, status: :created, location: @hero }
       else
-        format.html { render :new, status: :unprocessable_content }
+        format.html { render Views::Heroes::New.new(hero: @hero), status: :unprocessable_content }
         format.json { render json: @hero.errors, status: :unprocessable_content }
       end
     end
@@ -42,7 +46,7 @@ class HeroesController < ApplicationController
         format.html { redirect_to @hero, notice: "Hero was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @hero }
       else
-        format.html { render :edit, status: :unprocessable_content }
+        format.html { render Views::Heroes::Edit.new(hero: @hero), status: :unprocessable_content }
         format.json { render json: @hero.errors, status: :unprocessable_content }
       end
     end

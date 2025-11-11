@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@source "app/views/**/*.rb";
+@source "app/components/**/*.rb";
+
 @theme {
   --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif: "Fern", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;

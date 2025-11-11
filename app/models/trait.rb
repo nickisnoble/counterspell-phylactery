@@ -6,7 +6,7 @@ class Trait < ApplicationRecord
   has_and_belongs_to_many :heroes
   has_one_attached :cover
 
-  validates :type, presence: :true, format: /[a-zA-Z]+/
+  validates :type, presence: :true, format: { with: /\A[a-zA-Z]+\z/ }
   normalizes :type, with: ->(t) { t.strip.upcase }
 
   normalizes :description, with: ->(t) { t.strip.squish }

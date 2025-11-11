@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   include ActiveHashcash
-  before_action :check_hashcash, only: :create
+  before_action :check_hashcash, only: :create, unless: -> { Rails.env.test? }
 
   rate_limit to: 3,
              within: 5.minutes,
@@ -17,6 +17,8 @@ class SessionsController < ApplicationController
       else
         redirect_to events_path
       end
+    else
+      render Views::Sessions::New.new
     end
   end
 
@@ -24,7 +26,7 @@ class SessionsController < ApplicationController
     @user = User.find_or_initialize_by(email: params.require(:email))
 
     if @user.new_record? && !@user.save
-      render :new, status: :unprocessable_content, alert: @user.errors.full_messages.to_sentence
+      render Views::Sessions::New.new, status: :unprocessable_content, alert: @user.errors.full_messages.to_sentence
       return
     end
 
@@ -40,10 +42,17 @@ class SessionsController < ApplicationController
   end
 
   def verify
+    render Views::Sessions::Verify.new(email: session[:awaiting_login])
   end
 
   def validate
     email = session[:awaiting_login]
+
+    unless email.present?
+      redirect_to new_session_path, alert: "Session expired. Please try again."
+      return
+    end
+
     code = params.require(:code)
 
     if user = User.authenticate_by(email:, code:)
@@ -64,10 +73,6 @@ class SessionsController < ApplicationController
 
 
   private
-
-    def redirect_if_authenticated
-      redirect_to root_path if authenticated?
-    end
 
     def hashcash_after_failure
       redirect_back_or_to new_session_path, alert: "You might be a bot."

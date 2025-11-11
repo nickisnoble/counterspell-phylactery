@@ -32,7 +32,7 @@ class User < ApplicationRecord
   end
 
   def verify!
-    self.verified ||= true
+    update!(verified: true)
   end
 
   private

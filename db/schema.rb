@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_29_032450) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_10_170308) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -81,6 +81,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_032450) do
   create_table "heroes_traits", id: false, force: :cascade do |t|
     t.integer "hero_id", null: false
     t.integer "trait_id", null: false
+    t.index ["hero_id", "trait_id"], name: "index_heroes_traits_on_hero_id_and_trait_id", unique: true
     t.index ["hero_id"], name: "index_heroes_traits_on_hero_id"
     t.index ["trait_id"], name: "index_heroes_traits_on_trait_id"
   end
@@ -109,8 +110,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_032450) do
   end
 
   create_table "traits", force: :cascade do |t|
-    t.string "type"
-    t.string "name"
+    t.string "type", null: false
+    t.string "name", null: false
     t.string "slug"
     t.text "description"
     t.text "abilities"
