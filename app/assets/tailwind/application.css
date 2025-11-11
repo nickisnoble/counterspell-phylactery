@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-@source "../../views/**/*.rb";
-@source "../../components/**/*.rb";
+@source "app/views/**/*.rb";
+@source "app/components/**/*.rb";
 
 @theme {
   --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
