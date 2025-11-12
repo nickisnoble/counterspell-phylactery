@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Event One
+  date: 2025-12-01
+  status: 1
+  start_time: 2025-12-01 18:00:00
+  end_time: 2025-12-01 22:00:00
+  ticket_price: 25.00
+  location: one
+
+two:
+  name: Event Two
+  date: 2025-12-15
+  status: 1
+  start_time: 2025-12-15 18:00:00
+  end_time: 2025-12-15 22:00:00
+  ticket_price: 30.00
+  location: two

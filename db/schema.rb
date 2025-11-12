@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_10_170308) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_12_165222) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -66,6 +66,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_10_170308) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "events", force: :cascade do |t|
+    t.string "name"
+    t.date "date"
+    t.integer "status"
+    t.time "start_time"
+    t.time "end_time"
+    t.decimal "ticket_price", precision: 10, scale: 2, default: "0.0"
+    t.integer "location_id", null: false
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_events_on_location_id"
+    t.index ["slug"], name: "index_events_on_slug", unique: true
+  end
+
+  create_table "games", force: :cascade do |t|
+    t.integer "event_id", null: false
+    t.integer "gm_id", null: false
+    t.integer "seat_count", default: 5, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_games_on_event_id"
+    t.index ["gm_id"], name: "index_games_on_gm_id"
+  end
+
   create_table "heroes", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -86,6 +111,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_10_170308) do
     t.index ["trait_id"], name: "index_heroes_traits_on_trait_id"
   end
 
+  create_table "locations", force: :cascade do |t|
+    t.string "name"
+    t.text "address"
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_locations_on_slug", unique: true
+  end
+
   create_table "nondisposable_disposable_domains", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -98,6 +132,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_10_170308) do
     t.string "slug"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "seats", force: :cascade do |t|
+    t.integer "game_id", null: false
+    t.integer "user_id"
+    t.integer "hero_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_seats_on_game_id"
+    t.index ["hero_id"], name: "index_seats_on_hero_id"
+    t.index ["user_id"], name: "index_seats_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -137,7 +182,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_10_170308) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "events", "locations"
+  add_foreign_key "games", "events"
+  add_foreign_key "games", "users", column: "gm_id"
   add_foreign_key "heroes_traits", "heroes"
   add_foreign_key "heroes_traits", "traits"
+  add_foreign_key "seats", "games"
+  add_foreign_key "seats", "heroes"
+  add_foreign_key "seats", "users"
   add_foreign_key "sessions", "users"
 end

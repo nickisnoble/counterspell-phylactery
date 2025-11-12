@@ -51,6 +51,7 @@ end
 gem "rotp", "~> 6.3"
 gem "rack-attack", "~> 6.7"
 gem "nondisposable", "~> 0.1.0"
+gem "nocheckout", "~> 0.2"
 
 gem "dockerfile-rails", ">= 1.7", group: :development
 

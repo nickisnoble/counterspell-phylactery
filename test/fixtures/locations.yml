@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Location One
+  address: 123 First Street
+
+two:
+  name: Location Two
+  address: 456 Second Avenue
