@@ -10,7 +10,15 @@ class Event < ApplicationRecord
 
   enum :status, %w[planning upcoming past cancelled].index_by(&:itself), validate: true
 
+  scope :publicly_visible, -> { where(status: [:upcoming, :past]) }
+  scope :visible_to_gm, -> { all } # GMs see all events
+
   after_create :create_default_reminder_emails
+
+  def visible_to?(user)
+    return true if user&.admin? || user&.gm?
+    upcoming? || past?
+  end
 
   private
 
