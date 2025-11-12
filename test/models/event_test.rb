@@ -77,4 +77,23 @@ class EventTest < ActiveSupport::TestCase
     )
     assert_equal 0, event.ticket_price
   end
+
+  test "automatically creates two reminder emails after create" do
+    event = Event.create!(
+      name: "Test Event with Emails",
+      date: Date.today + 10.days,
+      location: locations(:one),
+      status: "upcoming"
+    )
+
+    assert_equal 2, event.event_emails.count
+
+    week_before = event.event_emails.find_by("send_at < ?", event.date - 2.days)
+    day_before = event.event_emails.find_by("send_at > ?", event.date - 2.days)
+
+    assert_not_nil week_before
+    assert_not_nil day_before
+    assert_match /one week away/, week_before.subject
+    assert_match /tomorrow/, day_before.subject
+  end
 end
