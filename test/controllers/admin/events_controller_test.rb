@@ -53,6 +53,33 @@ class Admin::EventsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_events_path
   end
 
+  test "create creates event with nested games" do
+    login_with_otp(@admin.email)
+    gm2 = User.create!(email: "gm2@test.com", system_role: "gm", display_name: "GM 2")
+
+    assert_difference("Event.count", 1) do
+      assert_difference("Game.count", 2) do
+        post admin_events_path, params: {
+          event: {
+            name: "Event with Games",
+            date: Date.today + 14.days,
+            location_id: @location.id,
+            status: "planning",
+            games_attributes: {
+              "0" => { gm_id: @gm.id, seat_count: 5 },
+              "1" => { gm_id: gm2.id, seat_count: 6 }
+            }
+          }
+        }
+      end
+    end
+
+    event = Event.find_by(name: "Event with Games")
+    assert_equal 2, event.games.count
+    assert_equal @gm.id, event.games.first.gm_id
+    assert_equal 5, event.games.first.seat_count
+  end
+
   test "edit displays form for admins" do
     login_with_otp(@admin.email)
     get edit_admin_event_path(@event)

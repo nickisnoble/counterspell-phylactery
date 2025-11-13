@@ -6,6 +6,8 @@ class Event < ApplicationRecord
   has_many :event_emails, dependent: :destroy
   has_rich_text :description
 
+  accepts_nested_attributes_for :games, allow_destroy: true, reject_if: :all_blank
+
   validates :date, presence: true
 
   enum :status, %w[planning upcoming past cancelled].index_by(&:itself), validate: true

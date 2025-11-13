@@ -5,9 +5,10 @@ class Views::Admin::Events::Form < Views::Base
   include Phlex::Rails::Helpers::Pluralize
   include Phlex::Rails::Helpers::OptionsForSelect
 
-  def initialize(event:, locations:)
+  def initialize(event:, locations:, gms:)
     @event = event
     @locations = locations
+    @gms = gms
   end
 
   def view_template
@@ -69,8 +70,50 @@ class Views::Admin::Events::Form < Views::Base
         form.rich_text_area :description, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full"
       end
 
+      # Nested Games Fields
+      div(class: "my-8") do
+        h3(class: "font-bold text-2xl mb-4") { "Games (Tables)" }
+        p(class: "text-gray-600 text-sm mb-4") { "Add game tables with GMs for this event. Default is 3 tables with 5 seats each." }
+
+        div(id: "games-fields") do
+          form.fields_for :games do |game_form|
+            render_game_fields(game_form)
+          end
+        end
+      end
+
       div do
         form.submit class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer"
+      end
+    end
+  end
+
+  private
+
+  def render_game_fields(game_form)
+    div(class: "p-4 mb-4 bg-gray-50 rounded-md border border-gray-200") do
+      div(class: "grid grid-cols-2 gap-4") do
+        div do
+          game_form.label :gm_id, "Game Master"
+          game_form.collection_select :gm_id, @gms, :id, :display_name,
+            { prompt: "Select GM" },
+            class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full"
+        end
+
+        div do
+          game_form.label :seat_count, "Number of Seats"
+          game_form.number_field :seat_count,
+            min: 1,
+            max: 10,
+            class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full"
+        end
+      end
+
+      unless game_form.object.new_record?
+        div(class: "mt-3") do
+          game_form.check_box :_destroy, class: "mr-2"
+          game_form.label :_destroy, "Remove this game", class: "text-sm text-red-600"
+        end
       end
     end
   end
