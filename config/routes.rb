@@ -10,6 +10,11 @@ Rails.application.routes.draw do
   resources :heroes
   resources :traits
 
+  namespace :admin do
+    resources :locations
+    resources :events
+  end
+
   resource :session do
     get :verify
     post :validate
