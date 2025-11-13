@@ -3,7 +3,9 @@ Rails.application.routes.draw do
 
   root "sessions#new"
 
-  resources :events, only: [:index, :show]
+  resources :events, only: [:index, :show] do
+    resources :event_emails, only: [:show]
+  end
   resources :users, path: "players", except: %w[ index new create destroy ]
   resource :dashboard, only: :show
 
