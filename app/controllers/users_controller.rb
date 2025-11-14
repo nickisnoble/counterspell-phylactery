@@ -1,7 +1,16 @@
 class UsersController < ApplicationController
   def show
     @user = User.find_by_slug!(params.expect(:id))
-    render Views::Users::Show.new(user: @user)
+
+    # Get past events the user attended with their heroes
+    past_event_data = Seat
+      .joins(game: :event, :hero)
+      .where(user: @user, events: { status: "past" })
+      .order("events.date DESC")
+      .select("seats.*, events.*, heroes.name as hero_name")
+      .group_by { |seat| seat.game.event }
+
+    render Views::Users::Show.new(user: @user, past_event_data: past_event_data)
   end
 
   def edit
