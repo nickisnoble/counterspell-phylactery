@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_12_185013) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_14_044442) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -79,7 +79,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_185013) do
   create_table "events", force: :cascade do |t|
     t.string "name"
     t.date "date"
-    t.integer "status"
+    t.integer "status", default: 0
     t.time "start_time"
     t.time "end_time"
     t.decimal "ticket_price", precision: 10, scale: 2, default: "0.0"
@@ -110,7 +110,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_185013) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "role"
+    t.integer "user_id", null: false
     t.index ["slug"], name: "index_heroes_on_slug", unique: true
+    t.index ["user_id"], name: "index_heroes_on_user_id"
   end
 
   create_table "heroes_traits", id: false, force: :cascade do |t|
@@ -198,6 +200,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_185013) do
   add_foreign_key "events", "locations"
   add_foreign_key "games", "events"
   add_foreign_key "games", "users", column: "gm_id"
+  add_foreign_key "heroes", "users"
   add_foreign_key "heroes_traits", "heroes"
   add_foreign_key "heroes_traits", "traits"
   add_foreign_key "seats", "games"

@@ -77,7 +77,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "can create admin user" do
-    user = User.create!(email: "admin@example.com", system_role: "admin")
+    user = User.create!(email: "newadmin@example.com", system_role: "admin")
     assert user.admin?
   end
 end

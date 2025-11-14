@@ -3,11 +3,13 @@ class UsersController < ApplicationController
     @user = User.find_by_slug!(params.expect(:id))
 
     # Get past events the user attended with their heroes
+    # Using left_joins to include seats even if hero was deleted
     past_event_data = Seat
-      .joins(game: :event, :hero)
+      .joins(game: :event)
+      .left_joins(:hero)
       .where(user: @user, events: { status: "past" })
       .order("events.date DESC")
-      .select("seats.*, events.*, heroes.name as hero_name")
+      .includes(:hero, game: :event)
       .group_by { |seat| seat.game.event }
 
     render Views::Users::Show.new(user: @user, past_event_data: past_event_data)

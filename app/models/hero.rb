@@ -1,6 +1,7 @@
 class Hero < ApplicationRecord
   include FriendlyPathable
 
+  belongs_to :user
   has_and_belongs_to_many :traits
   REQUIRED_TRAIT_TYPES = [ "ANCESTRY", "BACKGROUND", "CLASS" ].freeze
   validate :required_traits_present

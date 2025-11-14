@@ -13,7 +13,18 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
       ticket_price: 25
     )
     @game = @event.games.create!(gm: @gm, seat_count: 5)
-    @hero = Hero.create!(name: "Test Hero", user: @player)
+
+    # Create required traits for hero
+    ancestry = Trait.create!(type: "ANCESTRY", name: "Test Ancestry")
+    background = Trait.create!(type: "BACKGROUND", name: "Test Background")
+    class_trait = Trait.create!(type: "CLASS", name: "Test Class")
+
+    @hero = Hero.create!(
+      name: "Seats Test Hero",
+      user: @player,
+      role: "fighter",
+      traits: [ancestry, background, class_trait]
+    )
   end
 
   test "requires authentication to purchase" do

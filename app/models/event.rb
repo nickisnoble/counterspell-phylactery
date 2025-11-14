@@ -10,7 +10,7 @@ class Event < ApplicationRecord
 
   validates :date, presence: true
 
-  enum :status, %w[planning upcoming past cancelled].index_by(&:itself), validate: true
+  enum :status, %w[planning upcoming past cancelled], validate: true
 
   scope :publicly_visible, -> { where(status: [:upcoming, :past]) }
   scope :visible_to_gm, -> { all } # GMs see all events

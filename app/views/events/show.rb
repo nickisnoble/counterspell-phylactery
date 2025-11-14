@@ -109,6 +109,8 @@ class Views::Events::Show < Views::Base
   private
 
   def render_game_card(game)
+    available_seats = game.seat_count - game.seats.where.not(user_id: nil).count
+
     div(class: "bg-gray-50 rounded-lg p-6 border border-gray-200") do
       div(class: "flex items-center mb-4") do
         span(class: "text-3xl mr-3") { "🎲" }
@@ -123,8 +125,6 @@ class Views::Events::Show < Views::Base
           span(class: "mr-2") { "💺" }
           span { "#{game.seat_count} #{'seat'.pluralize(game.seat_count)}" }
         end
-
-        available_seats = game.seat_count - game.seats.where.not(user_id: nil).count
         div(class: "flex items-center") do
           span(class: "mr-2") { available_seats > 0 ? "✅" : "❌" }
           span(class: available_seats > 0 ? "text-green-600 font-semibold" : "text-red-600") do

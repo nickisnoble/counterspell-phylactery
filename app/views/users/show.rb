@@ -43,7 +43,7 @@ class Views::Users::Show < Views::Base
                     seats.each do |seat|
                       div(class: "flex items-center text-sm text-gray-700") do
                         span(class: "mr-2") { "🎭" }
-                        span { "Played #{seat.hero.name}" }
+                        span { "Played #{seat.hero&.name || 'Unknown Hero'}" }
                       end
                     end
                   end

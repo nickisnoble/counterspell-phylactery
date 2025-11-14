@@ -1,5 +1,6 @@
 class SeatsController < ApplicationController
   before_action :set_game
+  before_action :authorize_purchase, only: [:create]
 
   def create
     @seat = @game.seats.build(seat_params)
@@ -54,6 +55,21 @@ class SeatsController < ApplicationController
 
   def set_game
     @game = Game.find(params[:game_id])
+  end
+
+  def authorize_purchase
+    event = @game.event
+
+    unless event.upcoming?
+      redirect_to event_path(event), alert: "This event is not available for purchase"
+      return
+    end
+
+    available_seats = @game.seat_count - @game.seats.where.not(user_id: nil).count
+    if available_seats <= 0
+      redirect_to event_path(event), alert: "This table is full"
+      return
+    end
   end
 
   def seat_params
