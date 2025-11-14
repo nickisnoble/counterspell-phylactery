@@ -3,9 +3,13 @@
 class Views::Events::Show < Views::Base
   include Phlex::Rails::Helpers::ContentFor
   include Phlex::Rails::Helpers::LinkTo
+  include Phlex::Rails::Helpers::FormWith
+  include Phlex::Rails::Helpers::ButtonTo
 
-  def initialize(event:)
+  def initialize(event:, current_user: nil, user_heroes: [])
     @event = event
+    @current_user = current_user
+    @user_heroes = user_heroes
   end
 
   def view_template
@@ -133,12 +137,29 @@ class Views::Events::Show < Views::Base
         end
       end
 
-      # TODO: Add purchase button when Stripe integration is ready
-      # if available_seats > 0 && @event.upcoming?
-      #   div(class: "mt-4") do
-      #     link_to("Reserve Seat", "#", class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium")
-      #   end
-      # end
+      # Purchase button
+      if available_seats > 0 && @event.upcoming? && @current_user
+        div(class: "mt-4") do
+          if @user_heroes.any?
+            form_with(url: game_seats_path(game), method: :post) do |f|
+              f.select :hero_id, @user_heroes.map { |h| [h.name, h.id] },
+                { prompt: "Select your hero" },
+                class: "block w-full rounded-md border-gray-300 mb-2"
+
+              f.submit "Purchase Seat ($#{@event.ticket_price})",
+                class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer"
+            end
+          else
+            link_to("Create a Hero First", new_hero_path,
+              class: "block w-full text-center rounded-md px-4 py-2 bg-gray-400 text-white font-medium")
+          end
+        end
+      elsif available_seats > 0 && @event.upcoming?
+        div(class: "mt-4") do
+          link_to("Sign In to Purchase", new_session_path,
+            class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium")
+        end
+      end
     end
   end
 

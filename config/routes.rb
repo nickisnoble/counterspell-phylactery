@@ -12,6 +12,12 @@ Rails.application.routes.draw do
   resources :heroes
   resources :traits
 
+  resources :games, only: [] do
+    resources :seats, only: [:create] do
+      get :success, on: :collection
+    end
+  end
+
   namespace :admin do
     resources :locations
     resources :events
