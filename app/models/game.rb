@@ -3,6 +3,7 @@ class Game < ApplicationRecord
   belongs_to :gm, class_name: "User"
   has_many :seats, dependent: :destroy
 
+  validates :gm_id, presence: true
   validates :seat_count, numericality: { greater_than: 0 }
   validate :gm_must_have_appropriate_role
 

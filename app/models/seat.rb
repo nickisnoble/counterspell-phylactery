@@ -5,6 +5,7 @@ class Seat < ApplicationRecord
 
   validate :hero_unique_per_game, if: :hero_id?
   validate :one_seat_per_event, if: :user_id?
+  validate :seat_capacity_not_exceeded, if: :user_id?
 
   before_create :set_purchased_at, if: :user_id?
 
@@ -29,6 +30,15 @@ class Seat < ApplicationRecord
 
     if existing_seat
       errors.add(:user, "can only have one seat per event")
+    end
+  end
+
+  def seat_capacity_not_exceeded
+    return unless game && user_id
+
+    seats_taken = game.seats.where.not(id: id).where.not(user_id: nil).count
+    if seats_taken >= game.seat_count
+      errors.add(:base, "This table is full")
     end
   end
 

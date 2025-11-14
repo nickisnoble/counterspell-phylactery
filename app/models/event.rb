@@ -9,6 +9,7 @@ class Event < ApplicationRecord
   accepts_nested_attributes_for :games, allow_destroy: true, reject_if: :all_blank
 
   validates :date, presence: true
+  validates :ticket_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   enum :status, %w[planning upcoming past cancelled], validate: true
 
@@ -25,16 +26,22 @@ class Event < ApplicationRecord
   private
 
   def create_default_reminder_emails
-    # 1 week before event
-    event_emails.create!(
-      subject: "Reminder: #{name} is one week away!",
-      send_at: date - 7.days
-    )
+    one_week_before = date - 7.days
+    one_day_before = date - 1.day
 
-    # 1 day before event
-    event_emails.create!(
-      subject: "Reminder: #{name} is tomorrow!",
-      send_at: date - 1.day
-    )
+    # Only create reminders for future dates
+    if one_week_before > Time.current
+      event_emails.create!(
+        subject: "Reminder: #{name} is one week away!",
+        send_at: one_week_before
+      )
+    end
+
+    if one_day_before > Time.current
+      event_emails.create!(
+        subject: "Reminder: #{name} is tomorrow!",
+        send_at: one_day_before
+      )
+    end
   end
 end

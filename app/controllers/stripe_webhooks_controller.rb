@@ -2,6 +2,12 @@ class StripeWebhooksController < NoCheckout::Stripe::WebhooksController
   STRIPE_SIGNING_SECRET = ENV["STRIPE_SIGNING_SECRET"]
 
   def checkout_session_completed
+    # Validate metadata presence
+    unless data.metadata&.game_id && data.metadata&.user_id
+      Rails.logger.error "Webhook missing required metadata: session_id=#{data.id}"
+      return
+    end
+
     # Extract metadata from the session
     game_id = data.metadata.game_id
     user_id = data.metadata.user_id
@@ -15,10 +21,13 @@ class StripeWebhooksController < NoCheckout::Stripe::WebhooksController
     seat = game.seats.find_or_initialize_by(user: user, hero_id: hero_id)
     seat.stripe_payment_intent_id = data.payment_intent
     seat.purchased_at = Time.current
-    seat.save!
 
-    Rails.logger.info "Created seat #{seat.id} for user #{user.email} in game #{game.id}"
+    if seat.save
+      Rails.logger.info "Created seat #{seat.id} for user #{user.email} in game #{game.id}"
+    else
+      Rails.logger.error "Failed to save seat: #{seat.errors.full_messages.join(', ')}"
+    end
   rescue ActiveRecord::RecordNotFound => e
-    Rails.logger.error "Failed to create seat: #{e.message}"
+    Rails.logger.error "Failed to create seat - record not found: #{e.message}"
   end
 end

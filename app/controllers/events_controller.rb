@@ -4,9 +4,9 @@ class EventsController < ApplicationController
 
   def index
     @events = if authenticated? && (Current.user.gm? || Current.user.admin?)
-      Event.visible_to_gm.order(date: :asc)
+      Event.includes(:location).visible_to_gm.order(date: :asc)
     else
-      Event.publicly_visible.order(date: :asc)
+      Event.includes(:location).publicly_visible.order(date: :asc)
     end
 
     render Views::Events::Index.new(events: @events)
@@ -26,6 +26,6 @@ class EventsController < ApplicationController
   private
 
   def set_event
-    @event = Event.find_by_slug!(params[:id])
+    @event = Event.includes(:location, games: [:gm, :seats]).find_by_slug!(params[:id])
   end
 end

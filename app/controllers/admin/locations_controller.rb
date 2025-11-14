@@ -36,6 +36,8 @@ class Admin::LocationsController < ApplicationController
   def destroy
     @location.destroy
     redirect_to admin_locations_path, notice: "Location deleted successfully"
+  rescue ActiveRecord::DeleteRestrictionError
+    redirect_to admin_locations_path, alert: "Cannot delete location with existing events"
   end
 
   private
