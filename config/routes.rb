@@ -18,6 +18,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Stripe webhooks
+  post "/stripe/webhooks" => "stripe_webhooks#create"
+
   namespace :admin do
     resources :locations
     resources :events

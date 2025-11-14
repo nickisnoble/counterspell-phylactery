@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1><%= @event_email.subject %></h1>
+
+    <% if @event_email.body.present? %>
+      <%= @event_email.body %>
+    <% else %>
+      <p>Hi <%= @user.display_name || 'there' %>!</p>
+
+      <p>This is a reminder about your upcoming event:</p>
+
+      <h2><%= @event.name %></h2>
+
+      <p>
+        <strong>When:</strong> <%= @event.date.strftime('%A, %B %d, %Y') %><br>
+        <% if @event.start_time %>
+          <strong>Time:</strong> <%= @event.start_time.strftime('%I:%M %p') %> - <%= @event.end_time&.strftime('%I:%M %p') %><br>
+        <% end %>
+        <strong>Where:</strong> <%= @event.location.name %><br>
+        <%= @event.location.address %>
+      </p>
+
+      <% if @seat && @seat.hero %>
+        <p><strong>Your Hero:</strong> <%= @seat.hero.name %></p>
+      <% end %>
+
+      <% if @seat && @seat.game %>
+        <p><strong>Your Game Master:</strong> <%= @seat.game.gm.display_name %></p>
+      <% end %>
+
+      <p>We're looking forward to seeing you there!</p>
+    <% end %>
+
+    <p>
+      <a href="<%= event_url(@event) %>">View Event Details</a>
+    </p>
+  </body>
+</html>

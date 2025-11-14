@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_many :sessions, dependent: :destroy
   has_many :heroes, dependent: :destroy
+  has_many :seats, dependent: :destroy
   has_many :games_as_gm, class_name: "Game", foreign_key: "gm_id", dependent: :restrict_with_error
   has_rich_text :bio
 
