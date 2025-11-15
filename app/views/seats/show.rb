@@ -79,13 +79,13 @@ class Views::Seats::Show < Views::Base
         div(class: "border-2 border-gray-200 rounded-lg p-8 text-center mb-6 bg-white") do
           div(class: "inline-block p-4 bg-white") do
             qr_code = RQRCode::QRCode.new(@seat.qr_code_url)
-            unsafe_raw qr_code.as_svg(
+            raw qr_code.as_svg(
               module_size: 4,
               standalone: true,
               use_path: true,
               color: "000",
               shape_rendering: "crispEdges"
-            )
+            ).html_safe
           end
           p(class: "text-gray-600 font-mono text-sm mt-4") { "Ticket ##{@seat.id}" }
           p(class: "text-gray-500 text-xs mt-2") { "Scan this QR code at check-in" }

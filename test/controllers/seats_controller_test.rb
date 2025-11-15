@@ -40,4 +40,63 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     assert_match /stripe\.com/, response.location
   end
+
+  test "should show seat when authenticated as owner" do
+    seat = @game.seats.create!(user: @player, hero: @hero)
+    login_with_otp(@player.email)
+    get event_game_seat_path(@event, @game, seat)
+    assert_response :success
+  end
+
+  test "admin can view any seat" do
+    seat = @game.seats.create!(user: @player, hero: @hero)
+    admin = User.create!(email: "admin@test.com", system_role: "admin", display_name: "Admin")
+    login_with_otp(admin.email)
+    get event_game_seat_path(@event, @game, seat)
+    assert_response :success
+  end
+
+  test "cannot view other user's seat" do
+    seat = @game.seats.create!(user: @player, hero: @hero)
+    other_user = User.create!(email: "other@test.com", system_role: "player", display_name: "Other")
+    login_with_otp(other_user.email)
+    get event_game_seat_path(@event, @game, seat)
+    assert_redirected_to root_path
+  end
+
+  test "requires authentication to view seat" do
+    seat = @game.seats.create!(user: @player, hero: @hero)
+    get event_game_seat_path(@event, @game, seat)
+    assert_redirected_to new_session_path
+  end
+
+  test "cannot purchase for non-upcoming event" do
+    @event.update!(status: "past")
+    login_with_otp(@player.email)
+
+    post event_game_seats_path(@event, @game), params: { seat: { hero_id: @hero.id } }
+    assert_redirected_to event_path(@event)
+    assert_match /not available for purchase/, flash[:alert]
+  end
+
+  test "cannot purchase when table is full" do
+    # Fill all seats
+    @game.seat_count.times do
+      user = User.create!(email: "user#{rand(10000)}@test.com", system_role: "player")
+      @game.seats.create!(user: user)
+    end
+
+    login_with_otp(@player.email)
+    post event_game_seats_path(@event, @game), params: { seat: { hero_id: @hero.id } }
+    assert_redirected_to event_path(@event)
+    assert_match /full/, flash[:alert]
+  end
+
+  test "success creates seat and redirects" do
+    login_with_otp(@player.email)
+    seat = @game.seats.create!(user: @player, hero: @hero)
+
+    get success_event_game_seats_path(@event, @game, hero_id: @hero.id, payment_intent: "pi_test")
+    assert_redirected_to event_game_seat_path(@event, @game, seat)
+  end
 end

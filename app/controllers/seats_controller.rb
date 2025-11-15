@@ -1,6 +1,7 @@
 class SeatsController < ApplicationController
   before_action :set_event_and_game, only: [:create, :success, :show]
   before_action :authorize_purchase, only: [:create]
+  before_action :authorize_seat_viewing, only: [:show]
 
   def show
     @seat = @game.seats.find(params[:id])
@@ -55,12 +56,6 @@ class SeatsController < ApplicationController
     if @seat.new_record?
       @seat.stripe_payment_intent_id = params[:payment_intent]
       @seat.save!
-
-      # Broadcast seat purchase
-      EventChannel.broadcast_to(
-        @event,
-        { type: "seat_purchased", game_id: @game.id, hero_id: @seat.hero_id }
-      )
     end
 
     redirect_to event_game_seat_path(@event, @game, @seat), notice: "Seat purchased successfully!"
@@ -85,6 +80,13 @@ class SeatsController < ApplicationController
     if available_seats <= 0
       redirect_to event_path(event), alert: "This table is full"
       return
+    end
+  end
+
+  def authorize_seat_viewing
+    @seat = @game.seats.find(params[:id])
+    unless Current.user&.admin? || @seat.user == Current.user
+      redirect_to root_path, alert: "You can only view your own tickets"
     end
   end
 

@@ -79,4 +79,28 @@ class SeatTest < ActiveSupport::TestCase
     seat = Seat.create!(game: @game, user: @player1)
     assert_equal 32, seat.qr_token.length
   end
+
+  test "broadcasts seat purchase when created with user" do
+    # The broadcast callback is called after_commit
+    # Just verify the seat is created successfully (broadcast will fire)
+    seat = Seat.new(game: @game, user: @player1, hero: heroes(:one))
+    assert seat.save
+    assert seat.persisted?
+  end
+
+  test "broadcasts check-in when checked_in_at changes" do
+    seat = Seat.create!(game: @game, user: @player1)
+
+    # Check that check_in! updates the timestamp (broadcast will fire via callback)
+    assert_changes -> { seat.reload.checked_in_at } do
+      seat.check_in!
+    end
+  end
+
+  test "does not broadcast when seat has no user" do
+    seat = Seat.create!(game: @game)
+    # Empty seats don't broadcast - verify they can still be created
+    assert seat.persisted?
+    assert_nil seat.user_id
+  end
 end

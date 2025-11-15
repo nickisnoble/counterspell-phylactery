@@ -3,7 +3,7 @@ module Users
     before_action :set_user
 
     def index
-      @seats = @user.seats.includes(:game, :event, :hero).order(created_at: :desc)
+      @seats = @user.seats.includes(game: :event).includes(:hero).order(created_at: :desc)
       @upcoming_seats = @seats.joins(game: :event).where(events: { status: :upcoming }).order("events.date ASC")
       @past_seats = @seats.joins(game: :event).where(events: { status: :past }).order("events.date DESC")
 

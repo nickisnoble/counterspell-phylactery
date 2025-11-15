@@ -9,6 +9,9 @@ class Seat < ApplicationRecord
 
   before_create :set_purchased_at, if: :user_id?
 
+  # Broadcast seat changes to event subscribers
+  after_commit :broadcast_seat_update, on: [:create, :update]
+
   def checked_in?
     checked_in_at.present?
   end
@@ -70,5 +73,29 @@ class Seat < ApplicationRecord
 
   def set_purchased_at
     self.purchased_at ||= Time.current
+  end
+
+  def broadcast_seat_update
+    return unless game&.event && user_id
+
+    # Determine the type of update
+    update_type = if saved_change_to_checked_in_at?
+      "check_in"
+    elsif saved_change_to_user_id? || saved_change_to_hero_id?
+      "seat_purchased"
+    else
+      return # Don't broadcast other changes
+    end
+
+    EventChannel.broadcast_to(
+      game.event,
+      {
+        type: update_type,
+        seat_id: id,
+        game_id: game_id,
+        hero_id: hero_id,
+        checked_in: checked_in?
+      }
+    )
   end
 end
