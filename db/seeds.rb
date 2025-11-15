@@ -276,26 +276,6 @@ Event.find_each do |event|
   end
 end
 
-# Fill some seats for past and upcoming events (only if seats are empty)
-Event.where(status: [:past, :upcoming]).find_each do |event|
-  # Track which players are already assigned to this event
-  assigned_players = event.games.joins(:seats).where.not(seats: { user_id: nil }).pluck('seats.user_id').uniq
-  available_players = player_users.reject { |p| assigned_players.include?(p.id) }
-
-  event.games.each do |game|
-    empty_seats = game.seats.where(user_id: nil)
-    next if empty_seats.empty? || available_players.empty?
-
-    # Fill half to all-but-one seats, but don't exceed available players
-    filled_count = [[empty_seats.count / 2, empty_seats.count - 1].sample, available_players.count].min
-
-    empty_seats.limit(filled_count).each do |seat|
-      player = available_players.shift
-      seat.update!(user: player) if player
-    end
-  end
-end
-
 # Create Heroes
 heroes_data = [
   {
@@ -421,4 +401,33 @@ heroes_data.each do |hero_data|
   hero.save!
 
   puts "Created/Updated hero: #{hero.name}"
+end
+
+# Fill some seats for past and upcoming events (only if seats are empty)
+Event.where(status: [:past, :upcoming]).find_each do |event|
+  # Track which players are already assigned to this event
+  assigned_players = event.games.joins(:seats).where.not(seats: { user_id: nil }).pluck('seats.user_id').uniq
+  available_players = player_users.reject { |p| assigned_players.include?(p.id) }
+
+  event.games.each do |game|
+    empty_seats = game.seats.where(user_id: nil)
+    next if empty_seats.empty? || available_players.empty?
+
+    # Fill half to all-but-one seats, but don't exceed available players
+    filled_count = [[empty_seats.count / 2, empty_seats.count - 1].sample, available_players.count].min
+
+    empty_seats.limit(filled_count).each do |seat|
+      player = available_players.shift
+      next unless player
+
+      # Assign user to seat
+      seat.update!(user: player)
+
+      # Assign a random hero to the seat (for both past and upcoming events)
+      if Hero.exists?
+        available_heroes = Hero.where.not(id: game.seats.where.not(hero_id: nil).pluck(:hero_id))
+        seat.update!(hero: available_heroes.sample) if available_heroes.any?
+      end
+    end
+  end
 end
