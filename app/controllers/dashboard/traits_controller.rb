@@ -1,0 +1,86 @@
+class Dashboard::TraitsController < ApplicationController
+  before_action :require_gm_or_admin!
+  before_action :require_admin!, except: %i[ index show ]
+  before_action :set_trait, only: %i[ show edit update destroy ]
+
+  def index
+    @traits = Trait.all
+    render Views::Dashboard::Traits::Index.new(traits: @traits)
+  end
+
+  def show
+    render Views::Dashboard::Traits::Show.new(trait: @trait)
+  end
+
+  def new
+    @trait = Trait.new
+    render Views::Dashboard::Traits::New.new(trait: @trait)
+  end
+
+  def edit
+    render Views::Dashboard::Traits::Edit.new(trait: @trait)
+  end
+
+  def create
+    @trait = Trait.new(trait_params)
+
+    respond_to do |format|
+      if @trait.save
+        format.html { redirect_to dashboard_trait_path(@trait), notice: "Trait was successfully created." }
+        format.json {
+          render json: {
+            success: true,
+            trait: {
+              id: @trait.id,
+              name: @trait.name,
+              type: @trait.type
+            }
+          }, status: :created
+        }
+      else
+        format.html { render Views::Dashboard::Traits::New.new(trait: @trait), status: :unprocessable_content }
+        format.json {
+          render json: {
+            success: false,
+            errors: @trait.errors.full_messages
+          }, status: :unprocessable_content
+        }
+      end
+    end
+  end
+
+  def update
+    respond_to do |format|
+      if @trait.update(trait_params)
+        format.html { redirect_to dashboard_trait_path(@trait), notice: "Trait was successfully updated.", status: :see_other }
+        format.json { render :show, status: :ok, location: dashboard_trait_path(@trait) }
+      else
+        format.html { render Views::Dashboard::Traits::Edit.new(trait: @trait), status: :unprocessable_content }
+        format.json { render json: @trait.errors, status: :unprocessable_content }
+      end
+    end
+  end
+
+  def destroy
+    respond_to do |format|
+      if @trait.heroes.any?
+        hero_names = @trait.heroes.pluck(:name).join(", ")
+        format.html { redirect_to dashboard_trait_path(@trait), alert: "Cannot delete: still referenced by #{hero_names}", status: :unprocessable_content }
+        format.json { render json: { error: "Trait still in use by heroes: #{hero_names}" }, status: :unprocessable_content }
+      else
+        @trait.destroy!
+        format.html { redirect_to dashboard_traits_path, notice: "Trait was successfully destroyed.", status: :see_other }
+        format.json { head :no_content }
+      end
+    end
+  end
+
+  private
+    def set_trait
+      @trait = Trait.find_by_slug!(params[:id])
+    end
+
+    def trait_params
+      params.expect(trait: [ :type, :name, :description, :cover, abilities: {} ])
+    end
+end

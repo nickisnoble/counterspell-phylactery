@@ -24,6 +24,9 @@
     <meta name="twitter:description" content="Play table top adventures irl, whether you're a complete beginner or new to the hobby, there's a place in our world for you.">
     <meta name="twitter:image" content="https://counterspell.games/og-image.jpg">
 
+    <meta name="turbo-refresh-scroll" content="preserve">
+    <meta name="turbo-refresh-method" content="morph">
+
     <%= yield :head %>
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
@@ -37,8 +40,7 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "lexxy" %>
 
-    <%= javascript_importmap_tags %>
-    <script src="https://kit.fontawesome.com/8bcb00a03e.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/8bcb00a03e.js" crossorigin="anonymous" defer></script>
 
     <% if Rails.env.production? %>
       <script defer src="https://api.pirsch.io/pa.js" id="pianjs" data-code="oKRec8iQLQgKJr21uIOfvES9jNpmrB3P"></script>
@@ -79,5 +81,6 @@
         <% end %>
       </nav>
     </footer>
+    <%= javascript_importmap_tags %>
   </body>
 </html>

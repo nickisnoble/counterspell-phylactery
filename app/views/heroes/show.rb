@@ -6,6 +6,7 @@ class Views::Heroes::Show < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
   include Phlex::Rails::Helpers::ImageTag
   include Phlex::Rails::Helpers::URLFor
+  include ActionView::RecordIdentifier
 
   def initialize(hero:)
     @hero = hero
@@ -47,7 +48,27 @@ class Views::Heroes::Show < Views::Base
 
         div(class: "*:last:-z-1 justify-center grid sm:grid-cols-3 *:shadow-md pt-4 border-current/20 border-t-2 *:first:-rotate-1 *:last:rotate-1") do
           @hero.traits.each do |trait|
-            render Components::Card.from_trait(trait)
+            cover_url = trait.cover.attached? ? url_for(trait.cover) : nil
+            render Components::Card.new(
+              title: trait.name,
+              cover: cover_url,
+              dom_id: dom_id(trait),
+              badge: trait.type
+            ) do
+              p(class: "font-light italic text-pretty leading-snug") { trait.description }
+
+              if trait.abilities.present? && trait.abilities.any?
+                ul(class: "space-y-2 text-xs") do
+                  trait.abilities.each do |name, description|
+                    li do
+                      strong(class: "font-black text-[0.8em] uppercase") { "#{name}:" }
+                      whitespace
+                      plain description
+                    end
+                  end
+                end
+              end
+            end
           end
         end
       end

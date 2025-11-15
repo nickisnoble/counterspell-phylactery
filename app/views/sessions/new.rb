@@ -6,6 +6,8 @@ class Views::Sessions::New < Views::Base
   include Phlex::Rails::Helpers::CheckboxTag
   include Phlex::Rails::Helpers::JavascriptIncludeTag
 
+  register_output_helper :hashcash_hidden_field_tag
+
   def initialize
   end
 
@@ -77,7 +79,7 @@ class Views::Sessions::New < Views::Base
         end
 
         form_with url: session_path, class: "space-y-2" do |form|
-          raw helpers.hashcash_hidden_field_tag
+          hashcash_hidden_field_tag
 
           form.email_field :email,
             required: true,

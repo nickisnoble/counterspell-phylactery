@@ -1,0 +1,30 @@
+<%= @event_email.subject %>
+
+<% if @event_email.body.present? %>
+<%= @event_email.body.to_plain_text %>
+<% else %>
+Hi <%= @user.display_name || 'there' %>!
+
+This is a reminder about your upcoming event:
+
+<%= @event.name %>
+
+When: <%= @event.date.strftime('%A, %B %d, %Y') %>
+<% if @event.start_time %>
+Time: <%= @event.start_time.strftime('%I:%M %p') %> - <%= @event.end_time&.strftime('%I:%M %p') %>
+<% end %>
+Where: <%= @event.location.name %>
+<%= @event.location.address %>
+
+<% if @seat && @seat.hero %>
+Your Hero: <%= @seat.hero.name %>
+<% end %>
+
+<% if @seat && @seat.game %>
+Your Game Master: <%= @seat.game.gm.display_name %>
+<% end %>
+
+We're looking forward to seeing you there!
+<% end %>
+
+View Event Details: <%= event_url(@event) %>
