@@ -21,14 +21,13 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
 
     @hero = Hero.create!(
       name: "Seats Test Hero",
-      user: @player,
       role: "fighter",
       traits: [ancestry, background, class_trait]
     )
   end
 
   test "requires authentication to purchase" do
-    post game_seats_path(@game), params: { seat: { hero_id: @hero.id } }
+    post event_game_seats_path(@event, @game), params: { seat: { hero_id: @hero.id } }
     assert_redirected_to new_session_path
   end
 
@@ -36,7 +35,7 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
     skip("Requires Stripe API credentials")
     login_with_otp(@player.email)
 
-    post game_seats_path(@game), params: { seat: { hero_id: @hero.id } }
+    post event_game_seats_path(@event, @game), params: { seat: { hero_id: @hero.id } }
 
     assert_response :redirect
     assert_match /stripe\.com/, response.location

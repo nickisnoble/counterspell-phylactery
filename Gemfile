@@ -23,6 +23,7 @@ gem "image_processing", "~> 1.14"
 
 gem "lexxy", "~> 0.1.4.beta"
 gem "phlex-rails"
+gem "rqrcode", "~> 2.0"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

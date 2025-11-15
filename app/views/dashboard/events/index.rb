@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Views::Admin::Events::Index < Views::Base
+class Views::Dashboard::Events::Index < Views::Base
   include Phlex::Rails::Helpers::ContentFor
   include Phlex::Rails::Helpers::LinkTo
   include Phlex::Rails::Helpers::ButtonTo
@@ -12,10 +12,10 @@ class Views::Admin::Events::Index < Views::Base
   def view_template
     content_for(:title, "Admin - Events")
 
-    main(class: "w-full") do
-      div(class: "flex justify-between items-center mb-8") do
-        h1(class: "font-bold text-4xl") { "Events" }
-        link_to("New event", new_admin_event_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium")
+    main(class: "w-full max-w-7xl mx-auto px-4 py-8") do
+      div(class: "flex justify-between items-center mb-6") do
+        h1(class: "font-bold text-3xl") { "Events" }
+        link_to("+ New Event", new_dashboard_event_path, class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition")
       end
 
       div(id: "events", class: "container mx-auto") do
@@ -45,9 +45,9 @@ class Views::Admin::Events::Index < Views::Base
                       end
                     end
                     td(class: "px-6 py-4 whitespace-nowrap text-sm text-gray-500") { event.games.count }
-                    td(class: "px-6 py-4 whitespace-nowrap text-right text-sm font-medium") do
-                      link_to("Edit", edit_admin_event_path(event), class: "text-blue-600 hover:text-blue-900 mr-4")
-                      button_to("Delete", admin_event_path(event), method: :delete, form: { data: { turbo_confirm: "Are you sure?" } }, class: "text-red-600 hover:text-red-900")
+                    td(class: "px-6 py-4 whitespace-nowrap text-right text-sm") do
+                      link_to("Edit", edit_dashboard_event_path(event), class: "text-blue-600 hover:text-blue-800 mr-3")
+                      button_to("Delete", dashboard_event_path(event), method: :delete, form: { data: { turbo_confirm: "Are you sure?" } }, class: "text-gray-500 hover:text-red-600")
                     end
                   end
                 end
@@ -55,9 +55,9 @@ class Views::Admin::Events::Index < Views::Base
             end
           end
         else
-          div(class: "text-center py-16") do
-            p(class: "text-gray-500 text-lg") { "No events found." }
-            link_to("Create your first event", new_admin_event_path, class: "mt-4 inline-block rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium")
+          div(class: "bg-white rounded-lg border border-gray-200 text-center py-16") do
+            p(class: "text-gray-500 mb-4") { "No events yet." }
+            link_to("+ Create First Event", new_dashboard_event_path, class: "inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition")
           end
         end
       end

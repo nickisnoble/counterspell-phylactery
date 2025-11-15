@@ -21,7 +21,6 @@ class EventMailerTest < ActionMailer::TestCase
     class_trait = Trait.create!(type: "CLASS", name: "Mailer Test Class")
     @hero = Hero.create!(
       name: "Mailer Test Hero",
-      user: @player,
       role: "fighter",
       traits: [ancestry, background, class_trait]
     )

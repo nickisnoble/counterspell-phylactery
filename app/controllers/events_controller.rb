@@ -19,7 +19,7 @@ class EventsController < ApplicationController
       return
     end
 
-    user_heroes = current_user&.heroes || []
+    user_heroes = Hero.all
     render Views::Events::Show.new(event: @event, current_user: current_user, user_heroes: user_heroes)
   end
 

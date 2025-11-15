@@ -47,4 +47,36 @@ class SeatTest < ActiveSupport::TestCase
     seat = Seat.new(game: @game, user: @player1, hero: nil)
     assert seat.valid?
   end
+
+  test "checked_in? returns false when not checked in" do
+    seat = Seat.create!(game: @game, user: @player1)
+    assert_not seat.checked_in?
+  end
+
+  test "checked_in? returns true when checked in" do
+    seat = Seat.create!(game: @game, user: @player1)
+    seat.check_in!
+    assert seat.checked_in?
+  end
+
+  test "check_in! sets checked_in_at timestamp" do
+    seat = Seat.create!(game: @game, user: @player1)
+    assert_nil seat.checked_in_at
+
+    seat.check_in!
+    assert_not_nil seat.checked_in_at
+    assert seat.checked_in_at <= Time.current
+  end
+
+  test "qr_token generates consistent token for same seat" do
+    seat = Seat.create!(game: @game, user: @player1)
+    token1 = seat.qr_token
+    token2 = seat.qr_token
+    assert_equal token1, token2
+  end
+
+  test "qr_token is 32 characters long" do
+    seat = Seat.create!(game: @game, user: @player1)
+    assert_equal 32, seat.qr_token.length
+  end
 end

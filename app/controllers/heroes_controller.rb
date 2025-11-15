@@ -27,7 +27,6 @@ class HeroesController < ApplicationController
   # POST /heroes or /heroes.json
   def create
     @hero = Hero.new(hero_params)
-    @hero.user = Current.user
 
     respond_to do |format|
       if @hero.save

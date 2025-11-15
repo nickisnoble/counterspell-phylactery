@@ -1,6 +1,11 @@
 class SeatsController < ApplicationController
-  before_action :set_game
+  before_action :set_event_and_game, only: [:create, :success, :show]
   before_action :authorize_purchase, only: [:create]
+
+  def show
+    @seat = @game.seats.find(params[:id])
+    render Views::Seats::Show.new(seat: @seat, game: @game, event: @event)
+  end
 
   def create
     @seat = @game.seats.build(seat_params)
@@ -21,8 +26,8 @@ class SeatsController < ApplicationController
           quantity: 1
         }],
         mode: "payment",
-        success_url: success_game_seats_url(@game, hero_id: @seat.hero_id),
-        cancel_url: event_url(@game.event),
+        success_url: success_event_game_seats_url(@event, @game, hero_id: @seat.hero_id),
+        cancel_url: event_url(@event),
         metadata: {
           game_id: @game.id,
           user_id: Current.user.id,
@@ -52,13 +57,14 @@ class SeatsController < ApplicationController
       @seat.save!
     end
 
-    redirect_to event_path(@game.event), notice: "Seat purchased successfully!"
+    redirect_to event_game_seat_path(@event, @game, @seat), notice: "Seat purchased successfully!"
   end
 
   private
 
-  def set_game
-    @game = Game.find(params[:game_id])
+  def set_event_and_game
+    @event = Event.find_by_slug!(params[:event_id])
+    @game = @event.games.find(params[:game_id])
   end
 
   def authorize_purchase

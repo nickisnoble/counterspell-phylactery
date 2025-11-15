@@ -68,4 +68,27 @@ class EventEmailTest < ActiveSupport::TestCase
     email = EventEmail.create!(event: @event, subject: "Test", send_at: 1.day.from_now)
     assert_not email.sent?
   end
+
+  test "prevents updating sent_at after email is sent" do
+    email = EventEmail.create!(
+      event: @event,
+      subject: "Test",
+      send_at: 1.day.ago,
+      sent_at: 1.hour.ago
+    )
+    email.sent_at = 2.hours.ago
+    assert_not email.valid?
+    assert_includes email.errors[:sent_at], "cannot be changed after email is sent"
+  end
+
+  test "allows updating body after email is sent" do
+    email = EventEmail.create!(
+      event: @event,
+      subject: "Test",
+      send_at: 1.day.ago,
+      sent_at: 1.hour.ago
+    )
+    email.body = "Updated content"
+    assert email.valid?
+  end
 end

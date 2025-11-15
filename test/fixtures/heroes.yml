@@ -5,18 +5,15 @@ one:
   slug: test-hero
   pronouns: "They/Them"
   role: fighter
-  user: one
 
 denn:
   name: Denn
   slug: denn
   pronouns: "They/Them"
   role: fighter
-  user: one
 
 carina:
   name: Carina Croftblade
   slug: carina-croftblade
   pronouns: "She/Her"
   role: strategist
-  user: admin

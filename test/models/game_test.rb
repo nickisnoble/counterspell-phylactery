@@ -45,4 +45,20 @@ class GameTest < ActiveSupport::TestCase
     assert_not game.valid?
     assert_includes game.errors[:seat_count], "must be greater than 0"
   end
+
+  test "validates GM is unique per event" do
+    event = events(:one)
+    Game.create!(event: event, gm: @gm, seat_count: 5)
+    duplicate_game = Game.new(event: event, gm: @gm, seat_count: 5)
+    assert_not duplicate_game.valid?
+    assert_includes duplicate_game.errors[:gm_id], "cannot GM multiple tables at the same event"
+  end
+
+  test "allows same GM at different events" do
+    event1 = events(:one)
+    event2 = events(:two)
+    Game.create!(event: event1, gm: @gm, seat_count: 5)
+    game2 = Game.new(event: event2, gm: @gm, seat_count: 5)
+    assert game2.valid?
+  end
 end

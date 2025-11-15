@@ -88,7 +88,7 @@ class Views::Events::Show < Views::Base
 
       # Games/Tables section
       if @event.games.any?
-        div(class: "bg-white rounded-lg shadow-md p-8") do
+        div(class: "bg-white rounded-lg shadow-md p-8 mb-6") do
           h2(class: "font-bold text-2xl mb-6") { "Game Tables" }
           p(class: "text-gray-600 mb-6") { "#{@event.games.count} #{'table'.pluralize(@event.games.count)} available for this event" }
 
@@ -99,9 +99,14 @@ class Views::Events::Show < Views::Base
           end
         end
       else
-        div(class: "bg-yellow-50 rounded-lg p-6 text-center") do
+        div(class: "bg-yellow-50 rounded-lg p-6 text-center mb-6") do
           p(class: "text-yellow-800") { "Game tables are still being organized. Check back soon!" }
         end
+      end
+
+      # Check-in section (only for admins/GMs)
+      if @current_user && (@current_user.admin? || @current_user.gm?)
+        render_check_in_section
       end
     end
   end
@@ -141,7 +146,7 @@ class Views::Events::Show < Views::Base
       if available_seats > 0 && @event.upcoming? && @current_user
         div(class: "mt-4") do
           if @user_heroes.any?
-            form_with(url: game_seats_path(game), method: :post) do |f|
+            form_with(url: event_game_seats_path(@event, game), method: :post) do |f|
               f.select :hero_id, @user_heroes.map { |h| [h.name, h.id] },
                 { prompt: "Select your hero" },
                 class: "block w-full rounded-md border-gray-300 mb-2"
@@ -158,6 +163,81 @@ class Views::Events::Show < Views::Base
         div(class: "mt-4") do
           link_to("Sign In to Purchase", new_session_path,
             class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium")
+        end
+      end
+    end
+  end
+
+  def render_check_in_section
+    all_seats = @event.games.flat_map { |game| game.seats.where.not(user_id: nil).includes(:user, :hero, :game) }
+    return if all_seats.empty?
+
+    div(class: "bg-white rounded-lg shadow-md p-8") do
+      div(class: "flex justify-between items-center mb-6") do
+        h2(class: "font-bold text-2xl") { "Check-in Management" }
+        link_to("QR Scanner", check_in_path,
+          class: "px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md")
+      end
+
+      checked_in_count = all_seats.count(&:checked_in?)
+      p(class: "text-gray-600 mb-6") do
+        "#{checked_in_count} of #{all_seats.count} attendees checked in"
+      end
+
+      div(class: "overflow-x-auto") do
+        table(class: "min-w-full divide-y divide-gray-200") do
+          thead(class: "bg-gray-50") do
+            tr do
+              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Player" }
+              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Hero" }
+              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Table GM" }
+              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Status" }
+              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Action" }
+            end
+          end
+
+          tbody(class: "bg-white divide-y divide-gray-200") do
+            all_seats.each do |seat|
+              tr do
+                td(class: "px-6 py-4 whitespace-nowrap") do
+                  div(class: "text-sm font-medium text-gray-900") { seat.user.display_name }
+                  div(class: "text-sm text-gray-500") { seat.user.email }
+                end
+
+                td(class: "px-6 py-4 whitespace-nowrap text-sm text-gray-900") do
+                  seat.hero ? seat.hero.name : "-"
+                end
+
+                td(class: "px-6 py-4 whitespace-nowrap text-sm text-gray-900") do
+                  seat.game.gm.display_name
+                end
+
+                td(class: "px-6 py-4 whitespace-nowrap") do
+                  if seat.checked_in?
+                    span(class: "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800") do
+                      "✓ Checked in"
+                    end
+                    div(class: "text-xs text-gray-500 mt-1") do
+                      seat.checked_in_at.strftime("%I:%M %p")
+                    end
+                  else
+                    span(class: "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800") do
+                      "Not checked in"
+                    end
+                  end
+                end
+
+                td(class: "px-6 py-4 whitespace-nowrap text-sm") do
+                  button_to(
+                    seat.checked_in? ? "Undo" : "Check In",
+                    check_in_seat_path(seat),
+                    method: :patch,
+                    class: "px-3 py-1 #{seat.checked_in? ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'} text-white text-xs font-medium rounded cursor-pointer"
+                  )
+                end
+              end
+            end
+          end
         end
       end
     end

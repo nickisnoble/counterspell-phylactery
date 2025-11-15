@@ -3,25 +3,38 @@ Rails.application.routes.draw do
 
   root "sessions#new"
 
-  resources :events, only: [:index, :show] do
-    resources :event_emails, only: [:show]
+  resources :events, only: [ :index, :show ] do
+    resources :event_emails, only: [ :show ]
+    resources :games, only: [ :show ] do
+      resources :seats, only: [ :create, :show ] do
+        get :success, on: :collection
+      end
+    end
   end
-  resources :users, path: "players", except: %w[ index new create destroy ]
+
+  resources :locations, only: [ :index, :show ]
+
+  resources :users, path: "players", except: %w[ index new create destroy ] do
+    resources :seats, only: [ :index, :show ], controller: "users/seats"
+  end
+
   resource :dashboard, only: :show
 
   resources :heroes
   resources :traits
 
-  resources :games, only: [] do
-    resources :seats, only: [:create] do
-      get :success, on: :collection
-    end
-  end
-
   # Stripe webhooks
   post "/stripe/webhooks" => "stripe_webhooks#create"
 
-  namespace :admin do
+  # Check-in system
+  resource :check_in, only: [:show, :create]
+  resources :seats, only: [] do
+    member do
+      patch :check_in, to: "check_ins#update"
+    end
+  end
+
+  namespace :dashboard do
     resources :locations
     resources :events
   end
