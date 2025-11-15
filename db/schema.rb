@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_14_044442) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_15_001932) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -74,6 +74,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_044442) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_event_emails_on_event_id"
+    t.index ["send_at"], name: "index_event_emails_on_send_at"
+    t.index ["sent_at"], name: "index_event_emails_on_sent_at"
   end
 
   create_table "events", force: :cascade do |t|
@@ -87,8 +89,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_044442) do
     t.string "slug"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_events_on_date"
     t.index ["location_id"], name: "index_events_on_location_id"
     t.index ["slug"], name: "index_events_on_slug", unique: true
+    t.index ["status"], name: "index_events_on_status"
   end
 
   create_table "games", force: :cascade do |t|
@@ -154,6 +158,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_044442) do
     t.datetime "updated_at", null: false
     t.string "stripe_payment_intent_id"
     t.datetime "purchased_at"
+    t.index ["game_id", "user_id"], name: "index_seats_on_game_id_and_user_id"
     t.index ["game_id"], name: "index_seats_on_game_id"
     t.index ["hero_id"], name: "index_seats_on_hero_id"
     t.index ["user_id"], name: "index_seats_on_user_id"
