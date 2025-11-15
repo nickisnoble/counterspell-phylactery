@@ -6,24 +6,24 @@ class Views::Events::Show < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::ButtonTo
 
-  def initialize(event:, current_user: nil, user_heroes: [])
+  def initialize(event:, current_user: nil, available_heroes: [])
     @event = event
     @current_user = current_user
-    @user_heroes = user_heroes
+    @available_heroes = available_heroes
   end
 
   def view_template
     content_for(:title, @event.name)
 
-    main(class: "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8") do
+    main(class: "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8", data: { controller: "event-subscription", event_id: @event.slug }) do
       # Back link
       div(class: "mb-6") do
         link_to("← Back to Events", events_path, class: "text-blue-600 hover:text-blue-800")
       end
 
       # Event header
-      div(class: "bg-white rounded-lg shadow-md p-8 mb-6") do
-        div(class: "flex justify-between items-start mb-4") do
+      div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-6") do
+        div(class: "flex justify-between items-start mb-6") do
           h1(class: "font-bold text-4xl text-gray-900") { @event.name }
           span(class: "px-4 py-2 text-sm font-semibold rounded-full #{status_badge_class(@event.status)}") do
             @event.status&.titleize || "Unknown"
@@ -88,9 +88,11 @@ class Views::Events::Show < Views::Base
 
       # Games/Tables section
       if @event.games.any?
-        div(class: "bg-white rounded-lg shadow-md p-8 mb-6") do
-          h2(class: "font-bold text-2xl mb-6") { "Game Tables" }
-          p(class: "text-gray-600 mb-6") { "#{@event.games.count} #{'table'.pluralize(@event.games.count)} available for this event" }
+        div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-6") do
+          div(class: "mb-6 pb-3 border-b border-gray-200") do
+            h2(class: "font-semibold text-2xl mb-1") { "Game Tables" }
+            p(class: "text-sm text-gray-600") { "#{@event.games.count} #{'table'.pluralize(@event.games.count)} available for this event" }
+          end
 
           div(class: "grid gap-4 md:grid-cols-2 lg:grid-cols-3") do
             @event.games.each do |game|
@@ -99,8 +101,8 @@ class Views::Events::Show < Views::Base
           end
         end
       else
-        div(class: "bg-yellow-50 rounded-lg p-6 text-center mb-6") do
-          p(class: "text-yellow-800") { "Game tables are still being organized. Check back soon!" }
+        div(class: "bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center mb-6") do
+          p(class: "text-yellow-800 font-medium") { "Game tables are still being organized. Check back soon!" }
         end
       end
 
@@ -115,6 +117,9 @@ class Views::Events::Show < Views::Base
 
   def render_game_card(game)
     available_seats = game.seat_count - game.seats.where.not(user_id: nil).count
+    # Filter heroes already taken at this specific game
+    taken_hero_ids = game.seats.where.not(hero_id: nil).pluck(:hero_id)
+    available_heroes_for_game = @available_heroes.reject { |h| taken_hero_ids.include?(h.id) }
 
     div(class: "bg-gray-50 rounded-lg p-6 border border-gray-200") do
       div(class: "flex items-center mb-4") do
@@ -145,24 +150,25 @@ class Views::Events::Show < Views::Base
       # Purchase button
       if available_seats > 0 && @event.upcoming? && @current_user
         div(class: "mt-4") do
-          if @user_heroes.any?
-            form_with(url: event_game_seats_path(@event, game), method: :post) do |f|
-              f.select :hero_id, @user_heroes.map { |h| [h.name, h.id] },
+          if available_heroes_for_game.any?
+            form_with(url: event_game_seats_path(@event, game), method: :post, class: "space-y-3") do |f|
+              f.select :hero_id, available_heroes_for_game.map { |h| [h.name, h.id] },
                 { prompt: "Select your hero" },
-                class: "block w-full rounded-md border-gray-300 mb-2"
+                class: "block w-full rounded-md border border-gray-300 px-3 py-2.5 text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
 
               f.submit "Purchase Seat ($#{@event.ticket_price})",
-                class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer"
+                class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition"
             end
           else
-            link_to("Create a Hero First", new_hero_path,
-              class: "block w-full text-center rounded-md px-4 py-2 bg-gray-400 text-white font-medium")
+            div(class: "text-center text-sm text-gray-600 p-3 bg-yellow-50 border border-yellow-200 rounded-md") do
+              "All heroes taken for this table"
+            end
           end
         end
       elsif available_seats > 0 && @event.upcoming?
         div(class: "mt-4") do
           link_to("Sign In to Purchase", new_session_path,
-            class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium")
+            class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium transition")
         end
       end
     end
@@ -172,15 +178,17 @@ class Views::Events::Show < Views::Base
     all_seats = @event.games.flat_map { |game| game.seats.where.not(user_id: nil).includes(:user, :hero, :game) }
     return if all_seats.empty?
 
-    div(class: "bg-white rounded-lg shadow-md p-8") do
-      div(class: "flex justify-between items-center mb-6") do
-        h2(class: "font-bold text-2xl") { "Check-in Management" }
-        link_to("QR Scanner", check_in_path,
-          class: "px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md")
+    div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-8") do
+      div(class: "mb-6 pb-3 border-b border-gray-200") do
+        div(class: "flex justify-between items-center") do
+          h2(class: "font-semibold text-2xl") { "Check-in Management" }
+          link_to("QR Scanner", check_in_path,
+            class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition")
+        end
       end
 
       checked_in_count = all_seats.count(&:checked_in?)
-      p(class: "text-gray-600 mb-6") do
+      p(class: "text-sm text-gray-600 mb-6") do
         "#{checked_in_count} of #{all_seats.count} attendees checked in"
       end
 

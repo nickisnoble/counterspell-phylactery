@@ -55,6 +55,12 @@ class SeatsController < ApplicationController
     if @seat.new_record?
       @seat.stripe_payment_intent_id = params[:payment_intent]
       @seat.save!
+
+      # Broadcast seat purchase
+      EventChannel.broadcast_to(
+        @event,
+        { type: "seat_purchased", game_id: @game.id, hero_id: @seat.hero_id }
+      )
     end
 
     redirect_to event_game_seat_path(@event, @game, @seat), notice: "Seat purchased successfully!"

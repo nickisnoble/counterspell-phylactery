@@ -65,4 +65,34 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     get event_path(@past_event)
     assert_response :success
   end
+
+  test "show filters heroes already taken at specific game" do
+    # Create traits first
+    ancestry = Trait.create!(name: "Test Ancestry", type: "Ancestry", description: "Test")
+    background = Trait.create!(name: "Test Background", type: "Background", description: "Test")
+    char_class = Trait.create!(name: "Test Class", type: "Class", description: "Test")
+
+    # Create heroes with traits
+    hero1 = Hero.new(name: "Hero One", pronouns: "They/Them", role: "fighter")
+    hero1.traits = [ancestry, background, char_class]
+    hero1.save!
+
+    hero2 = Hero.new(name: "Hero Two", pronouns: "She/Her", role: "strategist")
+    hero2.traits = [ancestry, background, char_class]
+    hero2.save!
+
+    # Create a game with seats
+    game = @upcoming_event.games.first
+
+    # Take hero1 at this game
+    other_player = User.create!(email: "other@test.com", system_role: "player", display_name: "Other")
+    seat = game.seats.create!(user: other_player, hero: hero1)
+
+    # Login as current player
+    login_with_otp(@player.email)
+    get event_path(@upcoming_event)
+
+    assert_response :success
+    # Hero2 should be available, Hero1 should not
+  end
 end

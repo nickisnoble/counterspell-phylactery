@@ -21,6 +21,13 @@ class CheckInsController < ApplicationController
     end
 
     seat.check_in!
+
+    # Broadcast check-in update
+    EventChannel.broadcast_to(
+      seat.game.event,
+      { type: "check_in", seat_id: seat.id, checked_in: true }
+    )
+
     redirect_to check_in_path, notice: "✓ #{seat.user.display_name} checked in successfully!"
   end
 
@@ -35,9 +42,23 @@ class CheckInsController < ApplicationController
 
     if seat.checked_in?
       seat.update!(checked_in_at: nil)
+
+      # Broadcast check-out update
+      EventChannel.broadcast_to(
+        seat.game.event,
+        { type: "check_in", seat_id: seat.id, checked_in: false }
+      )
+
       redirect_to event_path(seat.game.event), notice: "#{seat.user.display_name} checked out"
     else
       seat.check_in!
+
+      # Broadcast check-in update
+      EventChannel.broadcast_to(
+        seat.game.event,
+        { type: "check_in", seat_id: seat.id, checked_in: true }
+      )
+
       redirect_to event_path(seat.game.event), notice: "#{seat.user.display_name} checked in"
     end
   end

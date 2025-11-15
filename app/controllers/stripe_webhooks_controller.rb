@@ -24,6 +24,12 @@ class StripeWebhooksController < NoCheckout::Stripe::WebhooksController
 
     if seat.save
       Rails.logger.info "Created seat #{seat.id} for user #{user.email} in game #{game.id}"
+
+      # Broadcast seat purchase confirmation
+      EventChannel.broadcast_to(
+        game.event,
+        { type: "seat_purchased", game_id: game.id, hero_id: seat.hero_id }
+      )
     else
       Rails.logger.error "Failed to save seat: #{seat.errors.full_messages.join(', ')}"
     end
