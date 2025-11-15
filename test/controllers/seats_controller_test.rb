@@ -99,4 +99,30 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
     get success_event_game_seats_path(@event, @game, hero_id: @hero.id, payment_intent: "pi_test")
     assert_redirected_to event_game_seat_path(@event, @game, seat)
   end
+
+  test "success with existing seat doesn't duplicate" do
+    login_with_otp(@player.email)
+    # Seat already exists (created by webhook)
+    existing_seat = @game.seats.create!(user: @player, hero: @hero, stripe_payment_intent_id: "pi_existing")
+
+    assert_no_difference "Seat.count" do
+      get success_event_game_seats_path(@event, @game, hero_id: @hero.id, payment_intent: "pi_new")
+    end
+
+    assert_redirected_to event_game_seat_path(@event, @game, existing_seat)
+  end
+
+  test "create with invalid seat shows error" do
+    login_with_otp(@player.email)
+    # Create another GM and game at the same event
+    other_gm = User.create!(email: "othergm#{rand(10000)}@test.com", system_role: "gm", display_name: "Other GM")
+    other_game = @event.games.create!(gm: other_gm, seat_count: 5)
+    other_game.seats.create!(user: @player, hero: @hero)
+
+    # Try to purchase another seat at the same event (violates one_seat_per_event)
+    post event_game_seats_path(@event, @game), params: { seat: { hero_id: @hero.id } }
+
+    assert_redirected_to event_path(@event)
+    assert_match /can only have one seat per event/, flash[:alert]
+  end
 end
