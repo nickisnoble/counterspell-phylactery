@@ -37,3 +37,6 @@
 !/app/assets/builds/.keep
 
 /config/credentials/test.key
+
+# Ignore SimpleCov coverage reports
+/coverage
