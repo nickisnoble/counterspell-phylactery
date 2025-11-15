@@ -1,23 +1,24 @@
-class TraitsController < ApplicationController
+class Dashboard::TraitsController < ApplicationController
+  before_action :require_gm_or_admin!
   before_action :require_admin!, except: %i[ index show ]
   before_action :set_trait, only: %i[ show edit update destroy ]
 
   def index
     @traits = Trait.all
-    render Views::Traits::Index.new(traits: @traits)
+    render Views::Dashboard::Traits::Index.new(traits: @traits)
   end
 
   def show
-    render Views::Traits::Show.new(trait: @trait)
+    render Views::Dashboard::Traits::Show.new(trait: @trait)
   end
 
   def new
     @trait = Trait.new
-    render Views::Traits::New.new(trait: @trait)
+    render Views::Dashboard::Traits::New.new(trait: @trait)
   end
 
   def edit
-    render Views::Traits::Edit.new(trait: @trait)
+    render Views::Dashboard::Traits::Edit.new(trait: @trait)
   end
 
   def create
@@ -25,7 +26,7 @@ class TraitsController < ApplicationController
 
     respond_to do |format|
       if @trait.save
-        format.html { redirect_to @trait, notice: "Trait was successfully created." }
+        format.html { redirect_to dashboard_trait_path(@trait), notice: "Trait was successfully created." }
         format.json {
           render json: {
             success: true,
@@ -37,7 +38,7 @@ class TraitsController < ApplicationController
           }, status: :created
         }
       else
-        format.html { render Views::Traits::New.new(trait: @trait), status: :unprocessable_content }
+        format.html { render Views::Dashboard::Traits::New.new(trait: @trait), status: :unprocessable_content }
         format.json {
           render json: {
             success: false,
@@ -51,10 +52,10 @@ class TraitsController < ApplicationController
   def update
     respond_to do |format|
       if @trait.update(trait_params)
-        format.html { redirect_to @trait, notice: "Trait was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @trait }
+        format.html { redirect_to dashboard_trait_path(@trait), notice: "Trait was successfully updated.", status: :see_other }
+        format.json { render :show, status: :ok, location: dashboard_trait_path(@trait) }
       else
-        format.html { render Views::Traits::Edit.new(trait: @trait), status: :unprocessable_content }
+        format.html { render Views::Dashboard::Traits::Edit.new(trait: @trait), status: :unprocessable_content }
         format.json { render json: @trait.errors, status: :unprocessable_content }
       end
     end
@@ -64,11 +65,11 @@ class TraitsController < ApplicationController
     respond_to do |format|
       if @trait.heroes.any?
         hero_names = @trait.heroes.pluck(:name).join(", ")
-        format.html { redirect_to @trait, alert: "Cannot delete: still referenced by #{hero_names}", status: :unprocessable_content }
+        format.html { redirect_to dashboard_trait_path(@trait), alert: "Cannot delete: still referenced by #{hero_names}", status: :unprocessable_content }
         format.json { render json: { error: "Trait still in use by heroes: #{hero_names}" }, status: :unprocessable_content }
       else
         @trait.destroy!
-        format.html { redirect_to traits_path, notice: "Trait was successfully destroyed.", status: :see_other }
+        format.html { redirect_to dashboard_traits_path, notice: "Trait was successfully destroyed.", status: :see_other }
         format.json { head :no_content }
       end
     end

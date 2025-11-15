@@ -19,7 +19,14 @@ class Seat < ApplicationRecord
 
   def qr_code_url
     # Generate URL that uniquely identifies this seat for check-in
-    Rails.application.routes.url_helpers.check_in_url(token: qr_token, host: Rails.application.config.action_mailer.default_url_options[:host])
+    host = Rails.application.config.action_mailer.default_url_options[:host]
+    port = Rails.application.config.action_mailer.default_url_options[:port]
+
+    url_options = { token: qr_token }
+    url_options[:host] = host if host
+    url_options[:port] = port if port && port != 80 && port != 443
+
+    Rails.application.routes.url_helpers.check_in_url(**url_options)
   end
 
   def qr_token

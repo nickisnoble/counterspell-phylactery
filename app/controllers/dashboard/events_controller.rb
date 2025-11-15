@@ -1,5 +1,6 @@
 class Dashboard::EventsController < ApplicationController
-  before_action :require_admin!
+  before_action :require_gm_or_admin!
+  before_action :require_admin!, except: %i[ index ]
   before_action :set_event, only: [:edit, :update, :destroy]
 
   def index

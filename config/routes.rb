@@ -21,7 +21,6 @@ Rails.application.routes.draw do
   resource :dashboard, only: :show
 
   resources :heroes
-  resources :traits
 
   # Stripe webhooks
   post "/stripe/webhooks" => "stripe_webhooks#create"
@@ -37,6 +36,7 @@ Rails.application.routes.draw do
   namespace :dashboard do
     resources :locations
     resources :events
+    resources :traits
   end
 
   resource :session do

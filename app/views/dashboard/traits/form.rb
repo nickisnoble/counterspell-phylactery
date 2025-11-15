@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Views::Traits::Form < Views::Base
+class Views::Dashboard::Traits::Form < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::Pluralize
   include Phlex::Rails::Helpers::ImageTag
@@ -11,7 +11,7 @@ class Views::Traits::Form < Views::Base
   end
 
   def view_template
-    form_with(model: @trait, class: "contents text-left") do |form|
+    form_with(model: [:dashboard, @trait], class: "contents text-left") do |form|
       if @trait.errors.any?
         div(id: "error_explanation", class: "bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3") do
           h2 { "#{pluralize(@trait.errors.count, 'error')} prohibited this trait from being saved:" }

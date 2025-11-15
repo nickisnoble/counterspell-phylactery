@@ -3,7 +3,7 @@ require_relative "../config/environment"
 require "rails/test_help"
 
 require "minitest/reporters"
-Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
+Minitest::Reporters.use! Minitest::Reporters::ProgressReporter.new
 
 module ActiveSupport
   class TestCase
@@ -47,6 +47,13 @@ module ActiveSupport
       # Use unique email per parallel worker to avoid collisions
       worker_suffix = defined?(@worker_id) ? @worker_id : 0
       @user = User.create!(email: "admin-#{worker_suffix}-#{SecureRandom.hex(4)}@example.com", system_role: "admin")
+      login_with_otp(@user.email)
+    end
+
+    def be_authenticated_as_gm!
+      # Use unique email per parallel worker to avoid collisions
+      worker_suffix = defined?(@worker_id) ? @worker_id : 0
+      @user = User.create!(email: "gm-#{worker_suffix}-#{SecureRandom.hex(4)}@example.com", system_role: "gm")
       login_with_otp(@user.email)
     end
   end
