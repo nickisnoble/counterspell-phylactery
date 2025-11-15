@@ -54,5 +54,6 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   mount ActiveHashcash::Engine, at: "hashcash"
+  mount ActionCable.server => "/cable"
   get "up" => "rails/health#show", as: :rails_health_check
 end

@@ -6,6 +6,8 @@ class Views::Events::Show < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::ButtonTo
 
+  register_output_helper :turbo_stream_from
+
   def initialize(event:, current_user: nil, available_heroes: [])
     @event = event
     @current_user = current_user
@@ -15,7 +17,9 @@ class Views::Events::Show < Views::Base
   def view_template
     content_for(:title, @event.name)
 
-    main(class: "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8", data: { controller: "event-subscription", event_id: @event.slug }) do
+    turbo_stream_from(@event)
+
+    main(class: "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8") do
       # Back link
       div(class: "mb-6") do
         link_to("← Back to Events", events_path, class: "text-blue-600 hover:text-blue-800")

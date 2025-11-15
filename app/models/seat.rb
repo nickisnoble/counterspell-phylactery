@@ -78,24 +78,10 @@ class Seat < ApplicationRecord
   def broadcast_seat_update
     return unless game&.event && user_id
 
-    # Determine the type of update
-    update_type = if saved_change_to_checked_in_at?
-      "check_in"
-    elsif saved_change_to_user_id? || saved_change_to_hero_id?
-      "seat_purchased"
-    else
-      return # Don't broadcast other changes
-    end
+    # Only broadcast on meaningful changes
+    return unless saved_change_to_checked_in_at? || saved_change_to_user_id? || saved_change_to_hero_id?
 
-    EventChannel.broadcast_to(
-      game.event,
-      {
-        type: update_type,
-        seat_id: id,
-        game_id: game_id,
-        hero_id: hero_id,
-        checked_in: checked_in?
-      }
-    )
+    # Broadcast a refresh to anyone viewing this event
+    broadcast_refresh_to(game.event)
   end
 end
