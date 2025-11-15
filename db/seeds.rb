@@ -152,3 +152,141 @@ datasets.each do |type, yaml|
     trait.save!
   end
 end
+
+# Create Locations
+tavern = Location.find_or_create_by(name: "The Dragon's Hoard Tavern") do |loc|
+  loc.address = "123 Market Street, Waterdeep, Sword Coast"
+end
+
+guild_hall = Location.find_or_create_by(name: "Adventurer's Guild Hall") do |loc|
+  loc.address = "456 Guild Square, Baldur's Gate, Sword Coast"
+end
+
+# Create Events with all statuses: planning, upcoming, past, cancelled
+# Planning events
+Event.find_or_create_by(name: "Quest for the Lost Artifact", location: tavern) do |event|
+  event.date = 30.days.from_now.to_date
+  event.status = :planning
+  event.start_time = "14:00"
+  event.end_time = "18:00"
+  event.ticket_price = 15.00
+end
+
+Event.find_or_create_by(name: "Dragon's Lair Expedition", location: guild_hall) do |event|
+  event.date = 45.days.from_now.to_date
+  event.status = :planning
+  event.start_time = "10:00"
+  event.end_time = "16:00"
+  event.ticket_price = 20.00
+end
+
+# Upcoming events
+Event.find_or_create_by(name: "Festival of Heroes", location: tavern) do |event|
+  event.date = 7.days.from_now.to_date
+  event.status = :upcoming
+  event.start_time = "18:00"
+  event.end_time = "23:00"
+  event.ticket_price = 10.00
+end
+
+Event.find_or_create_by(name: "Tournament of Champions", location: guild_hall) do |event|
+  event.date = 14.days.from_now.to_date
+  event.status = :upcoming
+  event.start_time = "12:00"
+  event.end_time = "20:00"
+  event.ticket_price = 25.00
+end
+
+# Past events
+Event.find_or_create_by(name: "Summer Solstice Celebration", location: tavern) do |event|
+  event.date = 30.days.ago.to_date
+  event.status = :past
+  event.start_time = "19:00"
+  event.end_time = "23:00"
+  event.ticket_price = 12.00
+end
+
+Event.find_or_create_by(name: "Guild Founders Day", location: guild_hall) do |event|
+  event.date = 60.days.ago.to_date
+  event.status = :past
+  event.start_time = "10:00"
+  event.end_time = "17:00"
+  event.ticket_price = 15.00
+end
+
+# Cancelled events
+Event.find_or_create_by(name: "Cancelled: Goblin Raid Defense", location: tavern) do |event|
+  event.date = 5.days.from_now.to_date
+  event.status = :cancelled
+  event.start_time = "15:00"
+  event.end_time = "19:00"
+  event.ticket_price = 10.00
+end
+
+Event.find_or_create_by(name: "Cancelled: Moonlight Market", location: guild_hall) do |event|
+  event.date = 3.days.ago.to_date
+  event.status = :cancelled
+  event.start_time = "20:00"
+  event.end_time = "02:00"
+  event.ticket_price = 5.00
+end
+
+# Create GM users
+gm_users = []
+3.times do |i|
+  u = User.find_or_create_by(email: "gm#{i + 1}@counterspell.games") do |user|
+    user.display_name = "GM #{i + 1}"
+  end
+  u.gm! unless u.gm? || u.admin?
+  gm_users << u
+end
+
+# Create some player users for seats
+player_users = []
+10.times do |i|
+  player_users << User.find_or_create_by(email: "player#{i + 1}@counterspell.games") do |user|
+    user.display_name = "Player #{i + 1}"
+  end
+end
+
+# Add games and seats to events
+Event.find_each do |event|
+  # Skip creating games for cancelled events or if they already have games
+  next if event.cancelled? || event.games.any?
+
+  # Create 1-2 games per event
+  game_count = [1, 2].sample
+  game_count.times do |game_index|
+    gm = gm_users.sample
+
+    game = event.games.create!(
+      gm: gm,
+      seat_count: [4, 5, 6].sample
+    )
+
+    # Create empty seats for the game
+    game.seat_count.times do
+      game.seats.create!
+    end
+  end
+end
+
+# Fill some seats for past and upcoming events (only if seats are empty)
+Event.where(status: [:past, :upcoming]).find_each do |event|
+  # Track which players are already assigned to this event
+  assigned_players = event.games.joins(:seats).where.not(seats: { user_id: nil }).pluck('seats.user_id').uniq
+  available_players = player_users.reject { |p| assigned_players.include?(p.id) }
+
+  event.games.each do |game|
+    empty_seats = game.seats.where(user_id: nil)
+    next if empty_seats.empty? || available_players.empty?
+
+    # Fill half to all-but-one seats, but don't exceed available players
+    filled_count = [[empty_seats.count / 2, empty_seats.count - 1].sample, available_players.count].min
+
+    empty_seats.limit(filled_count).each do |seat|
+      player = available_players.shift
+      seat.update!(user: player) if player
+    end
+  end
+end
