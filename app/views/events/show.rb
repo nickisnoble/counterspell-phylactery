@@ -5,6 +5,8 @@ class Views::Events::Show < Views::Base
   include Phlex::Rails::Helpers::LinkTo
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::ButtonTo
+  include Phlex::Rails::Helpers::ImageTag
+  include Phlex::Rails::Helpers::URLFor
 
   register_output_helper :turbo_stream_from
 
@@ -121,9 +123,8 @@ class Views::Events::Show < Views::Base
 
   def render_game_card(game)
     available_seats = game.seat_count - game.seats.where.not(user_id: nil).count
-    # Filter heroes already taken at this specific game
+    # Get heroes already taken at this specific game
     taken_hero_ids = game.seats.where.not(hero_id: nil).pluck(:hero_id)
-    available_heroes_for_game = @available_heroes.reject { |h| taken_hero_ids.include?(h.id) }
 
     div(class: "bg-gray-50 rounded-lg p-6 border border-gray-200") do
       div(class: "flex items-center mb-4") do
@@ -151,28 +152,77 @@ class Views::Events::Show < Views::Base
         end
       end
 
-      # Purchase button
+      # Hero selection form
       if available_seats > 0 && @event.upcoming? && @current_user
-        div(class: "mt-4") do
-          if available_heroes_for_game.any?
-            form_with(url: event_game_seats_path(@event, game), method: :post, class: "space-y-3") do |f|
-              f.select :hero_id, available_heroes_for_game.map { |h| [h.name, h.id] },
-                { prompt: "Select your hero" },
-                class: "block w-full rounded-md border border-gray-300 px-3 py-2.5 text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+        div(class: "mt-6") do
+          form_with(url: event_game_seats_path(@event, game), method: :post, class: "space-y-4") do |f|
+            # Hero selection grid
+            div(class: "space-y-3") do
+              p(class: "text-sm font-medium text-gray-700") { "Choose your hero:" }
 
-              f.submit "Purchase Seat ($#{@event.ticket_price})",
-                class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition"
+              div(class: "grid grid-cols-2 gap-3") do
+                @available_heroes.each do |hero|
+                  is_taken = taken_hero_ids.include?(hero.id)
+                  render_hero_option(f, hero, is_taken)
+                end
+              end
             end
-          else
-            div(class: "text-center text-sm text-gray-600 p-3 bg-yellow-50 border border-yellow-200 rounded-md") do
-              "All heroes taken for this table"
-            end
+
+            f.submit "Purchase Seat ($#{@event.ticket_price})",
+              class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition"
           end
         end
       elsif available_seats > 0 && @event.upcoming?
         div(class: "mt-4") do
           link_to("Sign In to Purchase", new_session_path,
             class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium transition")
+        end
+      end
+    end
+  end
+
+  def render_hero_option(form, hero, is_taken)
+    label_class = [
+      "relative flex flex-col cursor-pointer rounded-lg border-2 p-3 transition",
+      is_taken ? "opacity-40 cursor-not-allowed border-gray-200 bg-gray-100" : "border-gray-300 hover:border-blue-500 hover:bg-white"
+    ].join(" ")
+
+    label(class: label_class) do
+      # Hidden radio button
+      input(
+        type: "radio",
+        name: "hero_id",
+        value: hero.id,
+        disabled: is_taken,
+        class: "peer sr-only",
+        required: true
+      )
+
+      # Selected state indicator
+      div(class: "absolute top-2 right-2 hidden peer-checked:block") do
+        div(class: "w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center") do
+          span(class: "text-white text-xs") { "✓" }
+        end
+      end
+
+      # Hero portrait
+      if hero.portrait.present?
+        div(class: "aspect-square w-full mb-2 rounded overflow-hidden bg-gray-200") do
+          image_tag(url_for(hero.portrait), class: "w-full h-full object-cover object-top")
+        end
+      else
+        div(class: "aspect-square w-full mb-2 rounded bg-gray-200 flex items-center justify-center") do
+          span(class: "text-4xl") { "🦸" }
+        end
+      end
+
+      # Hero info
+      div(class: "space-y-1") do
+        p(class: "font-semibold text-sm text-gray-900 truncate") { hero.name }
+        p(class: "text-xs text-gray-600 truncate") { "#{hero.pronouns} • #{hero.role&.humanize}" }
+
+        if is_taken
+          p(class: "text-xs font-medium text-red-600 mt-2") { "Taken" }
         end
       end
     end
