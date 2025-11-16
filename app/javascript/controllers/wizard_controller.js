@@ -116,7 +116,7 @@ export default class extends Controller {
       const heroLabel = selectedHeroRadio.closest('label')
       const heroName = heroLabel.querySelector('.font-semibold')?.textContent || 'Unknown Hero'
 
-      const heroNameDisplay = this.element.querySelector('[data-hero_name="hero-name-display"]')
+      const heroNameDisplay = this.element.querySelector('[data-hero-name="hero-name-display"]')
       if (heroNameDisplay) {
         heroNameDisplay.textContent = heroName
       }
