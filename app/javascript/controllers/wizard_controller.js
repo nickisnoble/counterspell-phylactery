@@ -2,13 +2,43 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="wizard"
 export default class extends Controller {
-  static targets = ["step", "nextButton", "prevButton", "submitButton"]
+  static targets = ["step", "nextButton", "prevButton", "submitButton", "heroOption", "selectedRole"]
   static values = {
     currentStep: { type: Number, default: 0 }
   }
 
   connect() {
     this.showCurrentStep()
+  }
+
+  roleSelected(event) {
+    const selectedRole = event.target.value
+
+    // Filter heroes by selected role
+    this.heroOptionTargets.forEach(heroLabel => {
+      const heroRole = heroLabel.dataset.heroRole
+      const heroRadio = heroLabel.querySelector('input[type="radio"]')
+
+      if (heroRole === selectedRole) {
+        heroLabel.classList.remove("hidden")
+        if (heroRadio && heroRadio.disabled) {
+          // Keep disabled heroes visible but grayed out
+        } else if (heroRadio) {
+          heroRadio.required = true
+        }
+      } else {
+        heroLabel.classList.add("hidden")
+        if (heroRadio) {
+          heroRadio.required = false
+          heroRadio.checked = false
+        }
+      }
+    })
+
+    // Update the selected role text in step 2
+    if (this.hasSelectedRoleTarget) {
+      this.selectedRoleTarget.textContent = `Role: ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
+    }
   }
 
   next(event) {

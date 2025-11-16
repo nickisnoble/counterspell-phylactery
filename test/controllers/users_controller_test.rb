@@ -26,7 +26,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     char_class = Trait.create!(type: "CLASS", name: "User Test Class #{SecureRandom.hex(4)}")
     @hero = Hero.create!(
       name: "User Test Hero #{SecureRandom.hex(4)}",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, char_class]
     )
     @seat = @game.seats.create!(user: @user, hero: @hero)

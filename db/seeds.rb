@@ -351,7 +351,7 @@ heroes_data = [
   {
     name: "Carina Croftblade",
     pronouns: "She/Her",
-    role: "fighter",
+    role: "striker",
     traits: ["Freynor", "Seraph / Divine Wielder", "Highborne"],
     backstory: "Royarch Carina Croftblade, eldest warrior princess of the ruling Rukon Frey family, was somehow sent 2,000 years into the future during a great battle. As much as she exudes royal mannerisms and inherent leadership, strangers have a hard time believing her true origins. She's so far been unsuccessful in proving her lineage and taking her rightful place on the throne. Is she ready to navigate an unfamiliar future to reclaim her purpose in a world that has moved on?"
   },
@@ -365,7 +365,7 @@ heroes_data = [
   {
     name: "Garrick Ironheart",
     pronouns: "He/Him",
-    role: "fighter",
+    role: "striker",
     traits: ["Vark", "Warrior / Call of the Brave", "Seaborne"],
     backstory: "Garrick Ironheart may be short in stature, but his ingenious battle mentality, and innovative ideas, make an outsized impact on the world around him. Garrick descends from a noble line of Varks, a proud and mighty people, who were scattered from their mountain home into either lowland or seabound societies around 2,000 years ago. As a representative of the seabound society, The Undertide Dominion, Garrick has volunteered to explore the surface world, bringing back knowledge to improve his people's lives under the ocean."
   },
@@ -393,14 +393,14 @@ heroes_data = [
   {
     name: "Orion Tyrosson",
     pronouns: "He/Him",
-    role: "fighter",
+    role: "striker",
     traits: ["Freynor", "Ranger / Beastbound", "Wildborne"],
     backstory: "Orion Tyrosson is a ranger from the small village of Widemeadow. Founded by \"Landers,\" individuals who deepy mistrust magic users, Widemeadow's inhabitants are extremely tight-knit and self-reliant. But when a devastating curse hits the village's water supply, Orion begins an arduous journey to seek help. Little does he know, the very thing he refuses to embrace may be exactly what he needs to survive."
   },
   {
     name: "Jackie Greaves",
     pronouns: "She/Her",
-    role: "wild_card",
+    role: "face",
     traits: ["Vark", "Sorcerer / Elemental Origin", "Wanderborne"],
     backstory: "Jackie Greaves is a Vark, a people who were famously and tragically scattered from their mountain home around 2,000 years ago. But unlike other Varks, who proudly recall where their families settled in the years since, Jackie cannot. For her bubbly and dreamy personality covers amnesia – a deep uncertainty of who she is, and why she sees the concept of death as more fascinating than frightening. But despite this mystery, Jackie's inherent powers make her a strong healer and brave fighter in the battles to come."
   },
@@ -421,14 +421,14 @@ heroes_data = [
   {
     name: "Denn",
     pronouns: "He/Him",
-    role: "wild_card",
+    role: "face",
     traits: ["Kiplin", "Rogue / Syndicate", "Slyborne"],
     backstory: "Denn is a Kiplin, an ancestry that resembles a humanoid opossum, complete with a prehensile tail. He uses a combination of nimble dexterity and street smarts to survive in world's largest city, Chellesot. As an orphan, Denn is most loyal to his found family, and lacks the typical Kiplin mannerisms of truth-telling in favor of a scrappy, means-to-an-end mentality. While he would never admit it, Denn yearns for a deeper understanding of his native Kiplin family, a connection he has never known."
   },
   {
     name: "Stacey Batton",
     pronouns: "She/Her",
-    role: "fighter",
+    role: "striker",
     traits: ["Caldeynor", "Warrior / Call of the Brave", "Orderborne"],
     backstory: "Stacey Batton's life has been a series of unfortunate events. First her parents separated, leaving her in the care of her mother, who soon after, tragically passed. And while her father tried his best, moving her to the biggest city on the planet, Chellesot, where they set up a successful blacksmithing business, Stacey couldn't help but feel disconnected and lonely from those around her. But when her father suddenly went missing, leaving behind a cryptic message, she's forced to rediscover her long-lost dreams of traveling the universe."
   },
@@ -442,7 +442,7 @@ heroes_data = [
   {
     name: "Inara Darkstar",
     pronouns: "She/Her",
-    role: "wild_card",
+    role: "face",
     traits: ["Freynor", "Wizard / School of War", "Orderborne"],
     backstory: "Inara Darkstar had it all, once. A comfortable home, an honored family name that preceded her, and privilege that granted her access to the best schools. Inara had happily accepted a place among The Dancing Gale guild, a prestigious group of bards who heal the world with music. But when she found out her family's success was only made possible through a powerful crime group, the Machine Syndicate, she gave up her guildship to seek revenge for her family's honor."
   },

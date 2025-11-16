@@ -126,4 +126,71 @@ class SeatTest < ActiveSupport::TestCase
     assert_not seat.valid?
     assert_includes seat.errors[:user], "can only have one association per event"
   end
+
+  test "allows up to 2 heroes of same role per game" do
+    # Create heroes with traits
+    ancestry = Trait.create!(type: "ANCESTRY", name: "Test Ancestry #{SecureRandom.hex(4)}")
+    background = Trait.create!(type: "BACKGROUND", name: "Test Background #{SecureRandom.hex(4)}")
+    char_class = Trait.create!(type: "CLASS", name: "Test Class #{SecureRandom.hex(4)}")
+
+    striker1 = Hero.create!(name: "Striker 1 #{SecureRandom.hex(4)}", role: "striker", traits: [ancestry, background, char_class])
+    striker2 = Hero.create!(name: "Striker 2 #{SecureRandom.hex(4)}", role: "striker", traits: [ancestry, background, char_class])
+
+    player3 = User.create!(email: "player3@test.com", system_role: "player", display_name: "Player Three")
+
+    # First striker seat should be valid
+    seat1 = Seat.create!(game: @game, user: @player1, hero: striker1)
+    assert seat1.valid?
+
+    # Second striker seat should be valid
+    seat2 = Seat.create!(game: @game, user: @player2, hero: striker2)
+    assert seat2.valid?
+  end
+
+  test "prevents more than 2 heroes of same role per game" do
+    # Create heroes with traits
+    ancestry = Trait.create!(type: "ANCESTRY", name: "Test Ancestry #{SecureRandom.hex(4)}")
+    background = Trait.create!(type: "BACKGROUND", name: "Test Background #{SecureRandom.hex(4)}")
+    char_class = Trait.create!(type: "CLASS", name: "Test Class #{SecureRandom.hex(4)}")
+
+    striker1 = Hero.create!(name: "Striker 1 #{SecureRandom.hex(4)}", role: "striker", traits: [ancestry, background, char_class])
+    striker2 = Hero.create!(name: "Striker 2 #{SecureRandom.hex(4)}", role: "striker", traits: [ancestry, background, char_class])
+    striker3 = Hero.create!(name: "Striker 3 #{SecureRandom.hex(4)}", role: "striker", traits: [ancestry, background, char_class])
+
+    player3 = User.create!(email: "player3@test.com", system_role: "player", display_name: "Player Three")
+    player4 = User.create!(email: "player4@test.com", system_role: "player", display_name: "Player Four")
+
+    # First two striker seats should be valid
+    Seat.create!(game: @game, user: @player1, hero: striker1)
+    Seat.create!(game: @game, user: @player2, hero: striker2)
+
+    # Third striker seat should be invalid
+    seat3 = Seat.new(game: @game, user: player3, hero: striker3)
+    assert_not seat3.valid?
+    assert_includes seat3.errors[:hero], "role Striker already has 2 players at this table"
+  end
+
+  test "allows 2 strikers and 2 protectors at same game" do
+    # Create heroes with traits
+    ancestry = Trait.create!(type: "ANCESTRY", name: "Test Ancestry #{SecureRandom.hex(4)}")
+    background = Trait.create!(type: "BACKGROUND", name: "Test Background #{SecureRandom.hex(4)}")
+    char_class = Trait.create!(type: "CLASS", name: "Test Class #{SecureRandom.hex(4)}")
+
+    striker1 = Hero.create!(name: "Striker 1 #{SecureRandom.hex(4)}", role: "striker", traits: [ancestry, background, char_class])
+    striker2 = Hero.create!(name: "Striker 2 #{SecureRandom.hex(4)}", role: "striker", traits: [ancestry, background, char_class])
+    protector1 = Hero.create!(name: "Protector 1 #{SecureRandom.hex(4)}", role: "protector", traits: [ancestry, background, char_class])
+    protector2 = Hero.create!(name: "Protector 2 #{SecureRandom.hex(4)}", role: "protector", traits: [ancestry, background, char_class])
+
+    player3 = User.create!(email: "player3@test.com", system_role: "player", display_name: "Player Three")
+    player4 = User.create!(email: "player4@test.com", system_role: "player", display_name: "Player Four")
+
+    # Create seats with different roles
+    Seat.create!(game: @game, user: @player1, hero: striker1)
+    Seat.create!(game: @game, user: @player2, hero: striker2)
+    seat3 = Seat.create!(game: @game, user: player3, hero: protector1)
+    seat4 = Seat.create!(game: @game, user: player4, hero: protector2)
+
+    assert seat3.valid?
+    assert seat4.valid?
+  end
 end

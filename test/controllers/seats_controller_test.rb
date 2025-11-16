@@ -21,7 +21,7 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
 
     @hero = Hero.create!(
       name: "Seats Test Hero",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, class_trait]
     )
   end

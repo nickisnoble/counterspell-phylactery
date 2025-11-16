@@ -7,10 +7,18 @@ class SeatsController < ApplicationController
     taken_hero_ids = @game.seats.where.not(hero_id: nil).pluck(:hero_id)
     available_heroes = Hero.where.not(id: taken_hero_ids).order(:name)
 
+    # Calculate role availability (how many seats are taken per role)
+    role_counts = @game.seats
+      .joins(:hero)
+      .where.not(hero_id: nil)
+      .group("heroes.role")
+      .count
+
     render Views::Seats::New.new(
       event: @event,
       game: @game,
-      available_heroes: available_heroes
+      available_heroes: available_heroes,
+      role_counts: role_counts
     )
   end
 

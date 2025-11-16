@@ -28,7 +28,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
         hero: {
           name: "Unique Hero Name",
           pronouns: "They/Them",
-          role: "fighter"
+          role: "striker"
         }
       }
     end
@@ -87,7 +87,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
       hero: {
         name: "Updated Name",
         pronouns: "They/Them",
-        role: "wild_card"
+        role: "face"
       }
     }
 
@@ -95,7 +95,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
     @hero.reload
     assert_equal "Updated Name", @hero.name
     assert_equal "They/Them", @hero.pronouns
-    assert_equal "wild_card", @hero.role
+    assert_equal "face", @hero.role
   end
 
   test "should destroy hero" do
@@ -114,7 +114,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
         hero: {
           name: "Trait Parse Test #{Time.current.to_i}",
           pronouns: "He/Him",
-          role: "fighter"
+          role: "striker"
         },
         trait_ids_ancestry: @ancestry_trait.id.to_s,
         trait_ids_background: "", # Empty should be ignored, causing validation failure

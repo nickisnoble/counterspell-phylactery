@@ -2,7 +2,7 @@ require "test_helper"
 
 class HeroTest < ActiveSupport::TestCase
   test "requires certain traits" do
-    hero = Hero.new(name: "Test Hero", pronouns: "They/Them", role: "fighter")
+    hero = Hero.new(name: "Test Hero", pronouns: "They/Them", role: "striker")
     assert_not hero.valid?
     assert_includes hero.errors.full_messages.join, "must include"
   end
@@ -15,7 +15,7 @@ class HeroTest < ActiveSupport::TestCase
 
     hero = Hero.new(
       name: "Test Hero",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry1, ancestry2, background, class_trait]
     )
     assert_not hero.valid?
@@ -29,7 +29,7 @@ class HeroTest < ActiveSupport::TestCase
 
     hero = Hero.new(
       name: "Valid Hero",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, class_trait]
     )
     assert hero.valid?
@@ -42,14 +42,14 @@ class HeroTest < ActiveSupport::TestCase
 
     hero = Hero.create!(
       name: "Test Hero Name",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, class_trait]
     )
     assert_equal "test-hero-name", hero.slug
   end
 
   test "requires name" do
-    hero = Hero.new(role: "fighter")
+    hero = Hero.new(role: "striker")
     assert_not hero.valid?
   end
 
@@ -60,13 +60,13 @@ class HeroTest < ActiveSupport::TestCase
 
     Hero.create!(
       name: "Unique Hero",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, class_trait]
     )
 
     duplicate = Hero.new(
       name: "unique hero",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, class_trait]
     )
     assert_not duplicate.valid?
@@ -79,7 +79,7 @@ class HeroTest < ActiveSupport::TestCase
 
     hero = Hero.create!(
       name: "Hero With Whitespace Fields",
-      role: "fighter",
+      role: "striker",
       ideal: "  Justice  ",
       flaw: "  Stubborn  ",
       traits: [ancestry, background, class_trait]

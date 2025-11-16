@@ -4,13 +4,13 @@ one:
   name: Test Hero
   slug: test-hero
   pronouns: "They/Them"
-  role: fighter
+  role: striker
 
 denn:
   name: Denn
   slug: denn
   pronouns: "They/Them"
-  role: fighter
+  role: striker
 
 carina:
   name: Carina Croftblade
