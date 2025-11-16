@@ -501,9 +501,11 @@ Event.where(status: [:past, :upcoming]).find_each do |event|
     empty_seats = game.seats.where(user_id: nil).to_a
     next if empty_seats.empty?
 
-    # Get players NOT already at this event
+    # Get players NOT already at this event (either as a player OR as a GM)
     assigned_player_ids = event.games.joins(:seats).where.not(seats: { user_id: nil }).pluck('seats.user_id').uniq
-    available_players = player_users.reject { |p| assigned_player_ids.include?(p.id) }
+    gm_ids_at_event = event.games.pluck(:gm_id).uniq
+    excluded_user_ids = assigned_player_ids + gm_ids_at_event
+    available_players = player_users.reject { |p| excluded_user_ids.include?(p.id) }
 
     # For past events: fill ALL seats
     # For upcoming events: leave 1-2 seats empty per game

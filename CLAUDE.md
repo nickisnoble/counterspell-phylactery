@@ -1,0 +1,1 @@
+- Use fontawesome for icons (no emojis, ever!)

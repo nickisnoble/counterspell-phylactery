@@ -4,7 +4,7 @@ class Seat < ApplicationRecord
   belongs_to :hero, optional: true
 
   validate :hero_unique_per_game, if: :hero_id?
-  validate :one_seat_per_event, if: :user_id?
+  validate :one_association_per_event, if: :user_id?
   validate :seat_capacity_not_exceeded, if: :user_id?
 
   before_create :set_purchased_at, if: :user_id?
@@ -48,17 +48,22 @@ class Seat < ApplicationRecord
     end
   end
 
-  def one_seat_per_event
+  def one_association_per_event
     return unless game && user
 
     event = game.event
+
+    # Check if user has another seat at this event
     existing_seat = Seat.joins(:game).where(
       user: user,
       games: { event_id: event.id }
     ).where.not(id: id).exists?
 
-    if existing_seat
-      errors.add(:user, "can only have one seat per event")
+    # Check if user is GMing any game at this event
+    is_gm_at_event = Game.where(event: event, gm: user).exists?
+
+    if existing_seat || is_gm_at_event
+      errors.add(:user, "can only have one association per event")
     end
   end
 

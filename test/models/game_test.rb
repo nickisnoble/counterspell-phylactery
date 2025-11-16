@@ -51,7 +51,7 @@ class GameTest < ActiveSupport::TestCase
     Game.create!(event: event, gm: @gm, seat_count: 5)
     duplicate_game = Game.new(event: event, gm: @gm, seat_count: 5)
     assert_not duplicate_game.valid?
-    assert_includes duplicate_game.errors[:gm_id], "cannot GM multiple tables at the same event"
+    assert_includes duplicate_game.errors[:gm], "can only have one association per event"
   end
 
   test "allows same GM at different events" do
@@ -60,5 +60,27 @@ class GameTest < ActiveSupport::TestCase
     Game.create!(event: event1, gm: @gm, seat_count: 5)
     game2 = Game.new(event: event2, gm: @gm, seat_count: 5)
     assert game2.valid?
+  end
+
+  test "prevents user from GMing if they have a seat at same event" do
+    # Setup: create a game and give the user a seat
+    existing_game = Game.create!(event: events(:one), gm: @gm, seat_count: 5)
+    player_with_seat = User.create!(email: "player_gm@test.com", system_role: "gm", display_name: "Player GM")
+    Seat.create!(game: existing_game, user: player_with_seat)
+
+    # Attempt: try to make that user a GM at the same event
+    new_game = Game.new(event: events(:one), gm: player_with_seat, seat_count: 5)
+    assert_not new_game.valid?
+    assert_includes new_game.errors[:gm], "can only have one association per event"
+  end
+
+  test "prevents user from GMing multiple games at same event" do
+    # Setup: user is already GMing a game at event one
+    Game.create!(event: events(:one), gm: @gm, seat_count: 5)
+
+    # Attempt: try to make them GM another game at the same event
+    new_game = Game.new(event: events(:one), gm: @gm, seat_count: 5)
+    assert_not new_game.valid?
+    assert_includes new_game.errors[:gm], "can only have one association per event"
   end
 end

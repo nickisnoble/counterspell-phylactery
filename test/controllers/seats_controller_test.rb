@@ -138,10 +138,10 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
     other_game = @event.games.create!(gm: other_gm, seat_count: 5)
     other_game.seats.create!(user: @player, hero: @hero)
 
-    # Try to purchase another seat at the same event (violates one_seat_per_event)
+    # Try to purchase another seat at the same event (violates one_association_per_event)
     post event_game_seats_path(@event, @game), params: { seat: { hero_id: @hero.id } }
 
     assert_redirected_to event_path(@event)
-    assert_match /can only have one seat per event/, flash[:alert]
+    assert_match /can only have one association per event/, flash[:alert]
   end
 end

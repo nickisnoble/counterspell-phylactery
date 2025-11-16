@@ -4,9 +4,9 @@ class Game < ApplicationRecord
   has_many :seats, dependent: :destroy
 
   validates :gm_id, presence: true
-  validates :gm_id, uniqueness: { scope: :event_id, message: "cannot GM multiple tables at the same event" }
   validates :seat_count, numericality: { greater_than: 0 }
   validate :gm_must_have_appropriate_role
+  validate :one_association_per_event
 
   private
 
@@ -15,6 +15,23 @@ class Game < ApplicationRecord
 
     unless gm.gm? || gm.admin?
       errors.add(:gm, "must have GM or Admin role")
+    end
+  end
+
+  def one_association_per_event
+    return unless gm && event
+
+    # Check if user is GMing another game at this event
+    is_gm_at_another_game = Game.where(event: event, gm: gm).where.not(id: id).exists?
+
+    # Check if user has a seat at any game in this event
+    has_seat_at_event = Seat.joins(:game).where(
+      user: gm,
+      games: { event_id: event.id }
+    ).exists?
+
+    if is_gm_at_another_game || has_seat_at_event
+      errors.add(:gm, "can only have one association per event")
     end
   end
 end

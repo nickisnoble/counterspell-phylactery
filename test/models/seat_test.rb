@@ -103,4 +103,27 @@ class SeatTest < ActiveSupport::TestCase
     assert seat.persisted?
     assert_nil seat.user_id
   end
+
+  test "prevents user from having seat if they GM at same event" do
+    # Setup: user is GMing a game at event one
+    gm_user = User.create!(email: "gm_player@test.com", system_role: "gm", display_name: "GM Player")
+    Game.create!(event: events(:one), gm: gm_user, seat_count: 5)
+
+    # Attempt: try to give them a seat at a different game in the same event
+    seat = Seat.new(game: @game, user: gm_user)
+    assert_not seat.valid?
+    assert_includes seat.errors[:user], "can only have one association per event"
+  end
+
+  test "prevents user from having multiple seats at same event" do
+    # Setup: user already has a seat at a game in event one
+    other_gm = User.create!(email: "othergm@test.com", system_role: "gm", display_name: "Other GM")
+    other_game = Game.create!(event: events(:one), gm: other_gm, seat_count: 5)
+    Seat.create!(game: other_game, user: @player1)
+
+    # Attempt: try to give them another seat at a different game in the same event
+    seat = Seat.new(game: @game, user: @player1)
+    assert_not seat.valid?
+    assert_includes seat.errors[:user], "can only have one association per event"
+  end
 end
