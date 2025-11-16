@@ -31,6 +31,25 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
+  test "new shows hero selection for authenticated user" do
+    login_with_otp(@player.email)
+    get new_event_game_seat_path(@event, @game)
+    assert_response :success
+  end
+
+  test "new requires authentication" do
+    get new_event_game_seat_path(@event, @game)
+    assert_redirected_to new_session_path
+  end
+
+  test "new redirects for non-upcoming events" do
+    @event.update!(status: "past")
+    login_with_otp(@player.email)
+    get new_event_game_seat_path(@event, @game)
+    assert_redirected_to event_path(@event)
+    assert_match /not available/, flash[:alert]
+  end
+
   test "create redirects to Stripe checkout" do
     skip("Requires Stripe API credentials")
     login_with_otp(@player.email)

@@ -14,13 +14,19 @@ class Event < ApplicationRecord
   enum :status, %w[planning upcoming past cancelled], validate: true
 
   scope :publicly_visible, -> { where(status: [:upcoming, :past]) }
-  scope :visible_to_gm, -> { all } # GMs see all events
+  scope :visible_to_gm, -> { where(status: [:planning, :upcoming, :past, :cancelled]) }
 
   after_create :create_default_reminder_emails
 
   def visible_to?(user)
     return true if user&.admin? || user&.gm?
+    return has_ticket_holder?(user) if cancelled?
     upcoming? || past?
+  end
+
+  def has_ticket_holder?(user)
+    return false unless user
+    games.joins(:seats).where(seats: { user_id: user.id }).exists?
   end
 
   private

@@ -29,7 +29,7 @@ class Seat < ApplicationRecord
     url_options[:host] = host if host
     url_options[:port] = port if port && port != 80 && port != 443
 
-    Rails.application.routes.url_helpers.check_in_url(**url_options)
+    Rails.application.routes.url_helpers.checkin_url(**url_options)
   end
 
   def qr_token

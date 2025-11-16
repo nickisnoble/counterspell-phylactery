@@ -1,7 +1,18 @@
 class SeatsController < ApplicationController
-  before_action :set_event_and_game, only: [:create, :success, :show]
-  before_action :authorize_purchase, only: [:create]
+  before_action :set_event_and_game, only: [:new, :create, :success, :show]
+  before_action :authorize_purchase, only: [:new, :create]
   before_action :authorize_seat_viewing, only: [:show]
+
+  def new
+    taken_hero_ids = @game.seats.where.not(hero_id: nil).pluck(:hero_id)
+    available_heroes = Hero.where.not(id: taken_hero_ids).order(:name)
+
+    render Views::Seats::New.new(
+      event: @event,
+      game: @game,
+      available_heroes: available_heroes
+    )
+  end
 
   def show
     @seat = @game.seats.find(params[:id])

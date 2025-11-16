@@ -21,71 +21,93 @@ class Views::Events::Show < Views::Base
 
     turbo_stream_from(@event)
 
-    main(class: "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8") do
-      # Back link
-      div(class: "mb-6") do
-        link_to("← Back to Events", events_path, class: "text-blue-600 hover:text-blue-800")
+    main(class: "w-full max-w-3xl mx-auto px-4 py-12 bg-amber-50 min-h-screen") do
+      # Back link and checkin button
+      div(class: "mb-8 flex justify-between items-center") do
+        link_to("← Back to Events", events_path, class: "font-serif text-purple-900 hover:text-purple-700 font-medium transition")
+
+        if @current_user && (@current_user.admin? || @current_user.gm?)
+          link_to("Check-in Management", checkin_path, class: "btn px-4 py-2 font-serif font-semibold text-sm")
+        end
       end
 
-      # Event header
-      div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-6") do
-        div(class: "flex justify-between items-start mb-6") do
-          h1(class: "font-bold text-4xl text-gray-900") { @event.name }
-          span(class: "px-4 py-2 text-sm font-semibold rounded-full #{status_badge_class(@event.status)}") do
-            @event.status&.titleize || "Unknown"
+      # Event masthead - flex layout with auto-width sidebar
+      div(class: "mb-12 flex flex-col lg:flex-row gap-8") do
+        # Main content: Title, status, and description (left-aligned, flex-grow)
+        div(class: "flex-grow space-y-6 text-left") do
+          # Title and status
+          div(class: "space-y-3") do
+            h1(class: "font-display text-5xl text-blue-900 text-left") { @event.name }
+            span(class: "inline-block px-3 py-1 text-xs font-serif font-semibold rounded-full #{status_badge_class(@event.status)}") do
+              @event.status&.titleize || "Unknown"
+            end
+          end
+
+          # Description
+          if @event.description.present?
+            div(class: "prose prose-lg max-w-none font-serif text-blue-900/80 text-left") do
+              render @event.description
+            end
           end
         end
 
-        div(class: "grid md:grid-cols-2 gap-6 mt-6") do
-          # Left column - event details
-          div do
-            h2(class: "font-bold text-xl mb-4") { "Event Details" }
-            div(class: "space-y-3 text-gray-700") do
-              div(class: "flex items-center") do
-                span(class: "mr-3 text-2xl") { "📅" }
-                div do
-                  div(class: "font-semibold") { "Date" }
-                  div { @event.date.strftime("%A, %B %d, %Y") }
+        # Sidebar: Sticky sidebar with event details and CTA (auto-width)
+        div(class: "w-max flex-shrink-0") do
+          div(class: "lg:sticky lg:top-8 space-y-4 w-max") do
+            # Event details card
+            div(class: "border border-black/10 rounded-sm bg-white/70 p-4 space-y-3 min-w-[280px]") do
+              # Date
+              div(class: "flex items-start gap-2") do
+                i(class: "fa-duotone fa-calendar-days text-base text-emerald-500 shrink-0 mt-0.5")
+                div(class: "text-sm font-serif text-blue-900/80 font-medium text-left") do
+                  @event.date.strftime('%A, %B %d, %Y')
                 end
               end
 
+              # Time
               if @event.start_time
-                div(class: "flex items-center") do
-                  span(class: "mr-3 text-2xl") { "🕐" }
-                  div do
-                    div(class: "font-semibold") { "Time" }
-                    div { "#{@event.start_time.strftime('%I:%M %p')}#{@event.end_time ? " - #{@event.end_time.strftime('%I:%M %p')}" : ''}" }
+                div(class: "flex items-start gap-2") do
+                  i(class: "fa-duotone fa-clock text-base text-blue-500 shrink-0 mt-0.5")
+                  div(class: "text-sm font-serif text-blue-900/80 text-left") do
+                    plain @event.start_time.strftime('%-l:%M %p')
+                    if @event.end_time
+                      plain " - #{@event.end_time.strftime('%-l:%M %p')}"
+                    end
                   end
                 end
               end
 
-              div(class: "flex items-center") do
-                span(class: "mr-3 text-2xl") { "📍" }
-                div do
-                  div(class: "font-semibold") { "Location" }
-                  div { @event.location.name }
-                  div(class: "text-sm text-gray-500") { @event.location.address }
+              # Location (with full address)
+              div(class: "flex items-start gap-2") do
+                i(class: "fa-duotone fa-location-dot text-base text-pink-500 shrink-0 mt-0.5")
+                div(class: "text-sm font-serif text-blue-900/80 text-left") do
+                  div(class: "font-medium") { @event.location.name }
+                  div(class: "text-xs text-blue-900/60 mt-0.5") { @event.location.address }
                 end
               end
 
+              # Ticket Price
               if @event.ticket_price && @event.ticket_price > 0
-                div(class: "flex items-center") do
-                  span(class: "mr-3 text-2xl") { "💵" }
-                  div do
-                    div(class: "font-semibold") { "Ticket Price" }
-                    div(class: "text-2xl font-bold text-green-600") { "$#{@event.ticket_price}" }
+                div(class: "flex items-start gap-2 pt-2 border-t border-black/5") do
+                  i(class: "fa-duotone fa-coins text-base text-amber-500 shrink-0 mt-0.5")
+                  div(class: "text-sm font-serif text-blue-900/80 text-left") do
+                    plain "Tickets: "
+                    span(class: "font-display text-lg text-purple-900") { "$#{@event.ticket_price}" }
                   end
                 end
               end
             end
-          end
 
-          # Right column - description
-          if @event.description.present?
-            div do
-              h2(class: "font-bold text-xl mb-4") { "About This Event" }
-              div(class: "prose max-w-none") do
-                render @event.description
+            # CTA Button - only for upcoming events with available seats
+            if @event.upcoming? && has_available_seats?
+              if @current_user
+                a(href: "#games", class: "btn w-full") do
+                  "Get Tickets"
+                end
+              else
+                link_to(new_session_path, class: "btn w-full") do
+                  "Sign In to Get Tickets"
+                end
               end
             end
           end
@@ -94,213 +116,115 @@ class Views::Events::Show < Views::Base
 
       # Games/Tables section
       if @event.games.any?
-        div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-6") do
-          div(class: "mb-6 pb-3 border-b border-gray-200") do
-            h2(class: "font-semibold text-2xl mb-1") { "Game Tables" }
-            p(class: "text-sm text-gray-600") { "#{@event.games.count} #{'table'.pluralize(@event.games.count)} available for this event" }
-          end
+        div(id: "games", class: "mb-12") do
+          h2(class: "font-display text-3xl text-blue-900 mb-6") { "Game Tables" }
 
-          div(class: "grid gap-4 md:grid-cols-2 lg:grid-cols-3") do
+          div(class: "space-y-6") do
             @event.games.each do |game|
               render_game_card(game)
             end
           end
         end
       else
-        div(class: "bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center mb-6") do
-          p(class: "text-yellow-800 font-medium") { "Game tables are still being organized. Check back soon!" }
+        div(class: "py-8 text-center") do
+          p(class: "font-serif text-blue-900/60") { "Game tables are still being organized. Check back soon!" }
         end
-      end
-
-      # Check-in section (only for admins/GMs)
-      if @current_user && (@current_user.admin? || @current_user.gm?)
-        render_check_in_section
       end
     end
   end
 
   private
 
+  def has_available_seats?
+    @event.games.any? do |game|
+      game.seats.where(user_id: nil).exists?
+    end
+  end
+
   def render_game_card(game)
-    available_seats = game.seat_count - game.seats.where.not(user_id: nil).count
-    # Get heroes already taken at this specific game
-    taken_hero_ids = game.seats.where.not(hero_id: nil).pluck(:hero_id)
+    filled_seats = game.seats.where.not(user_id: nil).includes(:user, :hero)
+    available_seats = game.seat_count - filled_seats.count
 
-    div(class: "bg-gray-50 rounded-lg p-6 border border-gray-200") do
-      div(class: "flex items-center mb-4") do
-        span(class: "text-3xl mr-3") { "🎲" }
+    div(class: "border border-black/10 rounded-sm bg-white/50 overflow-hidden") do
+      div(class: "grid md:grid-cols-2 gap-6 p-6") do
+        # Left: GM info
+        div(class: "space-y-4") do
+          # GM header
+          div do
+            div(class: "flex items-center gap-2 mb-2") do
+              i(class: "fa-duotone fa-dice-d20 text-xl text-purple-500")
+              h3(class: "font-serif font-semibold text-lg text-blue-900") { game.gm.display_name }
+            end
+            div(class: "text-sm font-serif text-blue-900/60") do
+              plain "#{game.seat_count} #{'seat'.pluralize(game.seat_count)} • "
+              if available_seats > 0
+                span(class: "text-emerald-700") { "#{available_seats} available" }
+              else
+                span(class: "text-rose-700") { "Full" }
+              end
+            end
+          end
+
+          # GM bio
+          if game.gm.bio.present?
+            div(class: "prose prose-sm max-w-none font-serif text-blue-900/70") do
+              render game.gm.bio
+            end
+          end
+        end
+
+        # Right: Seats grid
         div do
-          div(class: "font-semibold text-lg") { "Game Master" }
-          div(class: "text-gray-700") { game.gm.display_name }
-        end
-      end
-
-      div(class: "space-y-2 text-sm text-gray-600") do
-        div(class: "flex items-center") do
-          span(class: "mr-2") { "💺" }
-          span { "#{game.seat_count} #{'seat'.pluralize(game.seat_count)}" }
-        end
-        div(class: "flex items-center") do
-          span(class: "mr-2") { available_seats > 0 ? "✅" : "❌" }
-          span(class: available_seats > 0 ? "text-green-600 font-semibold" : "text-red-600") do
-            if available_seats > 0
-              "#{available_seats} #{'seat'.pluralize(available_seats)} available"
-            else
-              "Table full"
-            end
-          end
-        end
-      end
-
-      # Hero selection form
-      if available_seats > 0 && @event.upcoming? && @current_user
-        div(class: "mt-6") do
-          form_with(url: event_game_seats_path(@event, game), method: :post, class: "space-y-4") do |f|
-            # Hero selection grid
-            div(class: "space-y-3") do
-              p(class: "text-sm font-medium text-gray-700") { "Choose your hero:" }
-
-              div(class: "grid grid-cols-2 gap-3") do
-                @available_heroes.each do |hero|
-                  is_taken = taken_hero_ids.include?(hero.id)
-                  render_hero_option(f, hero, is_taken)
-                end
-              end
+          div(class: "grid grid-cols-2 gap-3") do
+            # Render filled seats
+            filled_seats.each do |seat|
+              render_filled_seat(seat)
             end
 
-            f.submit "Purchase Seat ($#{@event.ticket_price})",
-              class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition"
+            # Render empty seats
+            available_seats.times do
+              render_empty_seat(game)
+            end
           end
-        end
-      elsif available_seats > 0 && @event.upcoming?
-        div(class: "mt-4") do
-          link_to("Sign In to Purchase", new_session_path,
-            class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium transition")
         end
       end
     end
   end
 
-  def render_hero_option(form, hero, is_taken)
-    label_class = [
-      "relative flex flex-col cursor-pointer rounded-lg border-2 p-3 transition",
-      is_taken ? "opacity-40 cursor-not-allowed border-gray-200 bg-gray-100" : "border-gray-300 hover:border-blue-500 hover:bg-white"
-    ].join(" ")
-
-    label(class: label_class) do
-      # Hidden radio button
-      input(
-        type: "radio",
-        name: "hero_id",
-        value: hero.id,
-        disabled: is_taken,
-        class: "peer sr-only",
-        required: true
-      )
-
-      # Selected state indicator
-      div(class: "absolute top-2 right-2 hidden peer-checked:block") do
-        div(class: "w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center") do
-          span(class: "text-white text-xs") { "✓" }
-        end
+  def render_filled_seat(seat)
+    div(class: "border border-black/10 rounded-sm p-3 bg-white min-h-[5rem] flex flex-col justify-center") do
+      div(class: "flex items-center gap-2 mb-1") do
+        i(class: "fa-solid fa-user text-sm text-purple-500")
+        span(class: "font-serif font-medium text-sm text-blue-900 truncate") { seat.user.display_name }
       end
-
-      # Hero portrait
-      if hero.portrait.present?
-        div(class: "aspect-square w-full mb-2 rounded overflow-hidden bg-gray-200") do
-          image_tag(url_for(hero.portrait), class: "w-full h-full object-cover object-top")
-        end
-      else
-        div(class: "aspect-square w-full mb-2 rounded bg-gray-200 flex items-center justify-center") do
-          span(class: "text-4xl") { "🦸" }
-        end
-      end
-
-      # Hero info
-      div(class: "space-y-1") do
-        p(class: "font-semibold text-sm text-gray-900 truncate") { hero.name }
-        p(class: "text-xs text-gray-600 truncate") { "#{hero.pronouns} • #{hero.role&.humanize}" }
-
-        if is_taken
-          p(class: "text-xs font-medium text-red-600 mt-2") { "Taken" }
+      if seat.hero
+        div(class: "flex items-center gap-2 text-xs font-serif text-blue-900/60") do
+          i(class: "fa-solid fa-mask text-xs")
+          span(class: "truncate") { seat.hero.name }
         end
       end
     end
   end
 
-  def render_check_in_section
-    all_seats = @event.games.flat_map { |game| game.seats.where.not(user_id: nil).includes(:user, :hero, :game) }
-    return if all_seats.empty?
-
-    div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-8") do
-      div(class: "mb-6 pb-3 border-b border-gray-200") do
-        div(class: "flex justify-between items-center") do
-          h2(class: "font-semibold text-2xl") { "Check-in Management" }
-          link_to("QR Scanner", check_in_path,
-            class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition")
+  def render_empty_seat(game)
+    # Only make clickable if event is upcoming and user can purchase
+    if @event.upcoming? && @current_user
+      link_to(new_event_game_seat_path(@event, game), class: "border border-dashed border-black/20 rounded-sm p-3 bg-amber-50/50 hover:bg-white hover:border-purple-500 transition flex items-center justify-center min-h-[5rem] group") do
+        div(class: "text-center") do
+          i(class: "fa-solid fa-plus text-purple-500/60 group-hover:text-purple-500 text-sm mb-1")
+          div(class: "text-xs font-serif text-blue-900/60 group-hover:text-blue-900") { "Purchase" }
         end
       end
-
-      checked_in_count = all_seats.count(&:checked_in?)
-      p(class: "text-sm text-gray-600 mb-6") do
-        "#{checked_in_count} of #{all_seats.count} attendees checked in"
-      end
-
-      div(class: "overflow-x-auto") do
-        table(class: "min-w-full divide-y divide-gray-200") do
-          thead(class: "bg-gray-50") do
-            tr do
-              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Player" }
-              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Hero" }
-              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Table GM" }
-              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Status" }
-              th(class: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") { "Action" }
-            end
-          end
-
-          tbody(class: "bg-white divide-y divide-gray-200") do
-            all_seats.each do |seat|
-              tr do
-                td(class: "px-6 py-4 whitespace-nowrap") do
-                  div(class: "text-sm font-medium text-gray-900") { seat.user.display_name }
-                  div(class: "text-sm text-gray-500") { seat.user.email }
-                end
-
-                td(class: "px-6 py-4 whitespace-nowrap text-sm text-gray-900") do
-                  seat.hero ? seat.hero.name : "-"
-                end
-
-                td(class: "px-6 py-4 whitespace-nowrap text-sm text-gray-900") do
-                  seat.game.gm.display_name
-                end
-
-                td(class: "px-6 py-4 whitespace-nowrap") do
-                  if seat.checked_in?
-                    span(class: "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800") do
-                      "✓ Checked in"
-                    end
-                    div(class: "text-xs text-gray-500 mt-1") do
-                      seat.checked_in_at.strftime("%I:%M %p")
-                    end
-                  else
-                    span(class: "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800") do
-                      "Not checked in"
-                    end
-                  end
-                end
-
-                td(class: "px-6 py-4 whitespace-nowrap text-sm") do
-                  button_to(
-                    seat.checked_in? ? "Undo" : "Check In",
-                    check_in_seat_path(seat),
-                    method: :patch,
-                    class: "px-3 py-1 #{seat.checked_in? ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'} text-white text-xs font-medium rounded cursor-pointer"
-                  )
-                end
-              end
-            end
-          end
+    elsif @event.upcoming?
+      link_to(new_session_path, class: "border border-dashed border-black/20 rounded-sm p-3 bg-amber-50/50 hover:bg-white hover:border-purple-500 transition flex items-center justify-center min-h-[5rem] group") do
+        div(class: "text-center") do
+          i(class: "fa-solid fa-right-to-bracket text-purple-500/60 group-hover:text-purple-500 text-sm mb-1")
+          div(class: "text-xs font-serif text-blue-900/60 group-hover:text-blue-900") { "Sign In" }
         end
+      end
+    else
+      div(class: "border border-dashed border-black/10 rounded-sm p-3 bg-amber-50/30 flex items-center justify-center min-h-[5rem]") do
+        div(class: "text-xs font-serif text-blue-900/40") { "Empty" }
       end
     end
   end
@@ -308,13 +232,13 @@ class Views::Events::Show < Views::Base
   def status_badge_class(status)
     case status
     when "upcoming"
-      "bg-green-100 text-green-800"
+      "bg-emerald-100 text-emerald-800 border border-emerald-200"
     when "past"
-      "bg-gray-100 text-gray-800"
+      "bg-amber-100 text-amber-800 border border-amber-200"
     when "cancelled"
-      "bg-red-100 text-red-800"
+      "bg-rose-100 text-rose-800 border border-rose-200"
     else
-      "bg-yellow-100 text-yellow-800"
+      "bg-purple-100 text-purple-800 border border-purple-200"
     end
   end
 end

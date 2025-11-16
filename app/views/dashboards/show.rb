@@ -15,7 +15,7 @@ class Views::Dashboards::Show < Views::Base
         render_link("Locations", "fa-location-dot", dashboard_locations_path)
         render_link("Heroes", "fa-mask", heroes_path)
         render_link("Traits", "fa-star", dashboard_traits_path)
-        render_link("Check-in", "fa-qrcode", check_in_path)
+        render_link("Check-in", "fa-qrcode", checkin_path)
       end
     end
   end

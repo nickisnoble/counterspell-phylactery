@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   resources :events, only: [ :index, :show ] do
     resources :event_emails, only: [ :show ]
     resources :games, only: [ :show ] do
-      resources :seats, only: [ :create, :show ] do
+      resources :seats, only: [ :new, :create, :show ] do
         get :success, on: :collection
       end
     end
@@ -25,11 +25,11 @@ Rails.application.routes.draw do
   # Stripe webhooks
   post "/stripe/webhooks" => "stripe_webhooks#create"
 
-  # Check-in system
-  resource :check_in, only: [:show, :create]
+  # Checkin system
+  resource :checkin, only: [:show, :create]
   resources :seats, only: [] do
     member do
-      patch :check_in, to: "check_ins#update"
+      patch :checkin, to: "checkins#update"
     end
   end
 

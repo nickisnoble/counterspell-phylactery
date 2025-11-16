@@ -4,10 +4,13 @@ class EventsController < ApplicationController
 
   def index
     @events = if authenticated? && (Current.user.gm? || Current.user.admin?)
-      Event.includes(:location).visible_to_gm.order(date: :asc)
+      Event.includes(:location, games: :seats).visible_to_gm.order(:date)
     else
-      Event.includes(:location).publicly_visible.order(date: :asc)
+      Event.includes(:location, games: :seats).publicly_visible.order(:date)
     end
+
+    # Sort by status priority (upcoming first, then planning, then past, then cancelled)
+    @events = @events.to_a.sort_by { |event| [status_priority(event), event.date] }
 
     render Views::Events::Index.new(events: @events)
   end
@@ -24,6 +27,16 @@ class EventsController < ApplicationController
   end
 
   private
+
+  def status_priority(event)
+    case event.status
+    when "upcoming" then 0
+    when "planning" then 1
+    when "past" then 2
+    when "cancelled" then 3
+    else 4
+    end
+  end
 
   def set_event
     @event = Event.includes(:location, games: [:gm, :seats]).find_by_slug!(params[:id])
