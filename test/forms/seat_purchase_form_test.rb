@@ -161,7 +161,7 @@ class SeatPurchaseFormTest < ActiveSupport::TestCase
 
     assert_equal 1, form.role_availability["striker"]
     assert_equal 1, form.role_availability["protector"]
-    assert_equal 0, form.role_availability.fetch("face", 0)
+    assert_equal 0, form.role_availability.fetch("charmer", 0)
   end
 
   test "role_available? returns true when under 2" do
