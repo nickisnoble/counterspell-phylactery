@@ -10,13 +10,13 @@ class Dashboard::SeatsController < ApplicationController
       # Re-render the seat card on success
       render turbo_stream: turbo_stream.replace(
         "seat_#{@seat.id}",
-        Views::Dashboard::Seats::SeatCard.new(seat: @seat, event: @event)
+        Views::Dashboard::Seats::SeatCard.new(seat: @seat, event: @event, show_errors: false)
       )
     else
       # Re-render the seat card with errors
       render turbo_stream: turbo_stream.replace(
         "seat_#{@seat.id}",
-        Views::Dashboard::Seats::SeatCardWithErrors.new(seat: @seat, event: @event)
+        Views::Dashboard::Seats::SeatCard.new(seat: @seat, event: @event, show_errors: true)
       ), status: :unprocessable_content
     end
   end

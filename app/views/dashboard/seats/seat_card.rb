@@ -4,14 +4,24 @@ class Views::Dashboard::Seats::SeatCard < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::TurboFrameTag
 
-  def initialize(seat:, event:)
+  def initialize(seat:, event:, show_errors: false)
     @seat = seat
     @event = event
+    @show_errors = show_errors
+    @has_errors = seat.errors.any?
   end
 
   def view_template
     turbo_frame_tag("seat_#{@seat.id}", class: "contents") do
-      div(class: "border border-gray-200 rounded-md p-3 bg-white") do
+      div(class: card_classes) do
+        # Error message (if any)
+        if @show_errors && @has_errors
+          div(class: "mb-3 p-2 bg-red-100 border border-red-200 rounded text-sm text-red-800") do
+            i(class: "fa-solid fa-exclamation-triangle mr-1")
+            plain @seat.errors.full_messages.to_sentence
+          end
+        end
+
         # Player and Hero info
         div(class: "mb-3") do
           div(class: "font-medium text-sm text-gray-900 mb-1") do
@@ -39,8 +49,8 @@ class Views::Dashboard::Seats::SeatCard < Views::Base
               @event.games,
               :id,
               ->(g) { "#{g.gm.display_name}'s table" },
-              {},
-              class: "block w-full text-sm rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+              { selected: select_value },
+              class: select_classes,
               data: { action: "change->seat-reassign#submit" }
             )
 
@@ -62,5 +72,29 @@ class Views::Dashboard::Seats::SeatCard < Views::Base
         end
       end
     end
+  end
+
+  private
+
+  def card_classes
+    if @has_errors && @show_errors
+      "border border-red-300 rounded-md p-3 bg-red-50"
+    else
+      "border border-gray-200 rounded-md p-3 bg-white"
+    end
+  end
+
+  def select_classes
+    base = "block w-full text-sm rounded-md"
+    if @has_errors && @show_errors
+      "#{base} border-red-300 focus:border-red-500 focus:ring-red-500"
+    else
+      "#{base} border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    end
+  end
+
+  def select_value
+    # If there are errors, show the original value
+    @has_errors ? (@seat.game_id_was || @seat.game_id) : @seat.game_id
   end
 end
