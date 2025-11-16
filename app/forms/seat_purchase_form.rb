@@ -12,6 +12,7 @@ class SeatPurchaseForm
   validate :role_matches_hero
   validate :role_not_full
   validate :hero_available
+  validate :one_association_per_event
 
   def initialize(attributes = {})
     super
@@ -90,6 +91,25 @@ class SeatPurchaseForm
 
     if game.seats.where(hero_id: hero.id).exists?
       errors.add(:hero, "is already taken at this table")
+    end
+  end
+
+  def one_association_per_event
+    return unless game && user
+
+    event = game.event
+
+    # Check if user has another seat at this event
+    existing_seat = Seat.joins(:game).where(
+      user: user,
+      games: { event_id: event.id }
+    ).exists?
+
+    # Check if user is GMing any game at this event
+    is_gm_at_event = Game.where(event: event, gm: user).exists?
+
+    if existing_seat || is_gm_at_event
+      errors.add(:user, "can only have one association per event")
     end
   end
 end

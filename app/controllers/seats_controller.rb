@@ -28,10 +28,14 @@ class SeatsController < ApplicationController
   end
 
   def create
-    @seat = @game.seats.build(seat_params)
-    @seat.user = Current.user
+    form = SeatPurchaseForm.new(
+      game_id: @game.id,
+      user_id: Current.user.id,
+      hero_id: params[:hero_id],
+      role: params[:role_selection]
+    )
 
-    if @seat.valid?
+    if form.valid?
       # Create Stripe checkout session
       session = Nocheckout::Session.create(
         line_items: [{
@@ -46,18 +50,18 @@ class SeatsController < ApplicationController
           quantity: 1
         }],
         mode: "payment",
-        success_url: success_event_game_seats_url(@event, @game, hero_id: @seat.hero_id),
+        success_url: success_event_game_seats_url(@event, @game, hero_id: params[:hero_id]),
         cancel_url: event_url(@event),
         metadata: {
           game_id: @game.id,
           user_id: Current.user.id,
-          hero_id: @seat.hero_id
+          hero_id: params[:hero_id]
         }
       )
 
       redirect_to session.url, allow_other_host: true
     else
-      redirect_to event_path(@game.event), alert: @seat.errors.full_messages.join(", ")
+      redirect_to event_path(@game.event), alert: form.errors.full_messages.join(", ")
     end
   end
 
