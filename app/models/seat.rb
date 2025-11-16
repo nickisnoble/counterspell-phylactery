@@ -102,9 +102,40 @@ class Seat < ApplicationRecord
     # Only broadcast on meaningful changes
     return unless saved_change_to_checked_in_at? || saved_change_to_user_id? || saved_change_to_hero_id?
 
-    # Broadcast a refresh to anyone viewing this event
-    # Note: seats/new doesn't subscribe to avoid disrupting wizard flow
-    # Real-time updates only work on event show pages
+    # Broadcast targeted Turbo Frame updates for wizard pages
+    # This updates role counts and hero availability without disrupting wizard state
+    broadcast_update_to_wizard
+
+    # Broadcast full page refresh for event show pages
     broadcast_refresh_to(game.event)
+  end
+
+  def broadcast_update_to_wizard
+    # Calculate current role counts
+    role_counts = game.seats
+      .joins(:hero)
+      .where.not(hero_id: nil)
+      .group("heroes.role")
+      .count
+
+    # Get available heroes (convert to array for serialization)
+    taken_hero_ids = game.seats.where.not(hero_id: nil).pluck(:hero_id)
+    available_heroes = Hero.where.not(id: taken_hero_ids).order(:name).to_a
+
+    # Broadcast role selection update
+    broadcast_replace_later_to(
+      game.event,
+      target: "game_#{game.id}_role_selection",
+      partial: "seats/role_selection",
+      locals: { game: game, role_counts: role_counts }
+    )
+
+    # Broadcast hero selection update
+    broadcast_replace_later_to(
+      game.event,
+      target: "game_#{game.id}_hero_selection",
+      partial: "seats/hero_selection",
+      locals: { game: game, available_heroes: available_heroes }
+    )
   end
 end

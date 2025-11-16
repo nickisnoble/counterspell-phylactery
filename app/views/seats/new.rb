@@ -6,6 +6,8 @@ class Views::Seats::New < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::ImageTag
   include Phlex::Rails::Helpers::URLFor
+  include Phlex::Rails::Helpers::TurboStreamFrom
+  include Phlex::Rails::Helpers::TurboFrameTag
 
   def initialize(event:, game:, available_heroes:, role_counts: {})
     @event = event
@@ -16,6 +18,9 @@ class Views::Seats::New < Views::Base
 
   def view_template
     content_for(:title, "Purchase Seat - #{@event.name}")
+
+    # Subscribe to Turbo Stream updates for this event
+    turbo_stream_from @event
 
     main(class: "w-full max-w-4xl mx-auto px-4 py-12 bg-amber-50 min-h-screen") do
       # Back link
@@ -53,9 +58,11 @@ class Views::Seats::New < Views::Base
           end
         end
 
-        div(class: "grid grid-cols-2 gap-4") do
-          Hero.roles.keys.each do |role|
-            render_role_option(role)
+        turbo_frame_tag "game_#{@game.id}_role_selection" do
+          div(class: "grid grid-cols-2 gap-4") do
+            Hero.roles.keys.each do |role|
+              render_role_option(role)
+            end
           end
         end
       end
@@ -67,9 +74,11 @@ class Views::Seats::New < Views::Base
           p(class: "font-serif text-lg text-blue-900/80", data: { wizard_target: "selectedRole" }) { "Select a role first" }
         end
 
-        div(class: "grid grid-cols-1 sm:grid-cols-2 gap-4", data: { wizard_target: "heroContainer" }) do
-          @available_heroes.each do |hero|
-            render_hero_option(hero)
+        turbo_frame_tag "game_#{@game.id}_hero_selection" do
+          div(class: "grid grid-cols-1 sm:grid-cols-2 gap-4", data: { wizard_target: "heroContainer" }) do
+            @available_heroes.each do |hero|
+              render_hero_option(hero)
+            end
           end
         end
       end
