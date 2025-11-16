@@ -1,0 +1,116 @@
+<% content_for(:title, "Purchase Seat - #{@event.name}") %>
+
+<%= turbo_stream_from @event %>
+
+<main class="w-full max-w-4xl mx-auto px-4 py-12 bg-amber-50 min-h-screen">
+  <!-- Back link -->
+  <div class="mb-8">
+    <%= link_to "← Back to Event", event_path(@event), class: "font-serif text-purple-900 hover:text-purple-700 font-medium transition" %>
+  </div>
+
+  <!-- Hero selection form -->
+  <% if @available_heroes.any? %>
+    <%= form_with(
+      url: event_game_seats_path(@event, @game),
+      method: :post,
+      data: { controller: "wizard" },
+      class: "space-y-6"
+    ) do |f| %>
+
+      <!-- Step 1: Role Selection -->
+      <div data-wizard-target="step">
+        <div class="mb-8">
+          <h1 class="font-display text-4xl text-blue-900 mb-2">Choose Your Role</h1>
+          <p class="font-serif text-lg text-blue-900/80">
+            GM: <%= @game.gm.display_name %>
+          </p>
+        </div>
+
+        <%= render partial: "seats/role_selection", locals: { game: @game, role_counts: @role_counts } %>
+      </div>
+
+      <!-- Step 2: Hero Selection -->
+      <div data-wizard-target="step" class="hidden">
+        <div class="mb-8">
+          <h1 class="font-display text-4xl text-blue-900 mb-2">Choose Your Hero</h1>
+          <p class="font-serif text-lg text-blue-900/80" data-wizard-target="selectedRole">Select a role first</p>
+        </div>
+
+        <%= render partial: "seats/hero_selection", locals: { game: @game, available_heroes: @available_heroes } %>
+      </div>
+
+      <!-- Step 3: Review Order -->
+      <div data-wizard-target="step" class="hidden">
+        <div class="mb-8">
+          <h1 class="font-display text-4xl text-blue-900 mb-2">Review Your Order</h1>
+        </div>
+
+        <div class="bg-white/50 rounded-sm border border-black/10 p-6 space-y-4">
+          <!-- Event details -->
+          <div class="border-b border-black/10 pb-4">
+            <p class="font-serif text-sm text-blue-900/60 mb-1">Event</p>
+            <p class="font-display text-xl text-blue-900"><%= @event.name %></p>
+            <p class="font-serif text-blue-900/80">
+              <% if @event.start_time %>
+                <%= @event.date.strftime('%B %d, %Y') %> at <%= @event.start_time.strftime('%I:%M %p') %>
+              <% else %>
+                <%= @event.date.strftime('%B %d, %Y') %>
+              <% end %>
+            </p>
+          </div>
+
+          <!-- GM details -->
+          <div class="border-b border-black/10 pb-4">
+            <p class="font-serif text-sm text-blue-900/60 mb-1">Game Master</p>
+            <p class="font-display text-lg text-blue-900"><%= @game.gm.display_name %></p>
+          </div>
+
+          <!-- Hero selection (will be updated by JavaScript) -->
+          <div class="border-b border-black/10 pb-4" id="selected-hero-display">
+            <p class="font-serif text-sm text-blue-900/60 mb-1">Your Hero</p>
+            <p class="font-display text-lg text-blue-900" data-hero-name="hero-name-display">No hero selected</p>
+          </div>
+
+          <!-- Price -->
+          <div>
+            <p class="font-serif text-sm text-blue-900/60 mb-1">Ticket Price</p>
+            <p class="font-display text-2xl text-purple-900">$<%= @event.ticket_price %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="pt-6 border-t border-black/10 flex gap-4 justify-between">
+        <!-- Previous button -->
+        <button
+          type="button"
+          data-action="click->wizard#previous"
+          data-wizard-target="prevButton"
+          class="btn-secondary px-6 py-3 font-serif font-semibold hidden">
+          ← Previous
+        </button>
+
+        <div class="flex-1"></div>
+
+        <!-- Next button -->
+        <button
+          type="button"
+          data-action="click->wizard#next"
+          data-wizard-target="nextButton"
+          class="btn px-6 py-3 font-serif font-semibold">
+          Continue →
+        </button>
+
+        <!-- Submit button (hidden initially) -->
+        <%= f.submit "Continue to Checkout",
+          data: { wizard_target: "submitButton" },
+          class: "btn block px-6 py-3 text-center font-serif font-semibold cursor-pointer hidden" %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="py-12 text-center">
+      <p class="font-serif text-lg text-blue-900/60 mb-6">All heroes are already taken at this table.</p>
+      <%= link_to "← Back to Event", event_path(@event), class: "btn px-6 py-3 font-serif font-semibold" %>
+    </div>
+  <% end %>
+</main>

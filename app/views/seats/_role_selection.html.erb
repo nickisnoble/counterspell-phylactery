@@ -1,0 +1,40 @@
+<%= turbo_frame_tag "game_#{game.id}_role_selection" do %>
+  <div class="grid grid-cols-2 gap-4">
+    <% Hero.roles.keys.each do |role| %>
+      <% count = role_counts[role] || 0 %>
+      <% is_full = count >= 2 %>
+      <% label_class = "relative flex flex-col cursor-pointer rounded-sm border border-black/10 p-6 transition #{is_full ? 'opacity-50 cursor-not-allowed bg-gray-200' : 'hover:border-purple-500 hover:bg-white bg-white/50'}" %>
+
+      <label class="<%= label_class %>">
+        <%= radio_button_tag "role_selection", role, false,
+            class: "peer sr-only",
+            required: true,
+            disabled: is_full,
+            data: { action: "change->wizard#roleSelected" } %>
+
+        <div class="absolute top-3 right-3 hidden peer-checked:block">
+          <div class="w-6 h-6 bg-purple-900 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+          </div>
+        </div>
+
+        <div class="mb-4 text-center">
+          <% icon_class = case role
+          when "striker" then "fa-duotone fa-sword text-5xl text-red-500"
+          when "protector" then "fa-duotone fa-shield text-5xl text-blue-500"
+          when "charmer" then "fa-duotone fa-masks-theater text-5xl text-purple-500"
+          when "strategist" then "fa-duotone fa-chess text-5xl text-green-500"
+          end %>
+          <i class="<%= icon_class %>"></i>
+        </div>
+
+        <p class="font-display text-xl text-blue-900 mb-2 text-center"><%= role.humanize %></p>
+
+        <% color_class = is_full ? "text-red-700" : "text-blue-900/60" %>
+        <p class="font-serif text-sm text-center <%= color_class %>">
+          <%= is_full ? "Full (2/2)" : "#{count}/2 taken" %>
+        </p>
+      </label>
+    <% end %>
+  </div>
+<% end %>

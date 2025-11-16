@@ -1,0 +1,40 @@
+<%= turbo_frame_tag "game_#{game.id}_hero_selection" do %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-wizard-target="heroContainer">
+    <% taken_hero_ids = game.seats.where.not(hero_id: nil).pluck(:hero_id) %>
+    <% available_heroes.each do |hero| %>
+      <% is_taken = taken_hero_ids.include?(hero.id) %>
+      <% label_class = "relative flex flex-col cursor-pointer rounded-sm border border-black/10 p-3 transition #{is_taken ? 'opacity-50' : 'hover:border-purple-500 hover:bg-white'} bg-white/50" %>
+
+      <label class="<%= label_class %>" data-hero-role="<%= hero.role %>" data-wizard-target="heroOption">
+        <%= radio_button_tag "hero_id", hero.id, false,
+            class: "peer sr-only",
+            required: true,
+            disabled: is_taken %>
+
+        <div class="absolute top-3 right-3 hidden peer-checked:block">
+          <div class="w-6 h-6 bg-purple-900 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+          </div>
+        </div>
+
+        <% if hero.portrait.present? %>
+          <div class="aspect-square w-full mb-3 rounded-sm overflow-hidden bg-amber-100 border border-black/10">
+            <%= image_tag hero.portrait, class: "w-full h-full object-cover object-top" %>
+          </div>
+        <% else %>
+          <div class="aspect-square w-full mb-3 rounded-sm bg-amber-100 border border-black/10 flex items-center justify-center">
+            <i class="fa-duotone fa-mask text-4xl text-purple-500"></i>
+          </div>
+        <% end %>
+
+        <p class="font-serif font-semibold text-sm text-blue-900 mb-1"><%= hero.name %></p>
+        <p class="font-serif text-xs text-blue-900/60">
+          <%= hero.pronouns %>
+          <% if hero.role %>
+            • <%= hero.role.humanize %>
+          <% end %>
+        </p>
+      </label>
+    <% end %>
+  </div>
+<% end %>
