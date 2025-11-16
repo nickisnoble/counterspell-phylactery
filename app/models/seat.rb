@@ -103,6 +103,8 @@ class Seat < ApplicationRecord
     return unless saved_change_to_checked_in_at? || saved_change_to_user_id? || saved_change_to_hero_id?
 
     # Broadcast a refresh to anyone viewing this event
+    # Note: seats/new doesn't subscribe to avoid disrupting wizard flow
+    # Real-time updates only work on event show pages
     broadcast_refresh_to(game.event)
   end
 end

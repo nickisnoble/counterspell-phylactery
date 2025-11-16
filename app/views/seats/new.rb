@@ -6,7 +6,6 @@ class Views::Seats::New < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::ImageTag
   include Phlex::Rails::Helpers::URLFor
-  include Phlex::Rails::Helpers::TurboStreamFrom
 
   def initialize(event:, game:, available_heroes:, role_counts: {})
     @event = event
@@ -17,9 +16,6 @@ class Views::Seats::New < Views::Base
 
   def view_template
     content_for(:title, "Purchase Seat - #{@event.name}")
-
-    # Subscribe to Turbo Stream updates for this event
-    turbo_stream_from @event
 
     main(class: "w-full max-w-4xl mx-auto px-4 py-12 bg-amber-50 min-h-screen") do
       # Back link
