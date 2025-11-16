@@ -4,7 +4,7 @@ class Hero < ApplicationRecord
   has_many :seats
   has_many :users, through: :seats
   has_and_belongs_to_many :traits
-  REQUIRED_TRAIT_TYPES = [ "ANCESTRY", "BACKGROUND", "CLASS" ].freeze
+  REQUIRED_TRAIT_TYPES = [ "ANCESTRY", "BACKGROUND" ].freeze
   validate :required_traits_present
   validate :no_duplicate_traits
 
