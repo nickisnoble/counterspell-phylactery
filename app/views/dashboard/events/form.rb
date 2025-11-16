@@ -285,6 +285,19 @@ class Views::Dashboard::Events::Form < Views::Base
             span(class: "font-medium") { seat.game.gm.display_name }
             plain "'s table"
           end
+          if seat.stripe_payment_intent_id.present?
+            div(class: "text-xs mt-1") do
+              a(
+                href: "https://dashboard.stripe.com/payments/#{seat.stripe_payment_intent_id}",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                class: "text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              ) do
+                i(class: "fa-solid fa-external-link text-xs")
+                plain "View Stripe Transaction"
+              end
+            end
+          end
         end
 
         # Game reassignment

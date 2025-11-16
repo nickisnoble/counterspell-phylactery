@@ -14,18 +14,20 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     @game = @event.games.create!(gm: @gm, seat_count: 5)
   end
 
-  test "should show game for upcoming event" do
+  test "should redirect to login when not authenticated" do
     get event_game_path(@event, @game)
-    assert_response :success
+    assert_redirected_to new_session_path
   end
 
-  test "should redirect for planning event when not authenticated" do
-    @event.update!(status: "planning")
+  test "should redirect players to root" do
+    player = User.create!(email: "regular@test.com", system_role: "player", display_name: "Regular Player")
+    login_with_otp(player.email)
     get event_game_path(@event, @game)
-    assert_redirected_to events_path
+    assert_redirected_to root_path
   end
 
-  test "should show game with available seats count" do
+  test "should show game for GMs with available seats" do
+    login_with_otp(@gm.email)
     get event_game_path(@event, @game)
     assert_response :success
   end
@@ -43,7 +45,7 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     @game.seats.create!(user: player, hero: hero)
 
     login_with_otp(@gm.email)
-    get game_path(@game)
+    get event_game_path(@event, @game)
     assert_response :success
   end
 
@@ -61,15 +63,15 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     @game.seats.create!(user: player, hero: hero)
 
     login_with_otp(admin.email)
-    get game_path(@game)
+    get event_game_path(@event, @game)
     assert_response :success
   end
 
   test "should redirect regular players trying to access game show" do
     player = User.create!(email: "player3@test.com", system_role: "player", display_name: "Test Player 3")
     login_with_otp(player.email)
-    get game_path(@game)
-    assert_redirected_to events_path
+    get event_game_path(@event, @game)
+    assert_redirected_to root_path
   end
 
   test "should show checkin button for today's games" do
@@ -78,7 +80,7 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     @game.seats.create!(user: player)
 
     login_with_otp(@gm.email)
-    get game_path(@game)
+    get event_game_path(@event, @game)
     assert_response :success
   end
 end
