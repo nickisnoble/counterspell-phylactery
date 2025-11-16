@@ -3,7 +3,7 @@ require "rails-controller-testing"
 class SessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     # Create user dynamically to avoid encryption issues with fixtures
-    @user = User.create!(email: "test@example.com")
+    @user = User.create!(email: "test@example.com", display_name: "Test User")
     # Clear any existing sessions
     @user.sessions.destroy_all
   end
@@ -44,10 +44,66 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     user = User.find_by(email: @user.email)
     valid_code = user.auth_code
 
-    # Verify code
+    # Verify code - should redirect to root since no return_to is set
     post validate_session_path, params: { code: valid_code }
     assert_nil session[:awaiting_login]
     assert_redirected_to root_path
+  end
+
+  test "should redirect to saved url after authentication" do
+    # Simulate user trying to access a protected page
+    event = Event.create!(
+      name: "Test Event",
+      date: Date.today + 7.days,
+      location: Location.create!(name: "Test Venue", address: "123 Test St"),
+      status: "upcoming",
+      ticket_price: 25
+    )
+    gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "GM")
+    game = event.games.create!(gm: gm, seat_count: 5)
+
+    # Try to access seat purchase page (requires auth)
+    get new_event_game_seat_path(event, game)
+    assert_redirected_to new_session_path
+
+    # Sign in
+    post session_path, params: { email: @user.email }
+    user = User.find_by(email: @user.email)
+    valid_code = user.auth_code
+
+    # Complete authentication
+    post validate_session_path, params: { code: valid_code }
+
+    # Should redirect back to the seat purchase page
+    assert_redirected_to new_event_game_seat_path(event, game)
+  end
+
+  test "should redirect to profile edit if display_name missing, then to saved url" do
+    # Create user without display_name
+    user_without_name = User.create!(email: "newuser@test.com")
+    assert_nil user_without_name.display_name
+
+    # Setup return URL
+    event = Event.create!(
+      name: "Test Event",
+      date: Date.today + 7.days,
+      location: Location.create!(name: "Test Venue", address: "123 Test St"),
+      status: "upcoming",
+      ticket_price: 25
+    )
+    gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "GM")
+    game = event.games.create!(gm: gm, seat_count: 5)
+
+    # Try to access seat purchase (sets return_to)
+    get new_event_game_seat_path(event, game)
+
+    # Authenticate
+    post session_path, params: { email: user_without_name.email }
+    valid_code = User.find_by(email: user_without_name.email).auth_code
+    post validate_session_path, params: { code: valid_code }
+
+    # Should redirect to profile edit
+    assert_redirected_to edit_user_path(user_without_name)
   end
 
   test "should reject invalid code" do

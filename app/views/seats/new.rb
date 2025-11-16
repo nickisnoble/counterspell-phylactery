@@ -22,35 +22,9 @@ class Views::Seats::New < Views::Base
         link_to("← Back to Event", event_path(@event), class: "font-serif text-purple-900 hover:text-purple-700 font-medium transition")
       end
 
-      # Header
-      div(class: "mb-8") do
-        h1(class: "font-display text-4xl text-blue-900 mb-2") { "Choose Your Hero" }
-        p(class: "font-serif text-lg text-blue-900/80") do
-          "GM: #{@game.gm.display_name}"
-        end
-      end
-
       # Hero selection form
       if @available_heroes.any?
-        form_with(url: event_game_seats_path(@event, @game), method: :post, class: "space-y-6") do |f|
-          div(class: "grid grid-cols-1 sm:grid-cols-2 gap-4") do
-            @available_heroes.each do |hero|
-              render_hero_option(f, hero)
-            end
-          end
-
-          div(class: "pt-6 border-t border-black/10") do
-            div(class: "flex items-center justify-between mb-4") do
-              div(class: "font-serif text-lg text-blue-900") do
-                plain "Ticket Price: "
-                span(class: "font-display text-2xl text-purple-900") { "$#{@event.ticket_price}" }
-              end
-            end
-
-            f.submit "Continue to Checkout",
-              class: "btn block w-full text-center font-serif font-semibold py-3 cursor-pointer"
-          end
-        end
+        render_wizard_form
       else
         div(class: "py-12 text-center") do
           p(class: "font-serif text-lg text-blue-900/60 mb-6") { "All heroes are already taken at this table." }
@@ -62,7 +36,96 @@ class Views::Seats::New < Views::Base
 
   private
 
-  def render_hero_option(form, hero)
+  def render_wizard_form
+    form_with(
+      url: event_game_seats_path(@event, @game),
+      method: :post,
+      data: { controller: "wizard" },
+      class: "space-y-6"
+    ) do |f|
+      # Step 1: Hero Selection
+      div(data: { wizard_target: "step" }) do
+        div(class: "mb-8") do
+          h1(class: "font-display text-4xl text-blue-900 mb-2") { "Choose Your Hero" }
+          p(class: "font-serif text-lg text-blue-900/80") do
+            "GM: #{@game.gm.display_name}"
+          end
+        end
+
+        div(class: "grid grid-cols-1 sm:grid-cols-2 gap-4") do
+          @available_heroes.each do |hero|
+            render_hero_option(hero)
+          end
+        end
+      end
+
+      # Step 2: Review Order
+      div(data: { wizard_target: "step" }, class: "hidden") do
+        div(class: "mb-8") do
+          h1(class: "font-display text-4xl text-blue-900 mb-2") { "Review Your Order" }
+        end
+
+        div(class: "bg-white/50 rounded-sm border border-black/10 p-6 space-y-4") do
+          # Event details
+          div(class: "border-b border-black/10 pb-4") do
+            p(class: "font-serif text-sm text-blue-900/60 mb-1") { "Event" }
+            p(class: "font-display text-xl text-blue-900") { @event.name }
+            p(class: "font-serif text-blue-900/80") do
+              if @event.start_time
+                "#{@event.date.strftime('%B %d, %Y')} at #{@event.start_time.strftime('%I:%M %p')}"
+              else
+                @event.date.strftime('%B %d, %Y')
+              end
+            end
+          end
+
+          # GM details
+          div(class: "border-b border-black/10 pb-4") do
+            p(class: "font-serif text-sm text-blue-900/60 mb-1") { "Game Master" }
+            p(class: "font-display text-lg text-blue-900") { @game.gm.display_name }
+          end
+
+          # Hero selection (will be updated by JavaScript)
+          div(class: "border-b border-black/10 pb-4", id: "selected-hero-display") do
+            p(class: "font-serif text-sm text-blue-900/60 mb-1") { "Your Hero" }
+            p(class: "font-display text-lg text-blue-900", data: { hero_name: "hero-name-display" }) { "No hero selected" }
+          end
+
+          # Price
+          div do
+            p(class: "font-serif text-sm text-blue-900/60 mb-1") { "Ticket Price" }
+            p(class: "font-display text-2xl text-purple-900") { "$#{@event.ticket_price}" }
+          end
+        end
+      end
+
+      # Navigation buttons
+      div(class: "pt-6 border-t border-black/10 flex gap-4 justify-between") do
+        # Previous button
+        button(
+          type: "button",
+          data: { action: "click->wizard#previous", wizard_target: "prevButton" },
+          class: "btn-secondary px-6 py-3 font-serif font-semibold hidden"
+        ) { "← Previous" }
+
+        div(class: "flex-1")
+
+        # Next button
+        button(
+          type: "button",
+          data: { action: "click->wizard#next", wizard_target: "nextButton" },
+          class: "btn px-6 py-3 font-serif font-semibold"
+        ) { "Continue →" }
+
+        # Submit button (hidden initially)
+        f.submit "Continue to Checkout",
+          data: { wizard_target: "submitButton" },
+          class: "btn block px-6 py-3 text-center font-serif font-semibold cursor-pointer hidden"
+      end
+    end
+  end
+
+  def render_hero_option(hero)
     label_class = "relative flex flex-col cursor-pointer rounded-sm border border-black/10 p-3 transition hover:border-purple-500 hover:bg-white bg-white/50"
 
     label(class: label_class) do

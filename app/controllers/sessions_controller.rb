@@ -12,11 +12,7 @@ class SessionsController < ApplicationController
 
   def new
     if authenticated?
-      if !Current.user.display_name.present?
-        redirect_to edit_user_path(Current.user)
-      else
-        redirect_to events_path
-      end
+      redirect_to events_path
     else
       render Views::Sessions::New.new
     end
@@ -60,7 +56,12 @@ class SessionsController < ApplicationController
       start_new_session_for user
       session.delete(:awaiting_login)
 
-      redirect_to root_path
+      # If user needs to complete profile, preserve the return_to URL
+      if !user.display_name.present?
+        redirect_to edit_user_path(user)
+      else
+        redirect_to after_authentication_url
+      end
     else
       redirect_to new_session_path, status: :unauthorized, error: "Dissonant weave. Try requesting new runes!"
     end
