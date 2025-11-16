@@ -131,32 +131,7 @@ class Views::Games::Show < Views::Base
 
         # Checkin button (only for today's games)
         if @is_today && can_check_in?(seat)
-          div(class: "flex flex-col items-end gap-2") do
-            if seat.checked_in?
-              div(class: "text-right") do
-                div(class: "mb-2 text-sm font-serif font-semibold text-emerald-700 flex items-center gap-1") do
-                  i(class: "fa-solid fa-check")
-                  plain "Checked in"
-                end
-                if seat.checked_in_at
-                  div(class: "mb-2 text-xs font-serif text-blue-900/60") { seat.checked_in_at.strftime("%I:%M %p") }
-                end
-              end
-              button_to(
-                "Undo",
-                checkin_seat_path(seat),
-                method: :patch,
-                class: "btn-secondary px-3 py-1.5 text-sm font-serif font-medium cursor-pointer"
-              )
-            else
-              button_to(
-                "Check In",
-                checkin_seat_path(seat),
-                method: :patch,
-                class: "btn px-4 py-2 font-serif font-semibold cursor-pointer"
-              )
-            end
-          end
+          render Views::Components::CheckinButton.new(seat: seat, variant: :card)
         elsif @is_today && seat.checked_in?
           div(class: "text-right") do
             div(class: "text-sm font-serif font-semibold text-emerald-700 flex items-center gap-1") do

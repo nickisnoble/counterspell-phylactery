@@ -133,12 +133,7 @@ class Views::Checkins::Show < Views::Base
       end
 
       td(class: "px-4 py-3 whitespace-nowrap text-sm") do
-        button_to(
-          seat.checked_in? ? "Undo" : "Check In",
-          checkin_seat_path(seat),
-          method: :patch,
-          class: "px-3 py-1 #{seat.checked_in? ? 'bg-blue-900/60 hover:bg-blue-900/80' : 'btn'} text-white text-xs font-serif font-medium rounded-sm cursor-pointer"
-        )
+        render Views::Components::CheckinButton.new(seat: seat, variant: :compact)
       end
     end
   end
