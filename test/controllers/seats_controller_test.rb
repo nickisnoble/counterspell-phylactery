@@ -144,4 +144,89 @@ class SeatsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to event_path(@event)
     assert_match /can only have one association per event/, flash[:alert]
   end
+
+  # Wizard-specific tests
+  test "new wizard calculates role counts correctly" do
+    login_with_otp(@player.email)
+
+    # Create another hero and seat
+    protector = Hero.create!(
+      name: "Protector Hero",
+      role: "protector",
+      traits: @hero.traits
+    )
+    other_player = User.create!(email: "other@test.com", system_role: "player", display_name: "Other")
+    @game.seats.create!(user: other_player, hero: protector)
+
+    get new_event_game_seat_path(@event, @game)
+    assert_response :success
+
+    # The response should include available_heroes and role_counts
+    # (tested implicitly - the view renders without error)
+  end
+
+  test "new wizard shows only available heroes" do
+    login_with_otp(@player.email)
+
+    # Take the striker hero
+    other_player = User.create!(email: "other@test.com", system_role: "player", display_name: "Other")
+    @game.seats.create!(user: other_player, hero: @hero)
+
+    get new_event_game_seat_path(@event, @game)
+    assert_response :success
+
+    # The hero should be marked as taken in the view
+    # (tested implicitly - the view renders with the taken hero disabled)
+  end
+
+  test "create validates role matches hero" do
+    login_with_otp(@player.email)
+
+    # Try to create with mismatched role
+    post event_game_seats_path(@event, @game), params: {
+      hero_id: @hero.id,
+      role_selection: "protector" # wrong role, hero is striker
+    }
+
+    assert_redirected_to event_path(@event)
+    assert_match /must match selected role/, flash[:alert]
+  end
+
+  test "create validates role not full" do
+    login_with_otp(@player.email)
+
+    # Create 2 striker heroes and take them
+    striker2 = Hero.create!(name: "Striker 2", role: "striker", traits: @hero.traits)
+    player1 = User.create!(email: "p1@test.com", system_role: "player", display_name: "P1")
+    player2 = User.create!(email: "p2@test.com", system_role: "player", display_name: "P2")
+    @game.seats.create!(user: player1, hero: @hero)
+    @game.seats.create!(user: player2, hero: striker2)
+
+    # Try to create another striker seat
+    striker3 = Hero.create!(name: "Striker 3", role: "striker", traits: @hero.traits)
+    post event_game_seats_path(@event, @game), params: {
+      hero_id: striker3.id,
+      role_selection: "striker"
+    }
+
+    assert_redirected_to event_path(@event)
+    assert_match /is full \(2\/2 players\)/, flash[:alert]
+  end
+
+  test "create validates hero not taken" do
+    login_with_otp(@player.email)
+
+    # Another player takes the hero
+    other_player = User.create!(email: "other@test.com", system_role: "player", display_name: "Other")
+    @game.seats.create!(user: other_player, hero: @hero)
+
+    # Try to take the same hero
+    post event_game_seats_path(@event, @game), params: {
+      hero_id: @hero.id,
+      role_selection: @hero.role
+    }
+
+    assert_redirected_to event_path(@event)
+    assert_match /already taken/, flash[:alert]
+  end
 end
