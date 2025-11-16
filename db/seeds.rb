@@ -4,11 +4,17 @@ require "yaml"
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
-# Create admins
+# Create admins (runs in all environments)
 admins = [ "nick", "marnie" ]
 admins.each do |name|
   u = User.find_or_create_by(email: "#{name}@counterspell.games", display_name: name)
   u.admin!
+end
+
+# Exit early if not in development
+unless Rails.env.development?
+  puts "Skipping development seeds (not in development environment)"
+  return
 end
 
 # Populate lore
@@ -162,96 +168,151 @@ end
 tavern = Location.find_or_create_by(name: "The Dragon's Hoard Tavern") do |loc|
   loc.address = "123 Market Street, Waterdeep, Sword Coast"
 end
+tavern.update!(about: "<p>A cozy establishment with warm fireplaces and the lingering scent of roasted meats. The walls are adorned with trophies from legendary adventures, and the proprietor claims a real dragon once stored its hoard in the basement. Whether true or not, adventurers gather here to share tales, plan expeditions, and enjoy the finest ale this side of the Sword Coast.</p><p>Live music every Thursday evening, featuring local bards and traveling minstrels.</p>")
 
 guild_hall = Location.find_or_create_by(name: "Adventurer's Guild Hall") do |loc|
   loc.address = "456 Guild Square, Baldur's Gate, Sword Coast"
 end
+guild_hall.update!(about: "<p>The official headquarters for registered adventurers in the region. This grand stone building features a quest board updated daily, a well-stocked armory, and training facilities for honing combat skills. Guild members benefit from exclusive contracts, legal protection, and access to the extensive archives documenting centuries of completed quests.</p><p>New members welcome - registration fee waived for veterans of notable campaigns.</p>")
 
 # Create Events with all statuses: planning, upcoming, past, cancelled
 # Planning events
-Event.find_or_create_by(name: "Quest for the Lost Artifact", location: tavern) do |event|
+planning_artifact = Event.find_or_create_by(name: "Quest for the Lost Artifact", location: tavern) do |event|
   event.date = 30.days.from_now.to_date
   event.status = :planning
   event.start_time = "14:00"
   event.end_time = "18:00"
   event.ticket_price = 15.00
 end
+planning_artifact.update!(description: "<p>Join us for an exciting quest to recover the legendary <strong>Amulet of Whispers</strong>, last seen in the ruins beneath the Cragmaw Mountains. Rumor has it the amulet grants its wearer the ability to understand any spoken language.</p><p><strong>What to expect:</strong></p><ul><li>Dungeon exploration and puzzle solving</li><li>Roleplay-heavy social encounters</li><li>Moderate combat difficulty</li><li>Recommended for characters level 3-5</li></ul>")
 
-Event.find_or_create_by(name: "Dragon's Lair Expedition", location: guild_hall) do |event|
+planning_dragon = Event.find_or_create_by(name: "Dragon's Lair Expedition", location: guild_hall) do |event|
   event.date = 45.days.from_now.to_date
   event.status = :planning
   event.start_time = "10:00"
   event.end_time = "16:00"
   event.ticket_price = 20.00
 end
+planning_dragon.update!(description: "<p>An epic expedition into the lair of Vermithrax the Ancient, a red dragon who has terrorized the countryside for centuries. This is a high-stakes adventure not for the faint of heart.</p><p><strong>Adventure details:</strong></p><ul><li>Full day session with breaks for lunch</li><li>Heavy combat focus with tactical challenges</li><li>Bring your A-game and your best character sheets</li><li>Recommended for experienced players, levels 8-10</li></ul><p><em>Note: Character death is possible. Come prepared!</em></p>")
 
-# Upcoming events
-Event.find_or_create_by(name: "Festival of Heroes", location: tavern) do |event|
-  event.date = 7.days.from_now.to_date
+# Upcoming events - ONE WILL BE SET TO TODAY
+festival = Event.find_or_create_by(name: "Festival of Heroes", location: tavern) do |event|
   event.status = :upcoming
   event.start_time = "18:00"
   event.end_time = "23:00"
   event.ticket_price = 10.00
 end
+# ALWAYS update the date to today, even if record already exists
+festival.update!(
+  date: Date.today,  # THIS ONE IS ALWAYS TODAY (using system timezone, not UTC)
+  description: "<p>Celebrate the brave heroes who protect our realm! This evening festival features food, drink, music, and games of skill. All adventurers are welcome to participate in friendly competitions and share tales of glory.</p><p><strong>Festival activities:</strong></p><ul><li>Archery competition (6:00 PM)</li><li>Storytelling contest (7:30 PM)</li><li>Live music from the Wandering Minstrels (9:00 PM)</li><li>Arm wrestling tournament (10:00 PM)</li></ul><p>Prizes for winners! <strong>Family-friendly event.</strong></p>"
+)
 
-Event.find_or_create_by(name: "Tournament of Champions", location: guild_hall) do |event|
+tournament = Event.find_or_create_by(name: "Tournament of Champions", location: guild_hall) do |event|
   event.date = 14.days.from_now.to_date
   event.status = :upcoming
   event.start_time = "12:00"
   event.end_time = "20:00"
   event.ticket_price = 25.00
 end
+tournament.update!(description: "<p>The annual Tournament of Champions returns! Watch or participate as the realm's finest warriors compete in single combat for glory, gold, and the title of Champion.</p><p><strong>Tournament format:</strong></p><ul><li>Single elimination brackets</li><li>Non-lethal combat (magical healing available)</li><li>All fighting styles welcome</li><li>Grand prize: 500 gold pieces and a masterwork weapon</li></ul><p>Spectators welcome! Betting encouraged (within reason).</p>")
 
 # Past events
-Event.find_or_create_by(name: "Summer Solstice Celebration", location: tavern) do |event|
+solstice = Event.find_or_create_by(name: "Summer Solstice Celebration", location: tavern) do |event|
   event.date = 30.days.ago.to_date
   event.status = :past
   event.start_time = "19:00"
   event.end_time = "23:00"
   event.ticket_price = 12.00
 end
+solstice.update!(description: "<p>We celebrated the longest day of the year with music, dancing, and feasting. The bonfire burned bright as adventurers from across the land gathered to honor the summer sun. Special thanks to the Wildborne druids who blessed the gathering with their nature magic.</p>")
 
-Event.find_or_create_by(name: "Guild Founders Day", location: guild_hall) do |event|
+founders = Event.find_or_create_by(name: "Guild Founders Day", location: guild_hall) do |event|
   event.date = 60.days.ago.to_date
   event.status = :past
   event.start_time = "10:00"
   event.end_time = "17:00"
   event.ticket_price = 15.00
 end
+founders.update!(description: "<p>A day to remember the founding of the Adventurer's Guild 200 years ago. We honored the original founders with ceremonies, shared stories of legendary quests, and inducted this year's class of new guild members. The archives were opened for public viewing, revealing artifacts from the guild's storied history.</p>")
 
 # Cancelled events
-Event.find_or_create_by(name: "Cancelled: Goblin Raid Defense", location: tavern) do |event|
+cancelled_raid = Event.find_or_create_by(name: "Cancelled: Goblin Raid Defense", location: tavern) do |event|
   event.date = 5.days.from_now.to_date
   event.status = :cancelled
   event.start_time = "15:00"
   event.end_time = "19:00"
   event.ticket_price = 10.00
 end
+cancelled_raid.update!(description: "<p><strong>EVENT CANCELLED:</strong> The goblin threat was resolved peacefully through diplomatic negotiations led by Guildmaster Thornwood. No defensive action required. We apologize for any inconvenience.</p><p>Refunds have been processed automatically.</p>")
 
-Event.find_or_create_by(name: "Cancelled: Moonlight Market", location: guild_hall) do |event|
+cancelled_market = Event.find_or_create_by(name: "Cancelled: Moonlight Market", location: guild_hall) do |event|
   event.date = 3.days.ago.to_date
   event.status = :cancelled
   event.start_time = "20:00"
   event.end_time = "02:00"
   event.ticket_price = 5.00
 end
+cancelled_market.update!(description: "<p><strong>EVENT CANCELLED:</strong> Due to unexpected weather conditions (localized temporal storm), the Moonlight Market has been postponed. We are working with vendors to reschedule for next month.</p><p>Keep an eye on our event board for the new date!</p>")
 
-# Create GM users
+# Create GM users with muppet names first (so we can reassign games)
+gm_data = [
+  { email: "kermit@counterspell.games", name: "Kermit", bio: "<p>Long-time game master with a passion for swamp-based adventures. Known for balanced encounters and memorable NPCs. <em>\"It's not easy being green... or a GM!\"</em></p>" },
+  { email: "gonzo@counterspell.games", name: "Gonzo", bio: "<p>Specializes in high-chaos, unpredictable campaigns where anything can happen. Loves incorporating bizarre plot twists and experimental mechanics. Former stunt performer turned storyteller.</p>" },
+  { email: "fozzie@counterspell.games", name: "Fozzie", bio: "<p>Runs lighthearted, comedy-focused games perfect for new players. Every session includes at least three terrible puns. <em>\"Wocka wocka!\"</em> Currently running a campaign about traveling bards.</p>" }
+]
+
 gm_users = []
-3.times do |i|
-  u = User.find_or_create_by(email: "gm#{i + 1}@counterspell.games") do |user|
-    user.display_name = "GM #{i + 1}"
+gm_data.each do |gm|
+  u = User.find_or_create_by(email: gm[:email]) do |user|
+    user.display_name = gm[:name]
   end
+  u.update!(bio: gm[:bio])
   u.gm! unless u.gm? || u.admin?
   gm_users << u
 end
 
-# Create some player users for seats
-player_users = []
-10.times do |i|
-  player_users << User.find_or_create_by(email: "player#{i + 1}@counterspell.games") do |user|
-    user.display_name = "Player #{i + 1}"
+# Delete old generic GM users after reassigning their games
+['gm1@counterspell.games', 'gm2@counterspell.games', 'gm3@counterspell.games'].each do |email|
+  old_gm = User.find_by(email: email)
+  if old_gm
+    # Reassign any games to a random muppet GM
+    old_gm.games_as_gm.update_all(gm_id: gm_users.sample.id) if old_gm.games_as_gm.any?
+    old_gm.destroy
   end
+end
+
+# Delete old generic player users
+User.where("email LIKE ?", "player%@counterspell.games").destroy_all
+
+# Create player users - mostly muppets, some LOTR characters
+player_data = [
+  { email: "piggy@counterspell.games", name: "Miss Piggy", bio: "<p>Prefers playing charismatic leaders and royalty. Has a collection of 47 character portraits commissioned from professional artists.</p>" },
+  { email: "animal@counterspell.games", name: "Animal", bio: "<p>DRUMS! DRUMS! Also enjoys playing barbarians. Very enthusiastic player, sometimes <em>too</em> enthusiastic during combat rounds.</p>" },
+  { email: "sam@counterspell.games", name: "Samwise", bio: "<p>Loyal friend and reliable player who never misses a session. Usually plays support characters. Brings snacks for the whole table.</p>" },
+  { email: "rizzo@counterspell.games", name: "Rizzo", bio: "<p>Plays rogues exclusively. Has an encyclopedic knowledge of the rulebooks and loves finding creative solutions to problems.</p>" },
+  { email: "legolas@counterspell.games", name: "Legolas", bio: "<p>Ranger enthusiast with a preference for archery-focused builds. Known for describing attacks in cinematic detail.</p>" },
+  { email: "rowlf@counterspell.games", name: "Rowlf", bio: "<p>Laid-back player who enjoys roleplay over combat. Often plays bards and brings a melodica to the table for \"authentic\" performances.</p>" },
+  { email: "beaker@counterspell.games", name: "Beaker", bio: "<p>Meep meep! Loves playing artificers and wizards. Has experienced more character deaths than anyone else at the table, usually from experiments gone wrong.</p>" },
+  { email: "gimli@counterspell.games", name: "Gimli", bio: "<p>Dwarf fighter main. Keeps detailed notes of every session and maintains the party's inventory spreadsheet. Competitive but good-natured.</p>" },
+  { email: "scooter@counterspell.games", name: "Scooter", bio: "<p>Enthusiastic newcomer to tabletop gaming. Asks lots of questions and takes extensive notes. Currently playing their first campaign.</p>" },
+  { email: "swedish@counterspell.games", name: "Swedish Chef", bio: "<p>Börk börk börk! Plays clerics and druids with cooking-themed abilities. Brings themed snacks matching the campaign setting to each session.</p>" },
+  { email: "statler@counterspell.games", name: "Statler", bio: "<p>Veteran player with decades of experience. Provides running commentary on game mechanics and rules interpretations. Secretly enjoys every session despite the grumbling.</p>" },
+  { email: "waldorf@counterspell.games", name: "Waldorf", bio: "<p>Always plays alongside Statler. Known for witty banter and surprisingly creative problem-solving. Makes the best character backstories at the table.</p>" },
+  { email: "fozzie-player@counterspell.games", name: "Fozzie Bear", bio: "<p>Not to be confused with GM Fozzie! This Fozzie is a player who loves comedy-relief characters. Every character has a catchphrase and tells terrible jokes.</p>" },
+  { email: "gonzo-player@counterspell.games", name: "Gonzo the Great", bio: "<p>Plays the most outrageous character concepts. Current character: a chicken-riding halfling daredevil. Always looking for the next impossible stunt.</p>" },
+  { email: "pepe@counterspell.games", name: "Pepe", bio: "<p>Smooth-talking player who specializes in face characters. Master of persuasion checks and social encounters. Can talk the party out of (or into) anything.</p>" },
+  { email: "camilla@counterspell.games", name: "Camilla", bio: "<p>Veteran player who brings intensity and drama to every session. Known for elaborate character voices and memorable roleplay moments. Bawk!</p>" },
+  { email: "bunsen@counterspell.games", name: "Dr. Bunsen", bio: "<p>Scientific approach to character building. Extensively researches optimal builds and strategies. Often experiments with unusual multiclass combinations.</p>" }
+]
+
+player_users = []
+player_data.each do |player|
+  u = User.find_or_create_by(email: player[:email]) do |user|
+    user.display_name = player[:name]
+  end
+  u.update!(bio: player[:bio])
+  player_users << u
 end
 
 # Add games and seats to events
@@ -259,10 +320,19 @@ Event.find_each do |event|
   # Skip creating games for cancelled events or if they already have games
   next if event.cancelled? || event.games.any?
 
-  # Create 1-2 games per event
-  game_count = [1, 2].sample
+  # Most events have 3 tables, some have 1-2
+  game_count = [3, 3, 3, 3, 2, 1].sample
+
+  # Don't exceed number of available GMs
+  game_count = [game_count, gm_users.count].min
+
+  # Track which GMs are already assigned to this event
+  available_gms = gm_users.dup
+
   game_count.times do |game_index|
-    gm = gm_users.sample
+    # Pick a GM that hasn't been assigned to this event yet
+    gm = available_gms.sample
+    available_gms.delete(gm)
 
     game = event.games.create!(
       gm: gm,
@@ -390,7 +460,6 @@ heroes_data.each do |hero_data|
 
   hero.pronouns = hero_data[:pronouns]
   hero.role = hero_data[:role]
-  hero.backstory = hero_data[:backstory]
 
   # Find and assign traits
   hero_traits = hero_data[:traits].map do |trait_name|
@@ -400,34 +469,60 @@ heroes_data.each do |hero_data|
   hero.traits = hero_traits
   hero.save!
 
+  # Set rich_text fields after saving (ActionText requires persisted record)
+  # Wrap backstory in HTML paragraph tags for proper rich text formatting
+  hero.update!(
+    backstory: "<p>#{hero_data[:backstory]}</p>",
+    summary: "<p><strong>#{hero_traits[0]&.name}</strong> #{hero.role.humanize.downcase} with a mysterious past and unwavering determination.</p>"
+  )
+
   puts "Created/Updated hero: #{hero.name}"
 end
 
-# Fill some seats for past and upcoming events (only if seats are empty)
-Event.where(status: [:past, :upcoming]).find_each do |event|
-  # Track which players are already assigned to this event
-  assigned_players = event.games.joins(:seats).where.not(seats: { user_id: nil }).pluck('seats.user_id').uniq
-  available_players = player_users.reject { |p| assigned_players.include?(p.id) }
-
+# Assign heroes to ALL seats (all events, not just past/upcoming)
+Event.find_each do |event|
   event.games.each do |game|
-    empty_seats = game.seats.where(user_id: nil)
-    next if empty_seats.empty? || available_players.empty?
-
-    # Fill half to all-but-one seats, but don't exceed available players
-    filled_count = [[empty_seats.count / 2, empty_seats.count - 1].sample, available_players.count].min
-
-    empty_seats.limit(filled_count).each do |seat|
-      player = available_players.shift
-      next unless player
-
-      # Assign user to seat
-      seat.update!(user: player)
-
-      # Assign a random hero to the seat (for both past and upcoming events)
-      if Hero.exists?
-        available_heroes = Hero.where.not(id: game.seats.where.not(hero_id: nil).pluck(:hero_id))
-        seat.update!(hero: available_heroes.sample) if available_heroes.any?
+    # First, ensure ALL seats have heroes (even empty seats)
+    game.seats.where(hero_id: nil).each do |seat|
+      available_heroes = Hero.where.not(id: game.seats.where.not(hero_id: nil).pluck(:hero_id))
+      if available_heroes.any?
+        seat.update!(hero: available_heroes.sample)
+      else
+        # If we've run out of unique heroes for this game, just pick any hero
+        seat.update!(hero: Hero.all.sample)
       end
+    end
+  end
+end
+
+# Fill seats with players for past and upcoming events
+Event.where(status: [:past, :upcoming]).find_each do |event|
+  event.games.each do |game|
+    empty_seats = game.seats.where(user_id: nil).to_a
+    next if empty_seats.empty?
+
+    # Get players NOT already at this event
+    assigned_player_ids = event.games.joins(:seats).where.not(seats: { user_id: nil }).pluck('seats.user_id').uniq
+    available_players = player_users.reject { |p| assigned_player_ids.include?(p.id) }
+
+    # For past events: fill ALL seats
+    # For upcoming events: leave 1-2 seats empty per game
+    if event.past?
+      seats_to_fill = empty_seats.count
+    else
+      # Upcoming: leave some seats available (1-2 per game)
+      seats_to_fill = [empty_seats.count - [1, 2].sample, 0].max
+    end
+
+    # Fill as many seats as we can with available players
+    filled = 0
+    empty_seats.shuffle.each do |seat|
+      break if filled >= seats_to_fill
+      break if available_players.empty?
+
+      player = available_players.shift
+      seat.update!(user: player)
+      filled += 1
     end
   end
 end
