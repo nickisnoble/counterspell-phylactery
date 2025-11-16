@@ -159,17 +159,19 @@ class Views::Dashboard::Events::Form < Views::Base
 
       # Seats Section (only show for persisted events with seats)
       if @event.persisted? && @event.seats.where.not(user_id: nil).exists?
-        div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6") do
+        div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6", id: "seats-management") do
           div(class: "mb-6 pb-3 border-b border-gray-200") do
             h3(class: "font-semibold text-lg mb-1") { "Manage Seats" }
             p(class: "text-sm text-gray-600") { "Reassign seats to different game tables." }
           end
 
-          div(class: "space-y-3") do
-            @event.seats.where.not(user_id: nil).includes(:user, :hero, :game).each do |seat|
-              form.fields_for :seats, seat do |seat_form|
-                render_seat_fields(seat_form, seat)
-              end
+          # Group seats by game and display in card layout
+          div(class: "space-y-6") do
+            @event.games.includes(seats: [:user, :hero]).each do |game|
+              filled_seats = game.seats.where.not(user_id: nil)
+              next if filled_seats.empty?
+
+              render_game_seats_card(game, filled_seats)
             end
           end
         end
@@ -266,50 +268,29 @@ class Views::Dashboard::Events::Form < Views::Base
     end
   end
 
-  def render_seat_fields(seat_form, seat)
-    div(class: "p-4 bg-gray-50 rounded-md border border-gray-200") do
-      seat_form.hidden_field :id
-
-      div(class: "grid grid-cols-3 gap-4 items-center") do
-        # Player/Hero info
-        div(class: "col-span-2") do
-          div(class: "font-medium text-sm text-gray-900") do
-            plain seat.user.display_name
-            if seat.hero
-              plain " - "
-              span(class: "text-gray-600") { seat.hero.name }
-            end
-          end
-          div(class: "text-xs text-gray-500 mt-1") do
-            plain "Currently at: "
-            span(class: "font-medium") { seat.game.gm.display_name }
-            plain "'s table"
-          end
-          if seat.stripe_payment_intent_id.present?
-            div(class: "text-xs mt-1") do
-              a(
-                href: "https://dashboard.stripe.com/payments/#{seat.stripe_payment_intent_id}",
-                target: "_blank",
-                rel: "noopener noreferrer",
-                class: "text-blue-600 hover:text-blue-800 flex items-center gap-1"
-              ) do
-                i(class: "fa-solid fa-external-link text-xs")
-                plain "View Stripe Transaction"
-              end
-            end
-          end
+  def render_game_seats_card(game, filled_seats)
+    div(class: "border border-gray-200 rounded-md bg-gray-50 overflow-hidden") do
+      # Game header
+      div(class: "bg-white border-b border-gray-200 px-4 py-3") do
+        div(class: "flex items-center gap-2") do
+          i(class: "fa-solid fa-dice-d20 text-lg text-purple-600")
+          h4(class: "font-semibold text-gray-900") { game.gm.display_name }
+          span(class: "text-sm text-gray-500") { "(#{filled_seats.count} #{'seat'.pluralize(filled_seats.count)})" }
         end
+      end
 
-        # Game reassignment
-        div do
-          seat_form.collection_select :game_id,
-            @event.games,
-            :id,
-            ->(game) { "#{game.gm.display_name}'s table" },
-            {},
-            class: input_classes
+      # Seats grid
+      div(class: "p-4") do
+        div(class: "grid md:grid-cols-2 gap-3") do
+          filled_seats.each do |seat|
+            render_seat_card(seat)
+          end
         end
       end
     end
+  end
+
+  def render_seat_card(seat)
+    render Views::Dashboard::Seats::SeatCard.new(seat: seat, event: @event)
   end
 end

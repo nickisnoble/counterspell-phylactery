@@ -35,7 +35,9 @@ Rails.application.routes.draw do
 
   namespace :dashboard do
     resources :locations
-    resources :events
+    resources :events do
+      resources :seats, only: [:update]
+    end
     resources :traits
   end
 
