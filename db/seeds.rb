@@ -400,7 +400,7 @@ heroes_data = [
   {
     name: "Jackie Greaves",
     pronouns: "She/Her",
-    role: "face",
+    role: "charmer",
     traits: ["Vark", "Sorcerer / Elemental Origin", "Wanderborne"],
     backstory: "Jackie Greaves is a Vark, a people who were famously and tragically scattered from their mountain home around 2,000 years ago. But unlike other Varks, who proudly recall where their families settled in the years since, Jackie cannot. For her bubbly and dreamy personality covers amnesia – a deep uncertainty of who she is, and why she sees the concept of death as more fascinating than frightening. But despite this mystery, Jackie's inherent powers make her a strong healer and brave fighter in the battles to come."
   },
@@ -421,7 +421,7 @@ heroes_data = [
   {
     name: "Denn",
     pronouns: "He/Him",
-    role: "face",
+    role: "charmer",
     traits: ["Kiplin", "Rogue / Syndicate", "Slyborne"],
     backstory: "Denn is a Kiplin, an ancestry that resembles a humanoid opossum, complete with a prehensile tail. He uses a combination of nimble dexterity and street smarts to survive in world's largest city, Chellesot. As an orphan, Denn is most loyal to his found family, and lacks the typical Kiplin mannerisms of truth-telling in favor of a scrappy, means-to-an-end mentality. While he would never admit it, Denn yearns for a deeper understanding of his native Kiplin family, a connection he has never known."
   },
@@ -442,7 +442,7 @@ heroes_data = [
   {
     name: "Inara Darkstar",
     pronouns: "She/Her",
-    role: "face",
+    role: "charmer",
     traits: ["Freynor", "Wizard / School of War", "Orderborne"],
     backstory: "Inara Darkstar had it all, once. A comfortable home, an honored family name that preceded her, and privilege that granted her access to the best schools. Inara had happily accepted a place among The Dancing Gale guild, a prestigious group of bards who heal the world with music. But when she found out her family's success was only made possible through a powerful crime group, the Machine Syndicate, she gave up her guildship to seek revenge for her family's honor."
   },

@@ -173,7 +173,7 @@ class Views::Seats::New < Views::Base
         icon_class = case role
         when "striker" then "fa-duotone fa-sword text-5xl text-red-500"
         when "protector" then "fa-duotone fa-shield text-5xl text-blue-500"
-        when "face" then "fa-duotone fa-comments text-5xl text-purple-500"
+        when "charmer" then "fa-duotone fa-masks-theater text-5xl text-purple-500"
         when "strategist" then "fa-duotone fa-chess text-5xl text-green-500"
         end
         i(class: icon_class)

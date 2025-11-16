@@ -13,7 +13,7 @@ class Hero < ApplicationRecord
   has_one_attached :portrait
 
   normalizes :ideal, :flaw, with: ->(f) { f.strip }
-  enum :role, %w[ striker protector face strategist ].index_by(&:itself), validate: true
+  enum :role, %w[ striker protector charmer strategist ].index_by(&:itself), validate: true
 
   private
 

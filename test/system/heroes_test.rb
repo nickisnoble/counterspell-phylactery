@@ -110,7 +110,7 @@ class HeroesTest < ApplicationSystemTestCase
     
     fill_in "Name", with: "JS Test Hero"
     choose "He/Him"
-    choose "face"
+    choose "charmer"
     
     # Select traits - if there were JS errors, these would likely fail
     select "Human Test", from: "hero_trait_ids_ancestry"

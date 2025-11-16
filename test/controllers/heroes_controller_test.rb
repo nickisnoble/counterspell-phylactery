@@ -87,7 +87,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
       hero: {
         name: "Updated Name",
         pronouns: "They/Them",
-        role: "face"
+        role: "charmer"
       }
     }
 
@@ -95,7 +95,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
     @hero.reload
     assert_equal "Updated Name", @hero.name
     assert_equal "They/Them", @hero.pronouns
-    assert_equal "face", @hero.role
+    assert_equal "charmer", @hero.role
   end
 
   test "should destroy hero" do
