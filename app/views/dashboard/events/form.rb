@@ -197,9 +197,19 @@ class Views::Dashboard::Events::Form < Views::Base
   end
 
   def render_game_fields(game_form)
+    render_game_fields_content(game_form, game_form.object.new_record?.to_s)
+  end
+
+  def render_game_template(form)
+    form.fields_for :games, Game.new, child_index: "NEW_RECORD" do |game_form|
+      render_game_fields_content(game_form, "true")
+    end
+  end
+
+  def render_game_fields_content(game_form, new_record_value)
     div(
       class: "nested-fields relative p-4 bg-gray-50 rounded-md border border-gray-200",
-      data: { new_record: game_form.object.new_record?.to_s }
+      data: { new_record: new_record_value }
     ) do
       game_form.hidden_field :_destroy
 
@@ -226,43 +236,6 @@ class Views::Dashboard::Events::Form < Views::Base
             max: 10,
             value: game_form.object.seat_count || 5,
             class: input_classes
-        end
-      end
-    end
-  end
-
-  def render_game_template(form)
-    form.fields_for :games, Game.new, child_index: "NEW_RECORD" do |game_form|
-      div(
-        class: "nested-fields relative p-4 bg-gray-50 rounded-md border border-gray-200",
-        data: { new_record: "true" }
-      ) do
-        game_form.hidden_field :_destroy
-
-        # X button in top right corner
-        button(
-          type: "button",
-          class: "absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded transition",
-          data: { action: "click->nested-form#remove" },
-          title: "Remove"
-        ) { "×" }
-
-        div(class: "grid grid-cols-2 gap-4") do
-          div do
-            game_form.label :gm_id, "Game Master", class: "block text-sm font-medium text-gray-700 mb-2"
-            game_form.collection_select :gm_id, @gms, :id, :display_name,
-              { prompt: "Select GM" },
-              class: input_classes
-          end
-
-          div do
-            game_form.label :seat_count, "Seats", class: "block text-sm font-medium text-gray-700 mb-2"
-            game_form.number_field :seat_count,
-              min: 1,
-              max: 10,
-              value: 5,
-              class: input_classes
-          end
         end
       end
     end
