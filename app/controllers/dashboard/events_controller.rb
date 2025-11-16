@@ -54,7 +54,8 @@ class Dashboard::EventsController < ApplicationController
     params.require(:event).permit(
       :name, :date, :location_id, :status, :ticket_price,
       :start_time, :end_time, :description,
-      games_attributes: [:id, :gm_id, :seat_count, :_destroy]
+      games_attributes: [:id, :gm_id, :seat_count, :_destroy],
+      seats_attributes: [:id, :game_id]
     )
   end
 end

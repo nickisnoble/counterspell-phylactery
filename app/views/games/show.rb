@@ -4,17 +4,25 @@ class Views::Games::Show < Views::Base
   include Phlex::Rails::Helpers::LinkTo
   include Phlex::Rails::Helpers::ContentFor
   include Phlex::Rails::Helpers::FormWith
+  include Phlex::Rails::Helpers::ButtonTo
 
-  def initialize(game:, event:, available_seats:, seats:, current_user:)
+  register_output_helper :turbo_stream_from
+
+  def initialize(game:, event:, available_seats:, seats:, current_user:, is_today: false, is_gm_or_admin: false)
     @game = game
     @event = event
     @available_seats = available_seats
     @seats = seats
     @current_user = current_user
+    @is_today = is_today
+    @is_gm_or_admin = is_gm_or_admin
   end
 
   def view_template
     content_for(:title, "#{@event.name} - #{@game.gm.display_name}'s Table")
+
+    # Subscribe to turbo streams for realtime updates
+    turbo_stream_from(@event) if @is_gm_or_admin
 
     main(class: "w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8") do
       # Back link
@@ -101,6 +109,14 @@ class Views::Games::Show < Views::Base
   private
 
   def render_seat(seat)
+    if @is_gm_or_admin
+      render_detailed_seat(seat)
+    else
+      render_simple_seat(seat)
+    end
+  end
+
+  def render_simple_seat(seat)
     div(class: "flex items-center justify-between border-b border-gray-200 pb-3") do
       div(class: "flex items-center") do
         span(class: "text-2xl mr-3") { "🎭" }
@@ -117,5 +133,89 @@ class Views::Games::Show < Views::Base
         end
       end
     end
+  end
+
+  def render_detailed_seat(seat)
+    div(class: "border border-gray-200 rounded-md p-4 bg-gray-50") do
+      div(class: "flex items-start justify-between") do
+        # Player and Hero info
+        div(class: "flex-1") do
+          # Player details
+          div(class: "mb-3") do
+            div(class: "font-semibold text-lg text-gray-900") { seat.user.display_name }
+            if seat.user.pronouns.present?
+              div(class: "text-sm text-gray-600") { seat.user.pronouns }
+            end
+            if seat.user.email.present?
+              div(class: "text-sm text-gray-500") { seat.user.email }
+            end
+          end
+
+          # Hero details
+          if seat.hero
+            div(class: "mt-3 pt-3 border-t border-gray-300") do
+              div(class: "font-medium text-gray-900 mb-1") { "Playing: #{seat.hero.name}" }
+              if seat.hero.pronouns.present?
+                div(class: "text-sm text-gray-600 mb-1") { seat.hero.pronouns }
+              end
+              if seat.hero.role.present?
+                div(class: "text-sm text-gray-600 capitalize") { "Role: #{seat.hero.role.humanize}" }
+              end
+            end
+          end
+
+          # User bio
+          if seat.user.bio.present?
+            div(class: "mt-3 pt-3 border-t border-gray-300") do
+              div(class: "text-sm font-medium text-gray-700 mb-1") { "Bio:" }
+              div(class: "prose prose-sm max-w-none text-gray-600") do
+                render seat.user.bio
+              end
+            end
+          end
+        end
+
+        # Checkin button (only for today's games)
+        if @is_today && can_check_in?(seat)
+          div(class: "ml-4") do
+            if seat.checked_in?
+              div do
+                div(class: "mb-2 text-sm font-medium text-emerald-700") { "Checked in" }
+                if seat.checked_in_at
+                  div(class: "mb-2 text-xs text-gray-500") { seat.checked_in_at.strftime("%I:%M %p") }
+                end
+                button_to(
+                  "Undo",
+                  checkin_seat_path(seat),
+                  method: :patch,
+                  class: "px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md cursor-pointer"
+                )
+              end
+            else
+              button_to(
+                "Check In",
+                checkin_seat_path(seat),
+                method: :patch,
+                class: "px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md cursor-pointer"
+              )
+            end
+          end
+        elsif @is_today
+          div(class: "ml-4") do
+            if seat.checked_in?
+              div(class: "text-sm font-medium text-emerald-700") { "Checked in" }
+              if seat.checked_in_at
+                div(class: "text-xs text-gray-500 mt-1") { seat.checked_in_at.strftime("%I:%M %p") }
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def can_check_in?(seat)
+    return true if @current_user&.admin?
+    @current_user&.id == @game.gm_id
   end
 end

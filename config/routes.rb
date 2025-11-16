@@ -22,6 +22,9 @@ Rails.application.routes.draw do
 
   resources :heroes
 
+  # Game management for GMs/Admins
+  resources :games, only: [:show]
+
   # Stripe webhooks
   post "/stripe/webhooks" => "stripe_webhooks#create"
 

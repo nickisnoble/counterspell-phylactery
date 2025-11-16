@@ -29,4 +29,56 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     get event_game_path(@event, @game)
     assert_response :success
   end
+
+  test "should show full player details for GMs" do
+    suffix = SecureRandom.hex(4)
+    ancestry = Trait.create!(name: "Test Ancestry #{suffix}", type: "Ancestry", description: "Test")
+    background = Trait.create!(name: "Test Background #{suffix}", type: "Background", description: "Test")
+    char_class = Trait.create!(name: "Test Class #{suffix}", type: "Class", description: "Test")
+
+    player = User.create!(email: "player@test.com", system_role: "player", display_name: "Test Player", pronouns: "they/them")
+    hero = Hero.new(name: "Test Hero #{suffix}", pronouns: "she/her", role: "fighter")
+    hero.traits = [ancestry, background, char_class]
+    hero.save!
+    @game.seats.create!(user: player, hero: hero)
+
+    login_with_otp(@gm.email)
+    get game_path(@game)
+    assert_response :success
+  end
+
+  test "should show full player details for admins" do
+    suffix = SecureRandom.hex(4)
+    ancestry = Trait.create!(name: "Admin Test Ancestry #{suffix}", type: "Ancestry", description: "Test")
+    background = Trait.create!(name: "Admin Test Background #{suffix}", type: "Background", description: "Test")
+    char_class = Trait.create!(name: "Admin Test Class #{suffix}", type: "Class", description: "Test")
+
+    admin = User.create!(email: "admin@test.com", system_role: "admin", display_name: "Admin")
+    player = User.create!(email: "player2@test.com", system_role: "player", display_name: "Test Player 2", pronouns: "they/them")
+    hero = Hero.new(name: "Admin Test Hero #{suffix}", pronouns: "she/her", role: "fighter")
+    hero.traits = [ancestry, background, char_class]
+    hero.save!
+    @game.seats.create!(user: player, hero: hero)
+
+    login_with_otp(admin.email)
+    get game_path(@game)
+    assert_response :success
+  end
+
+  test "should redirect regular players trying to access game show" do
+    player = User.create!(email: "player3@test.com", system_role: "player", display_name: "Test Player 3")
+    login_with_otp(player.email)
+    get game_path(@game)
+    assert_redirected_to events_path
+  end
+
+  test "should show checkin button for today's games" do
+    @event.update!(date: Date.today)
+    player = User.create!(email: "player4@test.com", system_role: "player", display_name: "Test Player 4")
+    @game.seats.create!(user: player)
+
+    login_with_otp(@gm.email)
+    get game_path(@game)
+    assert_response :success
+  end
 end

@@ -157,6 +157,24 @@ class Views::Dashboard::Events::Form < Views::Base
         end
       end
 
+      # Seats Section (only show for persisted events with seats)
+      if @event.persisted? && @event.seats.where.not(user_id: nil).exists?
+        div(class: "bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6") do
+          div(class: "mb-6 pb-3 border-b border-gray-200") do
+            h3(class: "font-semibold text-lg mb-1") { "Manage Seats" }
+            p(class: "text-sm text-gray-600") { "Reassign seats to different game tables." }
+          end
+
+          div(class: "space-y-3") do
+            @event.seats.where.not(user_id: nil).includes(:user, :hero, :game).each do |seat|
+              form.fields_for :seats, seat do |seat_form|
+                render_seat_fields(seat_form, seat)
+              end
+            end
+          end
+        end
+      end
+
       # Submit Button
       div(class: "flex gap-3") do
         form.submit class: "px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md cursor-pointer"
@@ -243,6 +261,40 @@ class Views::Dashboard::Events::Form < Views::Base
               value: 5,
               class: input_classes
           end
+        end
+      end
+    end
+  end
+
+  def render_seat_fields(seat_form, seat)
+    div(class: "p-4 bg-gray-50 rounded-md border border-gray-200") do
+      seat_form.hidden_field :id
+
+      div(class: "grid grid-cols-3 gap-4 items-center") do
+        # Player/Hero info
+        div(class: "col-span-2") do
+          div(class: "font-medium text-sm text-gray-900") do
+            plain seat.user.display_name
+            if seat.hero
+              plain " - "
+              span(class: "text-gray-600") { seat.hero.name }
+            end
+          end
+          div(class: "text-xs text-gray-500 mt-1") do
+            plain "Currently at: "
+            span(class: "font-medium") { seat.game.gm.display_name }
+            plain "'s table"
+          end
+        end
+
+        # Game reassignment
+        div do
+          seat_form.collection_select :game_id,
+            @event.games,
+            :id,
+            ->(game) { "#{game.gm.display_name}'s table" },
+            {},
+            class: input_classes
         end
       end
     end

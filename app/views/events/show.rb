@@ -171,6 +171,16 @@ class Views::Events::Show < Views::Base
               render game.gm.bio
             end
           end
+
+          # GM/Admin link to game details
+          if @current_user && (@current_user.admin? || @current_user.gm?)
+            div(class: "mt-4 pt-4 border-t border-black/10") do
+              link_to(game_path(game), class: "text-sm font-serif font-medium text-purple-900 hover:text-purple-700 transition flex items-center gap-2") do
+                i(class: "fa-solid fa-eye")
+                plain "View Player Details"
+              end
+            end
+          end
         end
 
         # Right: Seats grid
