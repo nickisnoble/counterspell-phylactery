@@ -25,18 +25,16 @@ module SeatBroadcasting
     taken_hero_ids = game.seats.where.not(hero_id: nil).pluck(:hero_id)
     available_heroes = Hero.where.not(id: taken_hero_ids).order(:name).to_a
 
-    broadcast_replace_later_to(
+    broadcast_replace_to(
       game.event,
       target: "game_#{game.id}_role_selection",
-      partial: "seats/role_selection",
-      locals: { game: game, role_counts: role_counts }
+      renderable: Views::Seats::RoleSelection.new(game: game, role_counts: role_counts)
     )
 
-    broadcast_replace_later_to(
+    broadcast_replace_to(
       game.event,
       target: "game_#{game.id}_hero_selection",
-      partial: "seats/hero_selection",
-      locals: { game: game, available_heroes: available_heroes }
+      renderable: Views::Seats::HeroSelection.new(game: game, available_heroes: available_heroes)
     )
   end
 end
