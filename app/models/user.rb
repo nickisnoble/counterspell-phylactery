@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_rich_text :bio
 
   before_create :generate_otp_secret
+  before_create :generate_unsubscribe_token
   encrypts :otp_secret
 
   normalizes :email, with: ->(e) { e.strip.downcase }
@@ -42,6 +43,10 @@ class User < ApplicationRecord
 
     def generate_otp_secret
       self.otp_secret = ROTP::Base32.random(16)
+    end
+
+    def generate_unsubscribe_token
+      self.unsubscribe_token = SecureRandom.hex(16)
     end
 
     def totp

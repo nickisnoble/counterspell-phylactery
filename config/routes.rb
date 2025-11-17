@@ -37,7 +37,14 @@ Rails.application.routes.draw do
     resources :locations
     resources :events
     resources :traits
+    resources :newsletters
   end
+
+  # Public newsletter routes
+  resources :newsletters, only: [:show]
+
+  # Unsubscribe route
+  resource :unsubscribe, only: [:show, :create]
 
   resource :session do
     get :verify

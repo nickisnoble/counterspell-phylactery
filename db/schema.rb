@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_17_053556) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -134,6 +134,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
     t.index ["slug"], name: "index_locations_on_slug", unique: true
   end
 
+  create_table "newsletters", force: :cascade do |t|
+    t.string "subject"
+    t.datetime "scheduled_at"
+    t.datetime "sent_at"
+    t.boolean "draft", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["draft"], name: "index_newsletters_on_draft"
+    t.index ["scheduled_at"], name: "index_newsletters_on_scheduled_at"
+    t.index ["sent_at"], name: "index_newsletters_on_sent_at"
+  end
+
   create_table "nondisposable_disposable_domains", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -195,8 +207,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
     t.boolean "newsletter", default: true
     t.string "slug", null: false
     t.boolean "verified"
+    t.string "unsubscribe_token"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["slug"], name: "index_users_on_slug", unique: true
+    t.index ["unsubscribe_token"], name: "index_users_on_unsubscribe_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

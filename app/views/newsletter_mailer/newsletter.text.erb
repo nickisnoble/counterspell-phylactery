@@ -1,0 +1,10 @@
+<%= @newsletter.subject %>
+
+<% if @newsletter.body.present? %>
+<%= @newsletter.body.to_plain_text %>
+<% end %>
+
+---
+
+View in browser: <%= newsletter_url(@newsletter) %>
+Unsubscribe: <%= unsubscribe_url(token: @user.unsubscribe_token) %>
