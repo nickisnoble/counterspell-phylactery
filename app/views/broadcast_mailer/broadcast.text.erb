@@ -4,6 +4,16 @@
 <%= @broadcast.body.to_plain_text %>
 <% end %>
 
+<% if @seat.present? %>
+
+YOUR SEAT IS CONFIRMED!
+=======================
+Check-in Link: <%= @seat.qr_code_url %>
+<% if @seat.hero.present? %>
+Hero: <%= @seat.hero.name %>
+<% end %>
+<% end %>
+
 <% if @event.present? %>
 
 EVENT DETAILS
@@ -22,4 +32,6 @@ View Event: <%= event_url(@event) %>
 ---
 
 View in browser: <%= broadcast_url(@broadcast) %>
+<% if @broadcast.marketing? %>
 Unsubscribe: <%= unsubscribe_url(token: @user.unsubscribe_token) %>
+<% end %>

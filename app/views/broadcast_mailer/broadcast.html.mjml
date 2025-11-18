@@ -36,11 +36,11 @@
             <mj-text>
               Use this QR code to check in at the event:
             </mj-text>
-            <mj-image
-              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<%= @seat.qr_code_url %>"
-              width="200px"
-              padding="20px 0"
-            />
+            <mj-raw>
+              <div style="text-align: center; padding: 20px 0;">
+                <%= @seat.qr_code_svg %>
+              </div>
+            </mj-raw>
             <mj-button href="<%= @seat.qr_code_url %>" background-color="#16a34a" color="#ffffff">
               Check-in Link
             </mj-button>
@@ -84,8 +84,8 @@
       <mj-section padding-top="10px">
         <mj-column>
           <mj-text font-size="12px" color="#666666" align="center">
-            <a href="<%= broadcast_url(@broadcast) %>" style="color: #6366f1; text-decoration: none;">View in browser</a> |
-            <a href="<%= unsubscribe_url(token: @user.unsubscribe_token) %>" style="color: #6366f1; text-decoration: none;">Unsubscribe</a>
+            <a href="<%= broadcast_url(@broadcast) %>" style="color: #6366f1; text-decoration: none;">View in browser</a><% if @broadcast.marketing? %> |
+            <a href="<%= unsubscribe_url(token: @user.unsubscribe_token) %>" style="color: #6366f1; text-decoration: none;">Unsubscribe</a><% end %>
           </mj-text>
         </mj-column>
       </mj-section>

@@ -40,6 +40,17 @@ class Seat < ApplicationRecord
     Digest::SHA256.hexdigest("#{id}-#{Rails.application.secret_key_base}")[0...32]
   end
 
+  def qr_code_svg
+    # Generate QR code as SVG for embedding in emails
+    require 'rqrcode'
+    qrcode = RQRCode::QRCode.new(qr_code_url)
+    qrcode.as_svg(
+      module_size: 4,
+      standalone: true,
+      use_path: true
+    )
+  end
+
   private
 
   def hero_unique_per_game
