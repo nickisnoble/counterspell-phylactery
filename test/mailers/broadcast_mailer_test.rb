@@ -64,7 +64,7 @@ class BroadcastMailerTest < ActionMailer::TestCase
     broadcast = Broadcast.create!(
       subject: "Seat Confirmation",
       scheduled_at: Time.current,
-      recipient_type: "event_attendees",
+      recipient_type: "single_recipient",
       broadcastable: seat
     )
 
@@ -91,7 +91,7 @@ class BroadcastMailerTest < ActionMailer::TestCase
     broadcast = Broadcast.create!(
       subject: "Seat Confirmation",
       scheduled_at: Time.current,
-      recipient_type: "event_attendees",
+      recipient_type: "single_recipient",
       broadcastable: seat
     )
 
@@ -106,5 +106,39 @@ class BroadcastMailerTest < ActionMailer::TestCase
 
     assert @broadcast.marketing?
     assert_match /Unsubscribe/, email.body.encoded
+  end
+
+  test "single_recipient broadcasts only send to seat owner" do
+    location = Location.create!(name: "Test Venue", address: "123 Test St")
+    gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "GM")
+    other_player = User.create!(email: "other@test.com", system_role: "player", display_name: "Other")
+    event = Event.create!(
+      name: "Test Event",
+      date: Date.today + 10.days,
+      location: location,
+      status: "upcoming"
+    )
+    game = event.games.create!(gm: gm, seat_count: 5)
+
+    # Create second hero for other player
+    ancestry2 = Trait.create!(type: "ANCESTRY", name: "Elf #{Time.current.to_i}")
+    background2 = Trait.create!(type: "BACKGROUND", name: "Noble #{Time.current.to_i}")
+    class2 = Trait.create!(type: "CLASS", name: "Wizard #{Time.current.to_i}")
+    hero2 = Hero.create!(name: "Other Hero #{Time.current.to_i}", role: "strategist", traits: [ancestry2, background2, class2])
+
+    seat1 = game.seats.create!(user: @user, hero: heroes(:one))
+    seat2 = game.seats.create!(user: other_player, hero: hero2)
+
+    broadcast = Broadcast.create!(
+      subject: "Seat Confirmation",
+      scheduled_at: Time.current,
+      recipient_type: "single_recipient",
+      broadcastable: seat1,
+      sent_at: nil  # Simulate BroadcastJob picking this up
+    )
+
+    # recipients should only return the seat owner, not all event attendees
+    assert_equal 1, broadcast.recipients.count
+    assert_equal [@user.id], broadcast.recipients.pluck(:id)
   end
 end

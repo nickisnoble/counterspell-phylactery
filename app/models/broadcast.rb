@@ -4,10 +4,11 @@ class Broadcast < ApplicationRecord
 
   validates :subject, presence: true
   validates :scheduled_at, presence: true
-  validates :recipient_type, presence: true, inclusion: { in: %w[all_subscribers event_attendees filtered] }
+  validates :recipient_type, presence: true, inclusion: { in: %w[all_subscribers event_attendees filtered single_recipient] }
   validate :scheduled_at_cannot_change_after_sent
   validate :sent_at_cannot_change_after_sent
   validate :broadcastable_required_for_event_attendees
+  validate :broadcastable_required_for_single_recipient
 
   scope :published, -> { where(draft: false) }
   scope :pending, -> { where(sent_at: nil, draft: false).where("scheduled_at <= ?", Time.current) }
@@ -60,6 +61,10 @@ class Broadcast < ApplicationRecord
       User.where(id: user_ids)
     when "filtered"
       apply_filters(User.where(newsletter: true))
+    when "single_recipient"
+      # For single recipient broadcasts (e.g. seat confirmations), send only to the associated user
+      return User.none unless seat&.user
+      User.where(id: seat.user.id)
     else
       User.none
     end
@@ -83,6 +88,12 @@ class Broadcast < ApplicationRecord
     return unless recipient_type == "event_attendees" && broadcastable.blank?
 
     errors.add(:broadcastable, "must exist for event_attendees")
+  end
+
+  def broadcastable_required_for_single_recipient
+    return unless recipient_type == "single_recipient" && (broadcastable.blank? || seat.blank?)
+
+    errors.add(:broadcastable, "must be a Seat for single_recipient")
   end
 
   def apply_filters(scope)

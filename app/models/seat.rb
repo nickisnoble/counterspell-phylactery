@@ -109,7 +109,7 @@ class Seat < ApplicationRecord
       subject: "Seat Confirmation",
       scheduled_at: Time.current,
       draft: false,
-      recipient_type: "event_attendees",
+      recipient_type: "single_recipient",
       sent_at: Time.current  # Mark as sent immediately to prevent BroadcastJob from picking it up
     )
     broadcast.body = "Your seat has been confirmed!"
