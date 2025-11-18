@@ -26,15 +26,14 @@ class EventMailerTest < ActionMailer::TestCase
     )
     @seat = @game.seats.create!(user: @player, hero: @hero, purchased_at: Time.current)
 
-    @event_email = @event.event_emails.first
+    @broadcast = @event.broadcasts.first
   end
 
-  test "reminder" do
-    mail = EventMailer.reminder(user: @player, event_email: @event_email)
+  test "reminder via broadcast mailer" do
+    mail = BroadcastMailer.broadcast(user: @player, broadcast: @broadcast)
 
-    assert_equal @event_email.subject, mail.subject
+    assert_equal @broadcast.subject, mail.subject
     assert_equal [@player.email], mail.to
     assert_match @event.name, mail.body.encoded
-    assert_match @player.display_name, mail.body.encoded
   end
 end

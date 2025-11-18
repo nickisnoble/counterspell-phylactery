@@ -80,4 +80,16 @@ class UserTest < ActiveSupport::TestCase
     user = User.create!(email: "newadmin@example.com", system_role: "admin")
     assert user.admin?
   end
+
+  test "generates unsubscribe token on create" do
+    user = User.create!(email: "test@example.com")
+    assert_not_nil user.unsubscribe_token
+    assert_equal 32, user.unsubscribe_token.length
+  end
+
+  test "unsubscribe tokens are unique" do
+    user1 = User.create!(email: "test1@example.com")
+    user2 = User.create!(email: "test2@example.com")
+    assert_not_equal user1.unsubscribe_token, user2.unsubscribe_token
+  end
 end

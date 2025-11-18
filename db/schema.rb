@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_18_043853) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -64,6 +64,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "broadcasts", force: :cascade do |t|
+    t.string "subject"
+    t.datetime "scheduled_at"
+    t.datetime "sent_at"
+    t.boolean "draft", default: true
+    t.string "recipient_type", default: "all_subscribers"
+    t.json "recipient_filters"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "broadcastable_type"
+    t.integer "broadcastable_id"
+    t.index ["broadcastable_type", "broadcastable_id"], name: "index_broadcasts_on_broadcastable_type_and_broadcastable_id"
+    t.index ["draft"], name: "index_broadcasts_on_draft"
+    t.index ["recipient_type"], name: "index_broadcasts_on_recipient_type"
+    t.index ["scheduled_at"], name: "index_broadcasts_on_scheduled_at"
+    t.index ["sent_at"], name: "index_broadcasts_on_sent_at"
+  end
+
+  create_table "email_events", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "broadcast_id"
+    t.string "event_type", null: false
+    t.string "resend_email_id", null: false
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["broadcast_id"], name: "index_email_events_on_broadcast_id"
+    t.index ["created_at"], name: "index_email_events_on_created_at"
+    t.index ["event_type"], name: "index_email_events_on_event_type"
+    t.index ["resend_email_id"], name: "index_email_events_on_resend_email_id"
+    t.index ["user_id", "event_type"], name: "index_email_events_on_user_id_and_event_type"
+    t.index ["user_id"], name: "index_email_events_on_user_id"
   end
 
   create_table "event_emails", force: :cascade do |t|
@@ -134,6 +168,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
     t.index ["slug"], name: "index_locations_on_slug", unique: true
   end
 
+  create_table "newsletters", force: :cascade do |t|
+    t.string "subject"
+    t.datetime "scheduled_at"
+    t.datetime "sent_at"
+    t.boolean "draft", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["draft"], name: "index_newsletters_on_draft"
+    t.index ["scheduled_at"], name: "index_newsletters_on_scheduled_at"
+    t.index ["sent_at"], name: "index_newsletters_on_sent_at"
+  end
+
   create_table "nondisposable_disposable_domains", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -184,6 +230,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
     t.index ["slug"], name: "index_traits_on_slug", unique: true
   end
 
+  create_table "unsubscribe_events", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_unsubscribe_events_on_created_at"
+    t.index ["user_id"], name: "index_unsubscribe_events_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "otp_secret", null: false
@@ -195,12 +250,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
     t.boolean "newsletter", default: true
     t.string "slug", null: false
     t.boolean "verified"
+    t.string "unsubscribe_token"
+    t.boolean "never_send_email", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["never_send_email"], name: "index_users_on_never_send_email"
     t.index ["slug"], name: "index_users_on_slug", unique: true
+    t.index ["unsubscribe_token"], name: "index_users_on_unsubscribe_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "email_events", "broadcasts"
+  add_foreign_key "email_events", "users"
   add_foreign_key "event_emails", "events"
   add_foreign_key "events", "locations"
   add_foreign_key "games", "events"
@@ -211,4 +272,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_030640) do
   add_foreign_key "seats", "heroes"
   add_foreign_key "seats", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "unsubscribe_events", "users"
 end

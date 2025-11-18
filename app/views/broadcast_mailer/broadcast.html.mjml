@@ -1,0 +1,94 @@
+<mjml>
+  <mj-head>
+    <mj-title><%= @broadcast.subject %></mj-title>
+    <mj-preview><%= @broadcast.subject %></mj-preview>
+    <mj-attributes>
+      <mj-all font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"></mj-all>
+      <mj-text font-size="14px" color="#000000" line-height="1.5"></mj-text>
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-wrapper background-color="#ffffff">
+      <mj-section padding-bottom="0">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="bold" padding-bottom="20px">
+            <%= @broadcast.subject %>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <% if @broadcast.body.present? %>
+        <mj-section>
+          <mj-column>
+            <mj-text>
+              <%= @broadcast.body %>
+            </mj-text>
+          </mj-column>
+        </mj-section>
+      <% end %>
+
+      <% if @seat.present? %>
+        <mj-section background-color="#f0fdf4" padding="20px">
+          <mj-column>
+            <mj-text font-size="18px" font-weight="bold" padding-bottom="10px" color="#166534">
+              Your Seat is Confirmed!
+            </mj-text>
+            <mj-text>
+              Use this QR code to check in at the event:
+            </mj-text>
+            <mj-raw>
+              <div style="text-align: center; padding: 20px 0;">
+                <%= @seat.qr_code_svg %>
+              </div>
+            </mj-raw>
+            <mj-button href="<%= add_utm_params(@seat.qr_code_url, content: 'checkin_button') %>" background-color="#16a34a" color="#ffffff">
+              Check-in Link
+            </mj-button>
+            <% if @seat.hero.present? %>
+              <mj-text padding-top="15px">
+                <strong>Hero:</strong> <%= @seat.hero.name %>
+              </mj-text>
+            <% end %>
+          </mj-column>
+        </mj-section>
+      <% end %>
+
+      <% if @event.present? %>
+        <mj-section background-color="#f9f9f9" padding="20px">
+          <mj-column>
+            <mj-text font-size="18px" font-weight="bold" padding-bottom="10px">
+              Event Details
+            </mj-text>
+            <mj-text>
+              <strong><%= @event.name %></strong><br/>
+              <%= @event.date.strftime('%A, %B %d, %Y') %><br/>
+              <% if @event.start_time %>
+                <%= @event.start_time.strftime('%I:%M %p') %> - <%= @event.end_time&.strftime('%I:%M %p') %><br/>
+              <% end %>
+              <%= @event.location.name %><br/>
+              <%= @event.location.address %>
+            </mj-text>
+            <mj-button href="<%= add_utm_params(event_url(@event), content: 'event_button') %>" background-color="#6366f1" color="#ffffff" padding-top="20px">
+              View Event
+            </mj-button>
+          </mj-column>
+        </mj-section>
+      <% end %>
+
+      <mj-section padding-top="30px">
+        <mj-column>
+          <mj-divider border-color="#e0e0e0"></mj-divider>
+        </mj-column>
+      </mj-section>
+
+      <mj-section padding-top="10px">
+        <mj-column>
+          <mj-text font-size="12px" color="#666666" align="center">
+            <a href="<%= add_utm_params(broadcast_url(@broadcast), content: 'view_browser') %>" style="color: #6366f1; text-decoration: none;">View in browser</a><% if @broadcast.marketing? %> |
+            <a href="<%= add_utm_params(unsubscribe_url(token: @user.unsubscribe_token), content: 'unsubscribe') %>" style="color: #6366f1; text-decoration: none;">Unsubscribe</a><% end %>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

@@ -5,7 +5,7 @@ class EventReminderJobTest < ActiveJob::TestCase
   setup do
     @location = Location.create!(name: "Test Venue", address: "123 Test St")
     @gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "GM")
-    @player = User.create!(email: "player@test.com", system_role: "player", display_name: "Player")
+    @player = User.create!(email: "player@test.com", system_role: "player", display_name: "Player", newsletter: true)
 
     @event = Event.create!(
       name: "Test Event",
@@ -27,48 +27,48 @@ class EventReminderJobTest < ActiveJob::TestCase
     )
     @seat = @game.seats.create!(user: @player, hero: @hero, purchased_at: Time.current)
 
-    # Auto-creates 2 event_emails (1 week before, 1 day before)
-    @event_email = @event.event_emails.first
+    # Auto-creates 2 broadcasts (1 week before, 1 day before)
+    @broadcast = @event.broadcasts.first
   end
 
   test "sends emails to users with seats" do
-    # Update send_at to be in the past
-    @event_email.update!(send_at: 1.hour.ago)
+    # Update scheduled_at to be in the past
+    @broadcast.update!(scheduled_at: 1.hour.ago)
 
     assert_enqueued_emails 1 do
       EventReminderJob.perform_now
     end
 
-    assert_not_nil @event_email.reload.sent_at
+    assert_not_nil @broadcast.reload.sent_at
   end
 
-  test "sends pending event emails that are due" do
-    # Update send_at to be in the past
-    @event_email.update!(send_at: 1.hour.ago)
+  test "sends pending event broadcasts that are due" do
+    # Update scheduled_at to be in the past
+    @broadcast.update!(scheduled_at: 1.hour.ago)
 
-    assert_nil @event_email.sent_at
+    assert_nil @broadcast.sent_at
 
     EventReminderJob.perform_now
 
-    assert_not_nil @event_email.reload.sent_at
+    assert_not_nil @broadcast.reload.sent_at
   end
 
-  test "does not send emails scheduled for the future" do
-    @event_email.update!(send_at: 1.day.from_now)
+  test "does not send broadcasts scheduled for the future" do
+    @broadcast.update!(scheduled_at: 1.day.from_now)
 
     EventReminderJob.perform_now
 
-    assert_nil @event_email.reload.sent_at
+    assert_nil @broadcast.reload.sent_at
   end
 
-  test "does not resend already sent emails" do
-    @event_email.update!(send_at: 1.hour.ago)
-    @event_email.mark_as_sent!
-    original_sent_at = @event_email.sent_at
+  test "does not resend already sent broadcasts" do
+    @broadcast.update!(scheduled_at: 1.hour.ago)
+    @broadcast.mark_as_sent!
+    original_sent_at = @broadcast.sent_at
 
     EventReminderJob.perform_now
 
     # sent_at should not change
-    assert_equal original_sent_at.to_i, @event_email.reload.sent_at.to_i
+    assert_equal original_sent_at.to_i, @broadcast.reload.sent_at.to_i
   end
 end

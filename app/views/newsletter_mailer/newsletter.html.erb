@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1><%= @newsletter.subject %></h1>
+
+    <% if @newsletter.body.present? %>
+      <%= @newsletter.body %>
+    <% end %>
+
+    <hr>
+
+    <p style="font-size: 12px; color: #666;">
+      <a href="<%= newsletter_url(@newsletter) %>">View in browser</a> |
+      <a href="<%= unsubscribe_url(token: @user.unsubscribe_token) %>">Unsubscribe</a>
+    </p>
+  </body>
+</html>

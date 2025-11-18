@@ -2,6 +2,7 @@ class Seat < ApplicationRecord
   belongs_to :game
   belongs_to :user, optional: true
   belongs_to :hero, optional: true
+  has_many :broadcasts, as: :broadcastable, dependent: :destroy
 
   validate :hero_unique_per_game, if: :hero_id?
   validate :one_association_per_event, if: :user_id?
@@ -11,6 +12,7 @@ class Seat < ApplicationRecord
 
   # Broadcast seat changes to event subscribers
   after_commit :broadcast_seat_update, on: [:create, :update]
+  after_commit :send_confirmation_email, on: :create, if: :user_id?
 
   def checked_in?
     checked_in_at.present?
@@ -36,6 +38,17 @@ class Seat < ApplicationRecord
     # Generate a secure token for this seat
     # Using a hash of seat id + secret to prevent guessing
     Digest::SHA256.hexdigest("#{id}-#{Rails.application.secret_key_base}")[0...32]
+  end
+
+  def qr_code_svg
+    # Generate QR code as SVG for embedding in emails
+    require 'rqrcode'
+    qrcode = RQRCode::QRCode.new(qr_code_url)
+    qrcode.as_svg(
+      module_size: 4,
+      standalone: true,
+      use_path: true
+    )
   end
 
   private
@@ -88,5 +101,20 @@ class Seat < ApplicationRecord
 
     # Broadcast a refresh to anyone viewing this event
     broadcast_refresh_to(game.event)
+  end
+
+  def send_confirmation_email
+    # Create a broadcast for this seat confirmation (will be sent immediately)
+    broadcast = broadcasts.create!(
+      subject: "Seat Confirmation",
+      scheduled_at: Time.current,
+      draft: false,
+      recipient_type: "single_recipient",
+      sent_at: Time.current  # Mark as sent immediately to prevent BroadcastJob from picking it up
+    )
+    broadcast.body = "Your seat has been confirmed!"
+
+    # Send the email immediately
+    BroadcastMailer.broadcast(user: user, broadcast: broadcast).deliver_later
   end
 end

@@ -1,0 +1,37 @@
+<%= @broadcast.subject %>
+
+<% if @broadcast.body.present? %>
+<%= @broadcast.body.to_plain_text %>
+<% end %>
+
+<% if @seat.present? %>
+
+YOUR SEAT IS CONFIRMED!
+=======================
+Check-in Link: <%= add_utm_params(@seat.qr_code_url, content: 'checkin_link') %>
+<% if @seat.hero.present? %>
+Hero: <%= @seat.hero.name %>
+<% end %>
+<% end %>
+
+<% if @event.present? %>
+
+EVENT DETAILS
+================
+<%= @event.name %>
+<%= @event.date.strftime('%A, %B %d, %Y') %>
+<% if @event.start_time %>
+<%= @event.start_time.strftime('%I:%M %p') %> - <%= @event.end_time&.strftime('%I:%M %p') %>
+<% end %>
+<%= @event.location.name %>
+<%= @event.location.address %>
+
+View Event: <%= add_utm_params(event_url(@event), content: 'event_link') %>
+<% end %>
+
+---
+
+View in browser: <%= add_utm_params(broadcast_url(@broadcast), content: 'view_browser') %>
+<% if @broadcast.marketing? %>
+Unsubscribe: <%= add_utm_params(unsubscribe_url(token: @user.unsubscribe_token), content: 'unsubscribe') %>
+<% end %>

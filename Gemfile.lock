@@ -249,6 +249,7 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
+    mjml-rails (4.16.0)
     msgpack (1.8.0)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
@@ -524,6 +525,7 @@ DEPENDENCIES
   lexxy (~> 0.1.4.beta)
   litestream (~> 0.14.0)
   minitest-reporters (~> 1.7)
+  mjml-rails
   nocheckout (~> 0.2)
   nondisposable (~> 0.1.0)
   phlex-rails
