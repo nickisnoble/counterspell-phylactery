@@ -9,16 +9,17 @@ class EventEmailsControllerTest < ActionDispatch::IntegrationTest
       location: @location,
       status: "upcoming"
     )
-    @event_email = @event.event_emails.first # Auto-created by callback
+    # Now auto-creates broadcasts instead of event_emails
+    @broadcast = @event.broadcasts.first
   end
 
-  test "show displays event email content" do
-    get event_event_email_path(@event, @event_email)
+  test "show displays broadcast content via broadcasts controller" do
+    get broadcast_path(@broadcast)
     assert_response :success
   end
 
   test "show works without authentication" do
-    get event_event_email_path(@event, @event_email)
+    get broadcast_path(@broadcast)
     assert_response :success
   end
 end

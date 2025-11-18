@@ -4,8 +4,7 @@ class Dashboard::BroadcastsControllerTest < ActionDispatch::IntegrationTest
   include ActionMailer::TestHelper
 
   setup do
-    @admin = User.create!(email: "admin@test.com", system_role: "admin", display_name: "Admin")
-    sign_in_as(@admin)
+    be_authenticated_as_admin!
     @broadcast = Broadcast.create!(
       subject: "Test Broadcast",
       scheduled_at: 1.hour.from_now,
@@ -65,11 +64,5 @@ class Dashboard::BroadcastsControllerTest < ActionDispatch::IntegrationTest
       delete dashboard_broadcast_url(@broadcast)
     end
     assert_redirected_to dashboard_broadcasts_path
-  end
-
-  private
-
-  def sign_in_as(user)
-    post session_url, params: { email: user.email, code: user.auth_code }
   end
 end
