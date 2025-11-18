@@ -151,4 +151,51 @@ class ButtondownServiceTest < ActiveSupport::TestCase
       @service.send(:find_subscriber, @email)
     end
   end
+
+  test "unsubscribe sends reason as tag to buttondown" do
+    subscriber_id = "test-subscriber-id"
+    reason = "too_many_emails"
+
+    # Stub get subscriber
+    stub_request(:get, "https://api.buttondown.email/v1/subscribers?email=#{@email}")
+      .to_return(
+        status: 200,
+        body: { results: [{ id: subscriber_id, email: @email, tags: [ "existing_tag" ] }] }.to_json,
+        headers: { "Content-Type" => "application/json" }
+      )
+
+    # Stub the unsubscribe with reason as tag
+    stub = stub_request(:patch, "https://api.buttondown.email/v1/subscribers/#{subscriber_id}")
+      .with(
+        body: hash_including(
+          subscriber_type: "unactivated",
+          tags: [ "existing_tag", "unsub:#{reason}" ]
+        )
+      )
+      .to_return(status: 200, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    result = @service.unsubscribe(@email, reason: reason)
+    assert result
+    assert_requested stub
+  end
+
+  test "unsubscribe without reason does not add tag" do
+    subscriber_id = "test-subscriber-id"
+
+    stub_request(:get, "https://api.buttondown.email/v1/subscribers?email=#{@email}")
+      .to_return(
+        status: 200,
+        body: { results: [{ id: subscriber_id, email: @email }] }.to_json,
+        headers: { "Content-Type" => "application/json" }
+      )
+
+    # Should not include tags field if no reason provided
+    stub = stub_request(:patch, "https://api.buttondown.email/v1/subscribers/#{subscriber_id}")
+      .with(body: { subscriber_type: "unactivated" }.to_json)
+      .to_return(status: 200, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    result = @service.unsubscribe(@email)
+    assert result
+    assert_requested stub
+  end
 end

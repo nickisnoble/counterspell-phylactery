@@ -10,6 +10,9 @@ class User < ApplicationRecord
   before_create :generate_otp_secret
   encrypts :otp_secret
 
+  # Virtual attribute for unsubscribe reason
+  attr_accessor :unsubscribe_reason
+
   after_commit :enqueue_newsletter_sync, on: :create, if: :newsletter?
   after_commit :enqueue_newsletter_sync, on: :update, if: :saved_change_to_newsletter?
 
@@ -54,6 +57,6 @@ class User < ApplicationRecord
     def enqueue_newsletter_sync
       return unless Rails.env.production? || ENV["BUTTONDOWN_API_KEY"].present?
 
-      NewsletterSyncJob.perform_later(id, newsletter?)
+      NewsletterSyncJob.perform_later(id, newsletter?, unsubscribe_reason)
     end
 end

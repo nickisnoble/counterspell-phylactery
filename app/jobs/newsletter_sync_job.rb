@@ -4,7 +4,7 @@ class NewsletterSyncJob < ApplicationJob
   retry_on Net::OpenTimeout, Net::ReadTimeout, wait: :exponentially_longer, attempts: 3
   retry_on ButtondownService::RateLimitError, wait: 1.minute, attempts: 5
 
-  def perform(user_id, subscribe)
+  def perform(user_id, subscribe, reason = nil)
     user = User.find_by(id: user_id)
     return unless user
 
@@ -14,8 +14,8 @@ class NewsletterSyncJob < ApplicationJob
       service.subscribe(user.email)
       Rails.logger.info("Subscribed #{user.email} to newsletter")
     else
-      service.unsubscribe(user.email)
-      Rails.logger.info("Unsubscribed #{user.email} from newsletter")
+      service.unsubscribe(user.email, reason: reason)
+      Rails.logger.info("Unsubscribed #{user.email} from newsletter (reason: #{reason || 'not provided'})")
     end
   rescue => e
     Rails.logger.error("Failed to sync newsletter for user #{user_id}: #{e.message}")

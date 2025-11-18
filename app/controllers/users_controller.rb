@@ -35,6 +35,6 @@ class UsersController < ApplicationController
 
   private
     def user_params
-      params.require(:user).permit(:display_name, :bio, :pronouns, :newsletters)
+      params.require(:user).permit(:display_name, :bio, :pronouns, :newsletter, :unsubscribe_reason)
     end
 end

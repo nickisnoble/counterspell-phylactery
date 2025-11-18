@@ -47,31 +47,51 @@ class Views::Users::Form < Views::Base
             plain " Email me about upcoming game sessions and more."
           end
 
-          # Unsubscribe confirmation modal
+          # Unsubscribe reason modal
           div(data: { newsletter_target: "modal" }, class: "hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50") do
-            div(class: "bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl") do
-              div(class: "flex items-start gap-4") do
-                # Icon
-                div(class: "flex-shrink-0") do
-                  i(class: "fas fa-exclamation-triangle text-yellow-500 text-2xl")
+            div(class: "bg-white rounded-lg p-6 max-w-lg mx-4 shadow-xl") do
+              h3(class: "text-xl font-semibold mb-2") { "Help us improve" }
+              p(class: "text-gray-600 mb-4") do
+                plain "We'd love to know why you're unsubscribing. Your feedback helps us send better emails."
+              end
+
+              # Reason options
+              div(class: "space-y-3 mb-6") do
+                [
+                  "Too many emails",
+                  "Not relevant to me",
+                  "Never signed up",
+                  "Privacy concerns",
+                  "Other"
+                ].each do |reason|
+                  label(class: "flex items-center gap-3 p-3 hover:bg-gray-50 rounded-md cursor-pointer") do
+                    input(
+                      type: "radio",
+                      name: "unsubscribe_reason",
+                      value: reason.downcase.gsub(" ", "_"),
+                      class: "accent-yellow-500",
+                      data: { action: "change->newsletter#toggleOtherField" }
+                    )
+                    span(class: "text-gray-700") { reason }
+                  end
                 end
 
-                # Content
-                div(class: "flex-1") do
-                  h3(class: "text-lg font-semibold mb-2") { "Unsubscribe from newsletter?" }
-                  p(class: "text-gray-600 mb-4") do
-                    plain "You'll no longer receive emails about upcoming game sessions, events, and other updates. You can always resubscribe later."
-                  end
+                # Other text field
+                textarea(
+                  data: { newsletter_target: "reasonField" },
+                  class: "hidden w-full p-3 border border-gray-300 rounded-md mt-2",
+                  placeholder: "Please tell us more...",
+                  rows: 3
+                )
+              end
 
-                  # Buttons
-                  div(class: "flex gap-3 justify-end") do
-                    button(type: "button", class: "px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md", data: { action: "click->newsletter#cancel" }) do
-                      plain "Keep subscription"
-                    end
-                    button(type: "button", class: "px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md", data: { action: "click->newsletter#confirm" }) do
-                      plain "Unsubscribe"
-                    end
-                  end
+              # Buttons
+              div(class: "flex gap-3 justify-end") do
+                button(type: "button", class: "px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md", data: { action: "click->newsletter#cancel" }) do
+                  plain "Keep subscription"
+                end
+                button(type: "button", class: "px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-md", data: { action: "click->newsletter#submit", newsletter_target: "submitButton" }) do
+                  plain "Unsubscribe"
                 end
               end
             end

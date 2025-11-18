@@ -31,7 +31,7 @@ class ButtondownService
     end
   end
 
-  def unsubscribe(email)
+  def unsubscribe(email, reason: nil)
     raise ConfigurationError, "BUTTONDOWN_API_KEY environment variable is not set" unless @api_key
 
     with_retry do
@@ -41,11 +41,23 @@ class ButtondownService
       # Return true if subscriber doesn't exist (already unsubscribed)
       return true if subscriber.nil?
 
+      # Build the request body
+      body = { subscriber_type: "unactivated" }
+
+      # Add unsubscribe reason as a tag if provided
+      if reason.present?
+        # Buttondown API accepts tags as an array
+        # Prepend "unsub:" to reason to identify unsubscribe reasons
+        tag = "unsub:#{reason}"
+        existing_tags = subscriber["tags"] || []
+        body[:tags] = (existing_tags + [ tag ]).uniq
+      end
+
       # Unsubscribe by setting subscriber_type to "unactivated"
       response = self.class.patch(
         "/subscribers/#{subscriber["id"]}",
         headers: headers,
-        body: { subscriber_type: "unactivated" }.to_json
+        body: body.to_json
       )
 
       handle_response(response)
