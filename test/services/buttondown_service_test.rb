@@ -103,4 +103,52 @@ class ButtondownServiceTest < ActiveSupport::TestCase
       service.subscribe(@email)
     end
   end
+
+  test "subscribe raises RateLimitError on 429 response" do
+    stub_request(:post, "https://api.buttondown.email/v1/subscribers")
+      .to_return(status: 429, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    assert_raises(ButtondownService::RateLimitError) do
+      @service.subscribe(@email)
+    end
+  end
+
+  test "subscribe raises AuthenticationError on 401 response" do
+    stub_request(:post, "https://api.buttondown.email/v1/subscribers")
+      .to_return(status: 401, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    assert_raises(ButtondownService::AuthenticationError) do
+      @service.subscribe(@email)
+    end
+  end
+
+  test "subscribe raises ServerError on 500 response" do
+    stub_request(:post, "https://api.buttondown.email/v1/subscribers")
+      .to_return(status: 500, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    assert_raises(ButtondownService::ServerError) do
+      @service.subscribe(@email)
+    end
+  end
+
+  test "subscribe retries on timeout" do
+    stub_request(:post, "https://api.buttondown.email/v1/subscribers")
+      .to_timeout
+      .times(2)
+      .then
+      .to_return(status: 201, body: { email: @email }.to_json, headers: { "Content-Type" => "application/json" })
+
+    result = @service.subscribe(@email)
+    assert result
+  end
+
+  test "find_subscriber handles malformed response" do
+    stub_request(:get, "https://api.buttondown.email/v1/subscribers?email=#{@email}")
+      .to_return(status: 200, body: "not json", headers: {})
+
+    # Should not raise, just return nil
+    assert_nothing_raised do
+      @service.send(:find_subscriber, @email)
+    end
+  end
 end

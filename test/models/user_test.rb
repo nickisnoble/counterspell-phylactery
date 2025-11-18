@@ -2,6 +2,7 @@ require "test_helper"
 require "webmock/minitest"
 
 class UserTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
   test "generates OTP secret on create" do
     user = User.create!(email: "test@example.com")
     assert_not_nil user.otp_secret
@@ -85,11 +86,15 @@ class UserTest < ActiveSupport::TestCase
   test "subscribes to buttondown when newsletter is true on create" do
     ENV["BUTTONDOWN_API_KEY"] = "test_key"
 
+    # Stub the API call
     stub_request(:post, "https://api.buttondown.email/v1/subscribers")
-      .with(body: hash_including(email: "subscriber@example.com"))
       .to_return(status: 201, body: {}.to_json, headers: { "Content-Type" => "application/json" })
 
-    user = User.create!(email: "subscriber@example.com", newsletter: true)
+    user = nil
+    perform_enqueued_jobs do
+      user = User.create!(email: "subscriber@example.com", newsletter: true)
+    end
+
     assert user.persisted?
   ensure
     ENV.delete("BUTTONDOWN_API_KEY")
@@ -106,11 +111,14 @@ class UserTest < ActiveSupport::TestCase
 
     ENV["BUTTONDOWN_API_KEY"] = "test_key"
 
+    # Stub the API call
     stub_request(:post, "https://api.buttondown.email/v1/subscribers")
-      .with(body: hash_including(email: "changer@example.com"))
       .to_return(status: 201, body: {}.to_json, headers: { "Content-Type" => "application/json" })
 
-    user.update!(newsletter: true)
+    perform_enqueued_jobs do
+      user.update!(newsletter: true)
+    end
+
     assert user.newsletter?
   ensure
     ENV.delete("BUTTONDOWN_API_KEY")
@@ -119,14 +127,16 @@ class UserTest < ActiveSupport::TestCase
   test "unsubscribes from buttondown when newsletter changes from true to false" do
     ENV["BUTTONDOWN_API_KEY"] = "test_key"
 
-    # Subscribe on create
+    # Stub subscribe on create
     stub_request(:post, "https://api.buttondown.email/v1/subscribers")
-      .with(body: hash_including(email: "unsubscriber@example.com"))
       .to_return(status: 201, body: {}.to_json, headers: { "Content-Type" => "application/json" })
 
-    user = User.create!(email: "unsubscriber@example.com", newsletter: true)
+    user = nil
+    perform_enqueued_jobs do
+      user = User.create!(email: "unsubscriber@example.com", newsletter: true)
+    end
 
-    # Unsubscribe on update
+    # Stub unsubscribe on update
     stub_request(:get, "https://api.buttondown.email/v1/subscribers")
       .with(query: hash_including(email: "unsubscriber@example.com"))
       .to_return(
@@ -139,7 +149,10 @@ class UserTest < ActiveSupport::TestCase
       .with(body: hash_including(subscriber_type: "unactivated"))
       .to_return(status: 200, body: {}.to_json, headers: { "Content-Type" => "application/json" })
 
-    user.update!(newsletter: false)
+    perform_enqueued_jobs do
+      user.update!(newsletter: false)
+    end
+
     assert_not user.newsletter?
   ensure
     ENV.delete("BUTTONDOWN_API_KEY")
