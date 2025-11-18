@@ -27,6 +27,32 @@
         </mj-section>
       <% end %>
 
+      <% if @seat.present? %>
+        <mj-section background-color="#f0fdf4" padding="20px">
+          <mj-column>
+            <mj-text font-size="18px" font-weight="bold" padding-bottom="10px" color="#166534">
+              Your Seat is Confirmed!
+            </mj-text>
+            <mj-text>
+              Use this QR code to check in at the event:
+            </mj-text>
+            <mj-image
+              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<%= @seat.qr_code_url %>"
+              width="200px"
+              padding="20px 0"
+            />
+            <mj-button href="<%= @seat.qr_code_url %>" background-color="#16a34a" color="#ffffff">
+              Check-in Link
+            </mj-button>
+            <% if @seat.hero.present? %>
+              <mj-text padding-top="15px">
+                <strong>Hero:</strong> <%= @seat.hero.name %>
+              </mj-text>
+            <% end %>
+          </mj-column>
+        </mj-section>
+      <% end %>
+
       <% if @event.present? %>
         <mj-section background-color="#f9f9f9" padding="20px">
           <mj-column>

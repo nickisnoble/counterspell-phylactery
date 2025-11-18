@@ -126,4 +126,21 @@ class SeatTest < ActiveSupport::TestCase
     assert_not seat.valid?
     assert_includes seat.errors[:user], "can only have one association per event"
   end
+
+  test "creates confirmation broadcast when seat is purchased" do
+    seat = Seat.create!(game: @game, user: @player1, hero: heroes(:one))
+
+    assert_equal 1, seat.broadcasts.count
+    broadcast = seat.broadcasts.first
+    assert_equal "Seat Confirmation", broadcast.subject
+    assert broadcast.transactional?
+    assert_not broadcast.draft?
+  end
+
+  test "sends confirmation email immediately when seat purchased" do
+    seat = Seat.create!(game: @game, user: @player1, hero: heroes(:one))
+    broadcast = seat.broadcasts.first
+
+    assert broadcast.scheduled_at <= Time.current
+  end
 end

@@ -3,6 +3,7 @@ class BroadcastMailer < ApplicationMailer
     @user = user
     @broadcast = broadcast
     @event = broadcast.event
+    @seat = broadcast.seat
 
     mail(
       to: user.email,

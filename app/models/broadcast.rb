@@ -34,9 +34,18 @@ class Broadcast < ApplicationRecord
     update!(sent_at: Time.current)
   end
 
-  # Convenience method for backward compatibility
+  # Convenience methods for accessing related objects
   def event
-    broadcastable if broadcastable_type == 'Event'
+    case broadcastable_type
+    when 'Event'
+      broadcastable
+    when 'Seat'
+      broadcastable.game.event
+    end
+  end
+
+  def seat
+    broadcastable if broadcastable_type == 'Seat'
   end
 
   # Returns the list of users who should receive this broadcast
