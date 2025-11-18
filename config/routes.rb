@@ -38,7 +38,11 @@ Rails.application.routes.draw do
     resources :events
     resources :traits
     resources :newsletters
-    resources :broadcasts
+    resources :broadcasts do
+      member do
+        post :preview
+      end
+    end
   end
 
   # Public newsletter routes
