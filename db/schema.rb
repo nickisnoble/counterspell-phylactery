@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_18_021613) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_18_024115) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -214,6 +214,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_021613) do
     t.index ["slug"], name: "index_traits_on_slug", unique: true
   end
 
+  create_table "unsubscribe_events", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_unsubscribe_events_on_created_at"
+    t.index ["user_id"], name: "index_unsubscribe_events_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "otp_secret", null: false
@@ -243,4 +252,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_021613) do
   add_foreign_key "seats", "heroes"
   add_foreign_key "seats", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "unsubscribe_events", "users"
 end

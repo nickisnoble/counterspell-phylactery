@@ -1,4 +1,4 @@
-class UnsubscribeController < ApplicationController
+class UnsubscribesController < ApplicationController
   allow_unauthenticated_access
 
   def show
@@ -13,6 +13,8 @@ class UnsubscribeController < ApplicationController
   def create
     @user = User.find_by(unsubscribe_token: params[:token])
     if @user
+      # Record the unsubscribe event with optional reason
+      @user.unsubscribe_events.create!(reason: params[:reason])
       @user.update!(newsletter: false)
       redirect_to unsubscribe_path(token: params[:token]), notice: "You have been successfully unsubscribed from newsletters"
     else
