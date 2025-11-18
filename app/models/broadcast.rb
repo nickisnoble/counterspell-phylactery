@@ -45,9 +45,10 @@ class Broadcast < ApplicationRecord
     when "all_subscribers"
       User.where(newsletter: true)
     when "event_attendees"
+      # Transactional emails go to all event attendees regardless of newsletter preference
       return User.none unless event
       user_ids = event.games.flat_map { |game| game.seats.where.not(user_id: nil).pluck(:user_id) }.uniq
-      User.where(id: user_ids, newsletter: true)
+      User.where(id: user_ids)
     when "filtered"
       apply_filters(User.where(newsletter: true))
     else

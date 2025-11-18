@@ -105,4 +105,45 @@ class BroadcastJobTest < ActiveJob::TestCase
 
     assert broadcast.reload.sent?
   end
+
+  test "transactional broadcasts ignore newsletter preference" do
+    location = Location.create!(name: "Test Venue", address: "123 Test St")
+    gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "GM")
+    # Player explicitly has newsletter: false
+    player = User.create!(email: "player@test.com", system_role: "player", display_name: "Player", newsletter: false)
+
+    event = Event.create!(
+      name: "Test Event",
+      date: Date.today + 10.days,
+      location: location,
+      status: "upcoming"
+    )
+
+    game = event.games.create!(gm: gm, seat_count: 5)
+
+    ancestry = Trait.create!(type: "ANCESTRY", name: "Test Ancestry #{Time.current.to_i}")
+    background = Trait.create!(type: "BACKGROUND", name: "Test Background #{Time.current.to_i}")
+    class_trait = Trait.create!(type: "CLASS", name: "Test Class #{Time.current.to_i}")
+    hero = Hero.create!(
+      name: "Test Hero #{Time.current.to_i}",
+      role: "fighter",
+      traits: [ancestry, background, class_trait]
+    )
+    seat = game.seats.create!(user: player, hero: hero, purchased_at: Time.current)
+
+    broadcast = Broadcast.create!(
+      subject: "Event Reminder",
+      scheduled_at: 1.hour.ago,
+      draft: false,
+      recipient_type: "event_attendees",
+      broadcastable: event
+    )
+
+    # Should send 1 email even though player has newsletter: false
+    assert_enqueued_emails 1 do
+      BroadcastJob.perform_now
+    end
+
+    assert broadcast.reload.sent?
+  end
 end
