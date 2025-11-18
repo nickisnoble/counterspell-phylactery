@@ -41,7 +41,7 @@
                 <%= @seat.qr_code_svg %>
               </div>
             </mj-raw>
-            <mj-button href="<%= @seat.qr_code_url %>" background-color="#16a34a" color="#ffffff">
+            <mj-button href="<%= add_utm_params(@seat.qr_code_url, content: 'checkin_button') %>" background-color="#16a34a" color="#ffffff">
               Check-in Link
             </mj-button>
             <% if @seat.hero.present? %>
@@ -68,7 +68,7 @@
               <%= @event.location.name %><br/>
               <%= @event.location.address %>
             </mj-text>
-            <mj-button href="<%= event_url(@event) %>" background-color="#6366f1" color="#ffffff" padding-top="20px">
+            <mj-button href="<%= add_utm_params(event_url(@event), content: 'event_button') %>" background-color="#6366f1" color="#ffffff" padding-top="20px">
               View Event
             </mj-button>
           </mj-column>
@@ -84,8 +84,8 @@
       <mj-section padding-top="10px">
         <mj-column>
           <mj-text font-size="12px" color="#666666" align="center">
-            <a href="<%= broadcast_url(@broadcast) %>" style="color: #6366f1; text-decoration: none;">View in browser</a><% if @broadcast.marketing? %> |
-            <a href="<%= unsubscribe_url(token: @user.unsubscribe_token) %>" style="color: #6366f1; text-decoration: none;">Unsubscribe</a><% end %>
+            <a href="<%= add_utm_params(broadcast_url(@broadcast), content: 'view_browser') %>" style="color: #6366f1; text-decoration: none;">View in browser</a><% if @broadcast.marketing? %> |
+            <a href="<%= add_utm_params(unsubscribe_url(token: @user.unsubscribe_token), content: 'unsubscribe') %>" style="color: #6366f1; text-decoration: none;">Unsubscribe</a><% end %>
           </mj-text>
         </mj-column>
       </mj-section>

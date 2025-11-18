@@ -108,6 +108,44 @@ class BroadcastMailerTest < ActionMailer::TestCase
     assert_match /Unsubscribe/, email.body.encoded
   end
 
+  test "emails include UTM tracking parameters" do
+    location = Location.create!(name: "Test Venue", address: "123 Test St")
+    gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "GM")
+    event = Event.create!(
+      name: "Test Event",
+      date: Date.today + 10.days,
+      location: location,
+      status: "upcoming"
+    )
+
+    broadcast = Broadcast.create!(
+      subject: "Event Reminder",
+      scheduled_at: 1.hour.from_now,
+      recipient_type: "event_attendees",
+      broadcastable: event
+    )
+
+    email = BroadcastMailer.broadcast(user: @user, broadcast: broadcast)
+
+    # Check that UTM parameters are present in links
+    assert_match /utm_source=email/, email.body.encoded
+    assert_match /utm_medium=transactional_email/, email.body.encoded
+    assert_match /utm_campaign=event_reminder/, email.body.encoded
+    assert_match /utm_content=event_button/, email.body.encoded
+  end
+
+  test "emails include Resend metadata in headers" do
+    email = BroadcastMailer.broadcast(user: @user, broadcast: @broadcast)
+
+    # Check for custom headers (X-Entity-Ref-ID and X-Broadcast-Type)
+    assert_equal @broadcast.id.to_s, email['X-Entity-Ref-ID'].to_s
+    assert_equal 'marketing', email['X-Broadcast-Type'].to_s
+
+    # Marketing emails should have List-Unsubscribe headers
+    assert email['List-Unsubscribe'].present?
+    assert email['List-Unsubscribe-Post'].present?
+  end
+
   test "single_recipient broadcasts only send to seat owner" do
     location = Location.create!(name: "Test Venue", address: "123 Test St")
     gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "GM")
