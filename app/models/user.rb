@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :heroes, through: :seats
   has_many :games_as_gm, class_name: "Game", foreign_key: "gm_id", dependent: :restrict_with_error
   has_many :unsubscribe_events, dependent: :destroy
+  has_many :email_events, dependent: :destroy
   has_rich_text :bio
 
   before_create :generate_otp_secret

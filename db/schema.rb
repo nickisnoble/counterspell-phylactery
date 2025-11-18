@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_18_024115) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_18_043853) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -82,6 +82,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_024115) do
     t.index ["recipient_type"], name: "index_broadcasts_on_recipient_type"
     t.index ["scheduled_at"], name: "index_broadcasts_on_scheduled_at"
     t.index ["sent_at"], name: "index_broadcasts_on_sent_at"
+  end
+
+  create_table "email_events", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "broadcast_id"
+    t.string "event_type", null: false
+    t.string "resend_email_id", null: false
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["broadcast_id"], name: "index_email_events_on_broadcast_id"
+    t.index ["created_at"], name: "index_email_events_on_created_at"
+    t.index ["event_type"], name: "index_email_events_on_event_type"
+    t.index ["resend_email_id"], name: "index_email_events_on_resend_email_id"
+    t.index ["user_id", "event_type"], name: "index_email_events_on_user_id_and_event_type"
+    t.index ["user_id"], name: "index_email_events_on_user_id"
   end
 
   create_table "event_emails", force: :cascade do |t|
@@ -235,13 +251,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_024115) do
     t.string "slug", null: false
     t.boolean "verified"
     t.string "unsubscribe_token"
+    t.boolean "never_send_email", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["never_send_email"], name: "index_users_on_never_send_email"
     t.index ["slug"], name: "index_users_on_slug", unique: true
     t.index ["unsubscribe_token"], name: "index_users_on_unsubscribe_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "email_events", "broadcasts"
+  add_foreign_key "email_events", "users"
   add_foreign_key "event_emails", "events"
   add_foreign_key "events", "locations"
   add_foreign_key "games", "events"

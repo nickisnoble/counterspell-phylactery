@@ -89,4 +89,90 @@ class BroadcastTest < ActiveSupport::TestCase
     assert_equal ["gm", "admin"], broadcast.recipient_filters["roles"]
     assert_equal 1, broadcast.recipient_filters["attended_event_id"]
   end
+
+  test "recipients excludes users with never_send_email: true" do
+    # Create users with different states
+    subscribed_user = User.create!(
+      email: "subscribed@example.com",
+      display_name: "Subscribed",
+      system_role: "player",
+      newsletter: true,
+      never_send_email: false
+    )
+
+    bounced_user = User.create!(
+      email: "bounced@example.com",
+      display_name: "Bounced",
+      system_role: "player",
+      newsletter: true,
+      never_send_email: true
+    )
+
+    complained_user = User.create!(
+      email: "complained@example.com",
+      display_name: "Complained",
+      system_role: "player",
+      newsletter: true,
+      never_send_email: true
+    )
+
+    broadcast = Broadcast.create!(
+      subject: "Test",
+      scheduled_at: 1.day.from_now,
+      recipient_type: "all_subscribers"
+    )
+
+    recipients = broadcast.recipients
+    assert_includes recipients, subscribed_user
+    assert_not_includes recipients, bounced_user
+    assert_not_includes recipients, complained_user
+  end
+
+  test "transactional broadcasts also exclude never_send_email users" do
+    location = Location.create!(name: "Test Location", address: "123 Test St")
+    event = Event.create!(
+      name: "Test Event",
+      date: 1.week.from_now,
+      location: location,
+      status: "upcoming"
+    )
+
+    gm = User.create!(
+      email: "gm@example.com",
+      display_name: "Game Master",
+      system_role: "gm"
+    )
+
+    active_user = User.create!(
+      email: "active@example.com",
+      display_name: "Active",
+      system_role: "player",
+      newsletter: false,
+      never_send_email: false
+    )
+
+    bounced_user = User.create!(
+      email: "bounced@example.com",
+      display_name: "Bounced",
+      system_role: "player",
+      newsletter: false,
+      never_send_email: true
+    )
+
+    # Create seats for both users
+    game = Game.create!(event: event, gm: gm)
+    Seat.create!(game: game, user: active_user)
+    Seat.create!(game: game, user: bounced_user)
+
+    broadcast = Broadcast.create!(
+      subject: "Event Reminder",
+      scheduled_at: 1.day.from_now,
+      recipient_type: "event_attendees",
+      broadcastable: event
+    )
+
+    recipients = broadcast.recipients
+    assert_includes recipients, active_user
+    assert_not_includes recipients, bounced_user, "Transactional emails should also exclude never_send_email users"
+  end
 end

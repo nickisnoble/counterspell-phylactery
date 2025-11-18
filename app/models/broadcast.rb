@@ -1,5 +1,6 @@
 class Broadcast < ApplicationRecord
   belongs_to :broadcastable, polymorphic: true, optional: true
+  has_many :email_events, dependent: :destroy
   has_rich_text :body
 
   validates :subject, presence: true
@@ -51,7 +52,7 @@ class Broadcast < ApplicationRecord
 
   # Returns the list of users who should receive this broadcast
   def recipients
-    case recipient_type
+    base_recipients = case recipient_type
     when "all_subscribers"
       User.where(newsletter: true)
     when "event_attendees"
@@ -68,6 +69,10 @@ class Broadcast < ApplicationRecord
     else
       User.none
     end
+
+    # Always exclude users who have been flagged to never receive email
+    # (bounced, complained, or manually blocked)
+    base_recipients.where(never_send_email: false)
   end
 
   private

@@ -25,6 +25,9 @@ Rails.application.routes.draw do
   # Stripe webhooks
   post "/stripe/webhooks" => "stripe_webhooks#create"
 
+  # Resend webhooks
+  post "/resend/webhooks" => "resend_webhooks#create", as: :resend_webhooks
+
   # Checkin system
   resource :checkin, only: [:show, :create]
   resources :seats, only: [] do
