@@ -4,7 +4,7 @@ class Event < ApplicationRecord
   belongs_to :location
   has_many :games, dependent: :destroy
   has_many :event_emails, dependent: :destroy # Legacy - use broadcasts instead
-  has_many :broadcasts, dependent: :destroy
+  has_many :broadcasts, as: :broadcastable, dependent: :destroy
   has_rich_text :description
 
   accepts_nested_attributes_for :games, allow_destroy: true, reject_if: :all_blank

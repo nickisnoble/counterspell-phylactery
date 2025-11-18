@@ -5,7 +5,7 @@ one:
   scheduled_at: <%= 1.week.from_now %>
   sent_at:
   draft: true
-  event: one
+  broadcastable: one (Event)
   recipient_type: event_attendees
   recipient_filters:
 
@@ -14,6 +14,6 @@ two:
   scheduled_at: <%= 1.day.from_now %>
   sent_at:
   draft: true
-  event:
+  broadcastable:
   recipient_type: all_subscribers
   recipient_filters: 

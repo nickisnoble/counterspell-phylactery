@@ -39,7 +39,7 @@ class BroadcastMailerTest < ActionMailer::TestCase
       subject: "Event Reminder",
       scheduled_at: 1.hour.from_now,
       recipient_type: "event_attendees",
-      event: event
+      broadcastable: event
     )
 
     email = BroadcastMailer.broadcast(user: @user, broadcast: broadcast)

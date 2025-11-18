@@ -3,7 +3,7 @@ class BroadcastJob < ApplicationJob
 
   def perform
     # Find all broadcasts that should be sent
-    pending_broadcasts = Broadcast.pending.includes(:event)
+    pending_broadcasts = Broadcast.pending.includes(:broadcastable)
 
     pending_broadcasts.find_each do |broadcast|
       # Get recipients based on broadcast type and filters

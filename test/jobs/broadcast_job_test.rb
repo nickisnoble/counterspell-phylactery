@@ -96,7 +96,7 @@ class BroadcastJobTest < ActiveJob::TestCase
       scheduled_at: 1.hour.ago,
       draft: false,
       recipient_type: "event_attendees",
-      event: event
+      broadcastable: event
     )
 
     assert_enqueued_emails 1 do

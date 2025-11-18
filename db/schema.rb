@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_18_001825) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_18_021613) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -71,13 +71,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_001825) do
     t.datetime "scheduled_at"
     t.datetime "sent_at"
     t.boolean "draft", default: true
-    t.integer "event_id"
     t.string "recipient_type", default: "all_subscribers"
     t.json "recipient_filters"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "broadcastable_type"
+    t.integer "broadcastable_id"
+    t.index ["broadcastable_type", "broadcastable_id"], name: "index_broadcasts_on_broadcastable_type_and_broadcastable_id"
     t.index ["draft"], name: "index_broadcasts_on_draft"
-    t.index ["event_id"], name: "index_broadcasts_on_event_id"
     t.index ["recipient_type"], name: "index_broadcasts_on_recipient_type"
     t.index ["scheduled_at"], name: "index_broadcasts_on_scheduled_at"
     t.index ["sent_at"], name: "index_broadcasts_on_sent_at"
@@ -232,7 +233,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_001825) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "broadcasts", "events"
   add_foreign_key "event_emails", "events"
   add_foreign_key "events", "locations"
   add_foreign_key "games", "events"

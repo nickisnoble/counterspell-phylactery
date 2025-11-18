@@ -1,5 +1,5 @@
 class Broadcast < ApplicationRecord
-  belongs_to :event, optional: true
+  belongs_to :broadcastable, polymorphic: true, optional: true
   has_rich_text :body
 
   validates :subject, presence: true
@@ -7,10 +7,20 @@ class Broadcast < ApplicationRecord
   validates :recipient_type, presence: true, inclusion: { in: %w[all_subscribers event_attendees filtered] }
   validate :scheduled_at_cannot_change_after_sent
   validate :sent_at_cannot_change_after_sent
-  validate :event_required_for_event_attendees
+  validate :broadcastable_required_for_event_attendees
 
   scope :published, -> { where(draft: false) }
   scope :pending, -> { where(sent_at: nil, draft: false).where("scheduled_at <= ?", Time.current) }
+
+  # Transactional emails are attached to a specific entity (Event, Seat, etc.)
+  # Marketing emails are general broadcasts (newsletters, announcements)
+  def transactional?
+    broadcastable.present?
+  end
+
+  def marketing?
+    !transactional?
+  end
 
   def sent?
     sent_at.present?
@@ -22,6 +32,11 @@ class Broadcast < ApplicationRecord
 
   def mark_as_sent!
     update!(sent_at: Time.current)
+  end
+
+  # Convenience method for backward compatibility
+  def event
+    broadcastable if broadcastable_type == 'Event'
   end
 
   # Returns the list of users who should receive this broadcast
@@ -54,10 +69,10 @@ class Broadcast < ApplicationRecord
     errors.add(:sent_at, "cannot be changed after broadcast is sent")
   end
 
-  def event_required_for_event_attendees
-    return unless recipient_type == "event_attendees" && event.blank?
+  def broadcastable_required_for_event_attendees
+    return unless recipient_type == "event_attendees" && broadcastable.blank?
 
-    errors.add(:event, "must exist for event_attendees")
+    errors.add(:broadcastable, "must exist for event_attendees")
   end
 
   def apply_filters(scope)

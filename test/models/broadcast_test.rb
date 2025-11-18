@@ -33,14 +33,14 @@ class BroadcastTest < ActiveSupport::TestCase
   end
 
   test "allows event_attendees recipient_type" do
-    broadcast = Broadcast.create!(subject: "Test", scheduled_at: 1.day.from_now, recipient_type: "event_attendees", event: @event)
+    broadcast = Broadcast.create!(subject: "Test", scheduled_at: 1.day.from_now, recipient_type: "event_attendees", broadcastable: @event)
     assert_equal "event_attendees", broadcast.recipient_type
   end
 
   test "requires event for event_attendees type" do
     broadcast = Broadcast.new(subject: "Test", scheduled_at: 1.day.from_now, recipient_type: "event_attendees")
     assert_not broadcast.valid?
-    assert_includes broadcast.errors[:event], "must exist for event_attendees"
+    assert_includes broadcast.errors[:broadcastable], "must exist for event_attendees"
   end
 
   test "allows updating scheduled_at before sent" do
