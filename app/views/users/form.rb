@@ -90,7 +90,7 @@ class Views::Users::Form < Views::Base
                 button(type: "button", class: "px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md", data: { action: "click->newsletter#cancel" }) do
                   plain "Keep subscription"
                 end
-                button(type: "button", class: "px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-md", data: { action: "click->newsletter#submit", newsletter_target: "submitButton" }) do
+                button(type: "button", class: "px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-md", data: { action: "click->newsletter#submit" }) do
                   plain "Unsubscribe"
                 end
               end
