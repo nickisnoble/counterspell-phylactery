@@ -49,7 +49,9 @@ class ButtondownService
         # Buttondown API accepts tags as an array
         # Prepend "unsub:" to reason to identify unsubscribe reasons
         tag = "unsub:#{reason}"
-        existing_tags = subscriber["tags"] || []
+        existing_tags = subscriber["tags"]
+        # Ensure existing_tags is an array (handle nil, empty string, etc.)
+        existing_tags = [] unless existing_tags.is_a?(Array)
         body[:tags] = (existing_tags + [ tag ]).uniq
       end
 

@@ -198,4 +198,31 @@ class ButtondownServiceTest < ActiveSupport::TestCase
     assert result
     assert_requested stub
   end
+
+  test "unsubscribe handles malformed tags gracefully" do
+    subscriber_id = "test-subscriber-id"
+    reason = "too_many_emails"
+
+    # API returns tags as empty string instead of array (malformed response)
+    stub_request(:get, "https://api.buttondown.email/v1/subscribers?email=#{@email}")
+      .to_return(
+        status: 200,
+        body: { results: [{ id: subscriber_id, email: @email, tags: "" }] }.to_json,
+        headers: { "Content-Type" => "application/json" }
+      )
+
+    # Should handle this gracefully and create new tags array
+    stub = stub_request(:patch, "https://api.buttondown.email/v1/subscribers/#{subscriber_id}")
+      .with(
+        body: hash_including(
+          subscriber_type: "unactivated",
+          tags: [ "unsub:#{reason}" ]
+        )
+      )
+      .to_return(status: 200, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    result = @service.unsubscribe(@email, reason: reason)
+    assert result
+    assert_requested stub
+  end
 end
