@@ -38,10 +38,14 @@ Rails.application.routes.draw do
     resources :events
     resources :traits
     resources :newsletters
+    resources :broadcasts
   end
 
   # Public newsletter routes
   resources :newsletters, only: [:show]
+
+  # Public broadcast routes
+  resources :broadcasts, only: [:show]
 
   # Unsubscribe route
   resource :unsubscribe, only: [:show, :create]

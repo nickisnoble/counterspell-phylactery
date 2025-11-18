@@ -1,0 +1,25 @@
+<%= @broadcast.subject %>
+
+<% if @broadcast.body.present? %>
+<%= @broadcast.body.to_plain_text %>
+<% end %>
+
+<% if @event.present? %>
+
+EVENT DETAILS
+================
+<%= @event.name %>
+<%= @event.date.strftime('%A, %B %d, %Y') %>
+<% if @event.start_time %>
+<%= @event.start_time.strftime('%I:%M %p') %> - <%= @event.end_time&.strftime('%I:%M %p') %>
+<% end %>
+<%= @event.location.name %>
+<%= @event.location.address %>
+
+View Event: <%= event_url(@event) %>
+<% end %>
+
+---
+
+View in browser: <%= broadcast_url(@broadcast) %>
+Unsubscribe: <%= unsubscribe_url(token: @user.unsubscribe_token) %>
