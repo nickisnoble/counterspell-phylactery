@@ -43,6 +43,7 @@ group :test do
   gem "simplecov", "~> 0.22.0"
   gem "rails-controller-testing", "~> 1.0"
   gem "minitest-reporters", "~> 1.7"
+  gem "webmock", "~> 3.24"
 end
 
 group :production do
@@ -61,3 +62,4 @@ gem "litestream", "~> 0.14.0"
 gem "aws-sdk-s3", "~> 1.199", require: false
 
 gem "active_hashcash", "~> 0.4.0"
+gem "httparty", "~> 0.22.0"

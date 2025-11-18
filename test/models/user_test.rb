@@ -1,4 +1,5 @@
 require "test_helper"
+require "webmock/minitest"
 
 class UserTest < ActiveSupport::TestCase
   test "generates OTP secret on create" do
@@ -79,5 +80,76 @@ class UserTest < ActiveSupport::TestCase
   test "can create admin user" do
     user = User.create!(email: "newadmin@example.com", system_role: "admin")
     assert user.admin?
+  end
+
+  test "subscribes to buttondown when newsletter is true on create" do
+    ENV["BUTTONDOWN_API_KEY"] = "test_key"
+
+    stub_request(:post, "https://api.buttondown.email/v1/subscribers")
+      .with(body: hash_including(email: "subscriber@example.com"))
+      .to_return(status: 201, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    user = User.create!(email: "subscriber@example.com", newsletter: true)
+    assert user.persisted?
+  ensure
+    ENV.delete("BUTTONDOWN_API_KEY")
+  end
+
+  test "does not subscribe to buttondown when newsletter is false on create" do
+    # Should not call ButtondownService at all
+    user = User.create!(email: "nonsubscriber@example.com", newsletter: false)
+    assert_equal false, user.newsletter
+  end
+
+  test "subscribes to buttondown when newsletter changes from false to true" do
+    user = User.create!(email: "changer@example.com", newsletter: false)
+
+    ENV["BUTTONDOWN_API_KEY"] = "test_key"
+
+    stub_request(:post, "https://api.buttondown.email/v1/subscribers")
+      .with(body: hash_including(email: "changer@example.com"))
+      .to_return(status: 201, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    user.update!(newsletter: true)
+    assert user.newsletter?
+  ensure
+    ENV.delete("BUTTONDOWN_API_KEY")
+  end
+
+  test "unsubscribes from buttondown when newsletter changes from true to false" do
+    ENV["BUTTONDOWN_API_KEY"] = "test_key"
+
+    # Subscribe on create
+    stub_request(:post, "https://api.buttondown.email/v1/subscribers")
+      .with(body: hash_including(email: "unsubscriber@example.com"))
+      .to_return(status: 201, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    user = User.create!(email: "unsubscriber@example.com", newsletter: true)
+
+    # Unsubscribe on update
+    stub_request(:get, "https://api.buttondown.email/v1/subscribers")
+      .with(query: hash_including(email: "unsubscriber@example.com"))
+      .to_return(
+        status: 200,
+        body: { results: [{ id: "test-id", email: "unsubscriber@example.com" }] }.to_json,
+        headers: { "Content-Type" => "application/json" }
+      )
+
+    stub_request(:patch, "https://api.buttondown.email/v1/subscribers/test-id")
+      .with(body: hash_including(subscriber_type: "unactivated"))
+      .to_return(status: 200, body: {}.to_json, headers: { "Content-Type" => "application/json" })
+
+    user.update!(newsletter: false)
+    assert_not user.newsletter?
+  ensure
+    ENV.delete("BUTTONDOWN_API_KEY")
+  end
+
+  test "does not call buttondown when newsletter stays the same" do
+    user = User.create!(email: "stayer@example.com", newsletter: true)
+
+    # Should not call ButtondownService
+    user.update!(display_name: "New Name")
+    assert_equal "New Name", user.display_name
   end
 end

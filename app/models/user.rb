@@ -10,6 +10,9 @@ class User < ApplicationRecord
   before_create :generate_otp_secret
   encrypts :otp_secret
 
+  after_commit :sync_newsletter_subscription, on: :create, if: :newsletter?
+  after_commit :sync_newsletter_subscription, on: :update, if: :saved_change_to_newsletter?
+
   normalizes :email, with: ->(e) { e.strip.downcase }
   validates :email,
     uniqueness: { case_sensitive: false },
@@ -46,5 +49,19 @@ class User < ApplicationRecord
 
     def totp
       ROTP::TOTP.new(otp_secret, issuer: "Counterspell")
+    end
+
+    def sync_newsletter_subscription
+      return unless Rails.env.production? || ENV["BUTTONDOWN_API_KEY"].present?
+
+      service = ButtondownService.new
+
+      if newsletter?
+        service.subscribe(email)
+      else
+        service.unsubscribe(email)
+      end
+    rescue => e
+      Rails.logger.error("Failed to sync newsletter subscription for #{email}: #{e.message}")
     end
 end
