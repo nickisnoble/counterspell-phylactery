@@ -84,9 +84,10 @@ class Seat < ApplicationRecord
     return unless game&.event && user_id
 
     # Only broadcast on meaningful changes
-    return unless saved_change_to_checked_in_at? || saved_change_to_user_id? || saved_change_to_hero_id?
+    relevant_changes = previous_changes.slice("checked_in_at", "user_id", "hero_id", "game_id")
+    return if relevant_changes.empty?
 
-    # Broadcast a refresh to anyone viewing this event
+    # Seats only move between games within the same event, so broadcasting the current event is sufficient
     broadcast_refresh_to(game.event)
   end
 end

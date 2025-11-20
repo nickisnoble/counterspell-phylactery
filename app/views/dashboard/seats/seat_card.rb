@@ -41,7 +41,7 @@ class Views::Dashboard::Seats::SeatCard < Views::Base
           model: @seat,
           url: dashboard_event_seat_path(@event, @seat),
           method: :patch,
-          data: { turbo_frame: "seat_#{@seat.id}" }
+          data: { turbo_frame: "seat_#{@seat.id}", controller: "seat-reassign" }
         ) do |f|
           div(class: "space-y-2") do
             f.collection_select(

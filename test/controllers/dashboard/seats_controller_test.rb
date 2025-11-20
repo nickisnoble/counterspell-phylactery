@@ -38,6 +38,7 @@ class Dashboard::SeatsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal @game2.id, @seat.reload.game_id
     assert_response :success
+    assert_includes response.body, 'data-controller="seat-reassign"', "seat card should mount seat-reassign Stimulus controller"
   end
 
   test "returns error when trying to move to full game" do
@@ -53,5 +54,6 @@ class Dashboard::SeatsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_content
     assert_equal @game1.id, @seat.reload.game_id
+    assert_includes response.body, "This table is full"
   end
 end

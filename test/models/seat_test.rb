@@ -1,11 +1,15 @@
 require "test_helper"
+require "turbo/broadcastable/test_helper"
 
 class SeatTest < ActiveSupport::TestCase
+  include Turbo::Broadcastable::TestHelper
+
   def setup
     @gm = User.create!(email: "gm@test.com", system_role: "gm", display_name: "Test GM")
     @player1 = User.create!(email: "player1@test.com", system_role: "player", display_name: "Player One")
     @player2 = User.create!(email: "player2@test.com", system_role: "player", display_name: "Player Two")
     @game = Game.create!(event: events(:one), gm: @gm, seat_count: 5)
+    clear_broadcasts_for(events(:one))
   end
 
   test "requires game" do
@@ -97,6 +101,18 @@ class SeatTest < ActiveSupport::TestCase
     end
   end
 
+  test "broadcasts refresh when seat moves to another game" do
+    seat = Seat.create!(game: @game, user: @player1)
+    other_gm = User.create!(email: "gm2@test.com", system_role: "gm", display_name: "Second GM")
+    new_game = Game.create!(event: events(:one), gm: other_gm, seat_count: 5)
+
+    clear_broadcasts_for(events(:one))
+
+    assert_turbo_stream_broadcasts events(:one), count: 1 do
+      seat.update!(game: new_game)
+    end
+  end
+
   test "does not broadcast when seat has no user" do
     seat = Seat.create!(game: @game)
     # Empty seats don't broadcast - verify they can still be created
@@ -125,5 +141,11 @@ class SeatTest < ActiveSupport::TestCase
     seat = Seat.new(game: @game, user: @player1)
     assert_not seat.valid?
     assert_includes seat.errors[:user], "can only have one association per event"
+  end
+
+  private
+
+  def clear_broadcasts_for(streamable)
+    broadcasts(stream_name_from(streamable)).clear
   end
 end
