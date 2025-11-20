@@ -1,6 +1,9 @@
+require "resend"
+
 class ResendWebhooksController < ApplicationController
   skip_before_action :verify_authenticity_token
   skip_before_action :require_authentication
+  before_action :verify_resend_signature!
 
   def create
     payload = params.permit!.to_h
@@ -37,5 +40,30 @@ class ResendWebhooksController < ApplicationController
 
     # Return 200 OK as required by Resend
     head :ok
+  end
+
+  private
+
+  def verify_resend_signature!
+    svix_id = request.headers["svix-id"] || request.headers["SVIX-ID"] || request.headers["HTTP_SVIX_ID"]
+    svix_timestamp = request.headers["svix-timestamp"] || request.headers["SVIX-TIMESTAMP"] || request.headers["HTTP_SVIX_TIMESTAMP"]
+    svix_signature = request.headers["svix-signature"] || request.headers["SVIX-SIGNATURE"] || request.headers["HTTP_SVIX_SIGNATURE"]
+
+    Resend::Webhooks.verify(
+      payload: request.raw_post,
+      headers: {
+        svix_id: svix_id,
+        svix_timestamp: svix_timestamp,
+        svix_signature: svix_signature
+      },
+      webhook_secret: resend_webhook_secret
+    )
+  rescue StandardError => e
+    Rails.logger.warn("Resend webhook signature verification failed: #{e.message}")
+    head :unauthorized and return
+  end
+
+  def resend_webhook_secret
+    ENV["RESEND_WEBHOOK_SECRET"] || Rails.application.credentials.resend_webhook_secret
   end
 end

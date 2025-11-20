@@ -1,4 +1,6 @@
 require "test_helper"
+require "base64"
+require "openssl"
 
 class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -9,6 +11,14 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       newsletter: true,
       never_send_email: false
     )
+
+    @webhook_secret = "whsec_#{Base64.strict_encode64("resend_test_secret")}"
+    @decoded_webhook_secret = Base64.strict_decode64(@webhook_secret.delete_prefix("whsec_"))
+    ENV["RESEND_WEBHOOK_SECRET"] = @webhook_secret
+  end
+
+  teardown do
+    ENV.delete("RESEND_WEBHOOK_SECRET")
   end
 
   test "email.bounced sets never_send_email to true" do
@@ -32,7 +42,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_changes -> { @user.reload.never_send_email }, from: false, to: true do
-      post resend_webhooks_path, params: payload, as: :json
+      post_resend_webhook(payload)
     end
 
     assert_response :ok
@@ -55,7 +65,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_changes -> { @user.reload.never_send_email }, from: false, to: true do
-      post resend_webhooks_path, params: payload, as: :json
+      post_resend_webhook(payload)
     end
 
     assert_response :ok
@@ -78,7 +88,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_no_changes -> { @user.reload.never_send_email } do
-      post resend_webhooks_path, params: payload, as: :json
+      post_resend_webhook(payload)
     end
 
     assert_response :ok
@@ -103,7 +113,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
 
     assert_response :ok
     assert_equal 1, EmailEvent.where(user: @user, event_type: "email.failed").count
@@ -124,7 +134,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
 
     assert_response :ok
     assert_equal 1, EmailEvent.where(user: @user, event_type: "email.sent").count
@@ -145,7 +155,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
 
     assert_response :ok
     assert_equal 1, EmailEvent.where(user: @user, event_type: "email.delivery_delayed").count
@@ -166,7 +176,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
 
     assert_response :ok
     assert_equal 1, EmailEvent.where(user: @user, event_type: "email.opened").count
@@ -193,7 +203,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
 
     assert_response :ok
     event = EmailEvent.find_by(user: @user, event_type: "email.clicked")
@@ -216,7 +226,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
 
     assert_response :ok
     # Should not create an event since user doesn't exist
@@ -245,7 +255,7 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
 
     assert_response :ok
     assert_equal 2, EmailEvent.where(event_type: "email.delivered").count
@@ -263,7 +273,49 @@ class ResendWebhooksControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    post resend_webhooks_path, params: payload, as: :json
+    post_resend_webhook(payload)
     assert_response :ok
+  end
+
+  test "returns unauthorized when signature validation fails" do
+    payload = {
+      type: "email.sent",
+      created_at: "2024-11-22T23:41:12.126Z",
+      data: {
+        email_id: SecureRandom.uuid,
+        from: "noreply@example.com",
+        to: [@user.email],
+        subject: "Test Email"
+      }
+    }
+
+    headers = signed_headers(payload)
+    headers["SVIX-SIGNATURE"] = "v1,invalid"
+
+    assert_no_changes -> { EmailEvent.count } do
+      post_resend_webhook(payload, headers: headers)
+    end
+
+    assert_response :unauthorized
+  end
+
+  private
+
+  def post_resend_webhook(payload, headers: signed_headers(payload))
+    post resend_webhooks_path, params: payload, as: :json, headers: headers
+  end
+
+  def signed_headers(payload, svix_id: SecureRandom.uuid, timestamp: Time.now.to_i.to_s)
+    payload_json = payload.to_json
+    signed_content = "#{svix_id}.#{timestamp}.#{payload_json}"
+    signature = Base64.strict_encode64(
+      OpenSSL::HMAC.digest("sha256", @decoded_webhook_secret, signed_content)
+    )
+
+    {
+      "SVIX-ID" => svix_id,
+      "SVIX-TIMESTAMP" => timestamp,
+      "SVIX-SIGNATURE" => "v1,#{signature}"
+    }
   end
 end
