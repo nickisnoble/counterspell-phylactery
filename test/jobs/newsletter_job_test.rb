@@ -62,4 +62,19 @@ class NewsletterJobTest < ActiveJob::TestCase
       NewsletterJob.perform_now
     end
   end
+
+  test "skips users flagged to never receive email" do
+    deliverable_user = User.create!(email: "deliverable@example.com", newsletter: true, never_send_email: false)
+    blocked_user = User.create!(email: "blocked@example.com", newsletter: true, never_send_email: true)
+
+    newsletter = Newsletter.create!(
+      subject: "Blocked Test Newsletter",
+      scheduled_at: 1.hour.ago,
+      draft: false
+    )
+
+    assert_enqueued_emails 1 do
+      NewsletterJob.perform_now
+    end
+  end
 end

@@ -103,6 +103,26 @@ class Dashboard::EventsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to dashboard_events_path
   end
 
+  test "search returns matching events for admins" do
+    login_with_otp(@admin.email)
+    matching = Event.create!(name: "Winter Bash", date: Date.today + 30.days, location: @location, status: "upcoming")
+    Event.create!(name: "Summer Jam", date: Date.today + 60.days, location: @location, status: "upcoming")
+
+    get search_dashboard_events_path, params: { q: "Winter" }
+    assert_response :success
+
+    results = JSON.parse(response.body)
+    assert_equal 1, results.size
+    assert_equal matching.id, results.first["id"]
+    assert_equal "Winter Bash", results.first["name"]
+  end
+
+  test "search redirects non-admin users" do
+    login_with_otp(@player.email)
+    get search_dashboard_events_path, params: { q: "Test" }
+    assert_redirected_to root_path
+  end
+
   private
 
   def sign_in_as(user)

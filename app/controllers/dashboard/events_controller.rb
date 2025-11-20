@@ -40,6 +40,13 @@ class Dashboard::EventsController < ApplicationController
     redirect_to dashboard_events_path, notice: "Event deleted successfully"
   end
 
+  def search
+    query = params[:q].to_s.strip
+    events = Event.order(date: :desc)
+    events = events.where(Event.arel_table[:name].matches("%#{query}%")) if query.present?
+    render json: events.limit(25).select(:id, :name, :date)
+  end
+
   private
 
   def set_event

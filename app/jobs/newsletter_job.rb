@@ -10,7 +10,7 @@ class NewsletterJob < ApplicationJob
 
     pending_newsletters.find_each do |newsletter|
       # Find all users who want to receive newsletters
-      users = User.where(newsletter: true)
+      users = User.where(newsletter: true, never_send_email: false)
 
       # Send email to each user
       users.find_each do |user|

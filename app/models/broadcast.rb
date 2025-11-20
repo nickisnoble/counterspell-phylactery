@@ -1,4 +1,6 @@
 class Broadcast < ApplicationRecord
+  attr_writer :event_id
+
   belongs_to :broadcastable, polymorphic: true, optional: true
   has_many :email_events, dependent: :destroy
   has_rich_text :body
@@ -10,6 +12,7 @@ class Broadcast < ApplicationRecord
   validate :sent_at_cannot_change_after_sent
   validate :broadcastable_required_for_event_attendees
   validate :broadcastable_required_for_single_recipient
+  before_validation :assign_event_broadcastable
 
   scope :published, -> { where(draft: false) }
   scope :pending, -> { where(sent_at: nil, draft: false).where("scheduled_at <= ?", Time.current) }
@@ -48,6 +51,10 @@ class Broadcast < ApplicationRecord
 
   def seat
     broadcastable if broadcastable_type == 'Seat'
+  end
+
+  def event_id
+    @event_id.presence || (broadcastable_type == "Event" ? broadcastable_id : nil)
   end
 
   # Returns the list of users who should receive this broadcast
@@ -106,23 +113,7 @@ class Broadcast < ApplicationRecord
 
     scope = scope.where(system_role: recipient_filters["roles"]) if recipient_filters["roles"].present?
 
-    if recipient_filters["attended_event_id"].present?
-      event = Event.find_by(id: recipient_filters["attended_event_id"])
-      if event
-        user_ids = event.games.flat_map { |game| game.seats.where.not(user_id: nil).pluck(:user_id) }.uniq
-        scope = scope.where(id: user_ids)
-      end
-    end
-
-    if recipient_filters["attended_any_event"] == true
-      user_ids = Seat.where.not(user_id: nil).distinct.pluck(:user_id)
-      scope = scope.where(id: user_ids)
-    end
-
-    if recipient_filters["never_attended"] == true
-      user_ids = Seat.where.not(user_id: nil).distinct.pluck(:user_id)
-      scope = scope.where.not(id: user_ids)
-    end
+    scope = apply_attendance_filter(scope)
 
     if recipient_filters["name_search"].present?
       search = "%#{recipient_filters["name_search"]}%"
@@ -130,5 +121,38 @@ class Broadcast < ApplicationRecord
     end
 
     scope
+  end
+
+  def assign_event_broadcastable
+    return unless recipient_type == "event_attendees"
+
+    self.broadcastable = Event.find_by(id: event_id)
+  end
+
+  def apply_attendance_filter(scope)
+    attendance_filter = recipient_filters["attendance_filter"]
+    attended_event_id = recipient_filters["attended_event_id"]
+
+    return scope unless attendance_filter.present?
+
+    case attendance_filter
+    when "any"
+      attendee_ids = Seat.where.not(user_id: nil).distinct.pluck(:user_id)
+      scope.where(id: attendee_ids)
+    when "never"
+      attendee_ids = Seat.where.not(user_id: nil).distinct.pluck(:user_id)
+      scope.where.not(id: attendee_ids)
+    when "specific"
+      if attended_event_id.present?
+        event = Event.find_by(id: attended_event_id)
+        if event
+          user_ids = event.games.flat_map { |game| game.seats.where.not(user_id: nil).pluck(:user_id) }.uniq
+          return scope.where(id: user_ids)
+        end
+      end
+      scope.none
+    else
+      scope
+    end
   end
 end

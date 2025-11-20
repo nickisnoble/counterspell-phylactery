@@ -38,7 +38,11 @@ Rails.application.routes.draw do
 
   namespace :dashboard do
     resources :locations
-    resources :events
+    resources :events do
+      collection do
+        get :search
+      end
+    end
     resources :traits
     resources :newsletters
     resources :broadcasts do

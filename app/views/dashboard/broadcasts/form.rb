@@ -91,21 +91,30 @@ class Views::Dashboard::Broadcasts::Form < Views::Base
                     input(type: "radio", name: "broadcast[recipient_filters][attendance_filter]", value: "never", class: "rounded-full border-gray-300 text-blue-600 shadow-sm")
                     span(class: "text-sm text-gray-700") { "Never attended" }
                   end
-                  label(class: "flex items-center gap-2") do
-                    input(type: "radio", name: "broadcast[recipient_filters][attendance_filter]", value: "specific", class: "rounded-full border-gray-300 text-blue-600 shadow-sm")
-                    span(class: "text-sm text-gray-700") { "Attended specific event:" }
-                  end
-                  select(name: "broadcast[recipient_filters][attended_event_id]", class: "ml-6 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500") do
-                    option(value: "") { "Select an event..." }
-                    @events.each do |event|
-                      option(value: event.id) { event.name }
-                    end
-                  end
-                end
+              label(class: "flex items-center gap-2") do
+                input(type: "radio", name: "broadcast[recipient_filters][attendance_filter]", value: "specific", class: "rounded-full border-gray-300 text-blue-600 shadow-sm")
+                span(class: "text-sm text-gray-700") { "Attended specific event:" }
               end
+              div(data: { controller: "event-search" }, class: "ml-6") do
+                input(type: "hidden", name: "broadcast[recipient_filters][attended_event_id]", data: { "event-search-target": "hidden" })
+                input(
+                  type: "text",
+                  placeholder: "Search events by name",
+                  list: "event-search-options",
+                  class: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                  data: {
+                    "action": "input->event-search#search change->event-search#select blur->event-search#select",
+                    "event-search-target": "input",
+                    "event-search-url-value": search_dashboard_events_path
+                  }
+                )
+                datalist(id: "event-search-options", data: { "event-search-target": "list" })
+              end
+            end
+          end
 
-              # Name/email search filter
-              div do
+          # Name/email search filter
+          div do
                 label(class: "block text-sm font-medium text-gray-700 mb-2") { "By name or email:" }
                 input(type: "text", name: "broadcast[recipient_filters][name_search]", placeholder: "Search by name or email", class: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500")
               end

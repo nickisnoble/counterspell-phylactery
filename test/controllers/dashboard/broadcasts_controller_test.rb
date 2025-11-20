@@ -36,6 +36,26 @@ class Dashboard::BroadcastsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to dashboard_broadcasts_path
   end
 
+  test "create event attendee broadcast assigns selected event" do
+    event = events(:one)
+
+    assert_difference("Broadcast.count") do
+      post dashboard_broadcasts_url, params: {
+        broadcast: {
+          subject: "Event Broadcast",
+          scheduled_at: 1.day.from_now,
+          recipient_type: "event_attendees",
+          event_id: event.id
+        }
+      }
+    end
+
+    broadcast = Broadcast.order(:created_at).last
+    assert_equal "Event Broadcast", broadcast.subject
+    assert_equal event, broadcast.broadcastable
+    assert_redirected_to dashboard_broadcasts_path
+  end
+
   test "preview sends test email to current user" do
     assert_enqueued_emails 1 do
       post preview_dashboard_broadcast_url(@broadcast)

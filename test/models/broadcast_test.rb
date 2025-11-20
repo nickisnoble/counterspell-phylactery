@@ -175,4 +175,73 @@ class BroadcastTest < ActiveSupport::TestCase
     assert_includes recipients, active_user
     assert_not_includes recipients, bounced_user, "Transactional emails should also exclude never_send_email users"
   end
+
+  test "filtered recipients include only users who attended any event when attendance_filter is any" do
+    location = Location.create!(name: "Loc", address: "123 Road")
+    event = Event.create!(name: "Event #{SecureRandom.hex(4)}", slug: "event-#{SecureRandom.hex(4)}", date: 1.week.from_now, location: location, status: "upcoming")
+    gm = User.create!(email: "gm@example.com", system_role: "gm")
+
+    attended_user = User.create!(email: "attended@example.com", newsletter: true, system_role: "player")
+    never_attended_user = User.create!(email: "never@example.com", newsletter: true, system_role: "player")
+    game = Game.create!(event: event, gm: gm)
+    Seat.create!(game: game, user: attended_user)
+
+    broadcast = Broadcast.create!(
+      subject: "Filtered",
+      scheduled_at: 1.day.from_now,
+      recipient_type: "filtered",
+      recipient_filters: { "attendance_filter" => "any" }
+    )
+
+    recipients = broadcast.recipients
+    assert_includes recipients, attended_user
+    assert_not_includes recipients, never_attended_user
+  end
+
+  test "filtered recipients exclude users who attended any event when attendance_filter is never" do
+    location = Location.create!(name: "Loc", address: "123 Road")
+    event = Event.create!(name: "Event #{SecureRandom.hex(4)}", slug: "event-#{SecureRandom.hex(4)}", date: 1.week.from_now, location: location, status: "upcoming")
+    gm = User.create!(email: "gm@example.com", system_role: "gm")
+
+    attended_user = User.create!(email: "attended@example.com", newsletter: true, system_role: "player")
+    never_attended_user = User.create!(email: "never@example.com", newsletter: true, system_role: "player")
+    game = Game.create!(event: event, gm: gm)
+    Seat.create!(game: game, user: attended_user)
+
+    broadcast = Broadcast.create!(
+      subject: "Filtered",
+      scheduled_at: 1.day.from_now,
+      recipient_type: "filtered",
+      recipient_filters: { "attendance_filter" => "never" }
+    )
+
+    recipients = broadcast.recipients
+    assert_includes recipients, never_attended_user
+    assert_not_includes recipients, attended_user
+  end
+
+  test "filtered recipients include only users who attended specific event" do
+    location = Location.create!(name: "Loc", address: "123 Road")
+    event_one = Event.create!(name: "Event One #{SecureRandom.hex(4)}", slug: "event-one-#{SecureRandom.hex(4)}", date: 1.week.from_now, location: location, status: "upcoming")
+    event_two = Event.create!(name: "Event Two #{SecureRandom.hex(4)}", slug: "event-two-#{SecureRandom.hex(4)}", date: 2.weeks.from_now, location: location, status: "upcoming")
+    gm = User.create!(email: "gm@example.com", system_role: "gm")
+
+    user_one = User.create!(email: "one@example.com", newsletter: true, system_role: "player")
+    user_two = User.create!(email: "two@example.com", newsletter: true, system_role: "player")
+    game_one = Game.create!(event: event_one, gm: gm)
+    game_two = Game.create!(event: event_two, gm: gm)
+    Seat.create!(game: game_one, user: user_one)
+    Seat.create!(game: game_two, user: user_two)
+
+    broadcast = Broadcast.create!(
+      subject: "Filtered",
+      scheduled_at: 1.day.from_now,
+      recipient_type: "filtered",
+      recipient_filters: { "attendance_filter" => "specific", "attended_event_id" => event_one.id }
+    )
+
+    recipients = broadcast.recipients
+    assert_includes recipients, user_one
+    assert_not_includes recipients, user_two
+  end
 end
