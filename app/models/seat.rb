@@ -6,7 +6,6 @@ class Seat < ApplicationRecord
   belongs_to :hero, optional: true
 
   validate :hero_unique_per_game, if: :hero_id?
-  validate :max_two_per_role_per_game, if: :hero_id?
   validate :one_association_per_event, if: :user_id?
   validate :seat_capacity_not_exceeded, if: :user_id?
 
@@ -45,21 +44,6 @@ class Seat < ApplicationRecord
 
     if game.seats.where(hero_id: hero_id).where.not(id: id).exists?
       errors.add(:hero, "is already taken at this table")
-    end
-  end
-
-  def max_two_per_role_per_game
-    return unless game && hero&.role
-
-    # Count how many seats at this game have heroes with the same role
-    same_role_count = game.seats
-      .joins(:hero)
-      .where(heroes: { role: hero.role })
-      .where.not(id: id)
-      .count
-
-    if same_role_count >= 2
-      errors.add(:hero, "role #{hero.role.humanize} already has 2 players at this table")
     end
   end
 

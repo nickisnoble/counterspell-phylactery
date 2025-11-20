@@ -3,109 +3,82 @@
 class Views::Games::Show < Views::Base
   include Phlex::Rails::Helpers::LinkTo
   include Phlex::Rails::Helpers::ContentFor
-  include Phlex::Rails::Helpers::FormWith
+  include Phlex::Rails::Helpers::ButtonTo
 
-  def initialize(game:, event:, available_seats:, seats:, current_user:)
+  register_output_helper :turbo_stream_from
+
+  def initialize(game:, event:, available_seats:, seats:, current_user:, is_today: false, is_gm_or_admin: false)
     @game = game
     @event = event
     @available_seats = available_seats
     @seats = seats
     @current_user = current_user
+    @is_today = is_today
+    @is_gm_or_admin = is_gm_or_admin
   end
 
   def view_template
     content_for(:title, "#{@event.name} - #{@game.gm.display_name}'s Table")
 
-    main(class: "w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8") do
+    # Subscribe to turbo streams for realtime updates
+    turbo_stream_from(@event)
+
+    main(class: "w-full max-w-3xl mx-auto px-4 py-12 bg-amber-50 min-h-screen") do
       # Back link
-      div(class: "mb-6") do
-        link_to("← Back to #{@event.name}", event_path(@event), class: "text-blue-600 hover:text-blue-800")
+      div(class: "mb-8") do
+        link_to("← Back to #{@event.name}", event_path(@event), class: "font-serif text-purple-900 hover:text-purple-700 font-medium transition")
       end
 
       # Game header
-      div(class: "bg-white rounded-lg shadow-md p-8 mb-6") do
-        div(class: "flex items-start mb-4") do
-          span(class: "text-4xl mr-4") { "🎲" }
+      div(class: "border border-black/10 rounded-sm bg-white/70 p-6 mb-8") do
+        div(class: "mb-6 pb-4 border-b border-black/10") do
+          div(class: "flex items-center gap-3 mb-2") do
+            i(class: "fa-duotone fa-dice-d20 text-2xl text-purple-500")
+            h1(class: "font-display text-4xl text-blue-900") { @game.gm.display_name }
+          end
+          p(class: "font-serif text-blue-900/60 text-sm") { "Game Master" }
+        end
+
+        div(class: "grid md:grid-cols-2 gap-6") do
+          # Event info
           div do
-            h1(class: "font-bold text-3xl text-gray-900") { "Table #{@game.id}" }
-            p(class: "text-gray-600 text-lg mt-2") { "Game Master: #{@game.gm.display_name}" }
-          end
-        end
-
-        div(class: "mt-6 grid md:grid-cols-2 gap-4") do
-          div(class: "flex items-center") do
-            span(class: "mr-3 text-2xl") { "💺" }
-            div do
-              div(class: "font-semibold") { "Seats" }
-              div(class: "text-gray-600") { "#{@game.seat_count} total" }
-            end
-          end
-
-          div(class: "flex items-center") do
-            span(class: "mr-3 text-2xl") { @available_seats > 0 ? "✅" : "❌" }
-            div do
-              div(class: "font-semibold") { "Availability" }
-              div(class: @available_seats > 0 ? "text-green-600 font-semibold" : "text-red-600") do
-                if @available_seats > 0
-                  "#{@available_seats} #{'seat'.pluralize(@available_seats)} available"
-                else
-                  "Table full"
-                end
+            div(class: "text-sm font-serif font-medium text-blue-900/80 mb-2") { "Event" }
+            div(class: "font-display text-lg text-purple-900") { @event.name }
+            if @event.date
+              div(class: "text-xs font-serif text-blue-900/60 mt-1") do
+                @event.date.strftime('%A, %B %d, %Y')
               end
             end
           end
-        end
 
-        # Purchase button
-        if @available_seats > 0 && @event.upcoming? && @current_user
-          div(class: "mt-6 pt-6 border-t border-gray-200") do
-            user_heroes = Hero.all
-            if user_heroes.any?
-              hero_options = user_heroes.map { |hero| [hero.name, hero.id, { data: { role: hero.role } }] }
-
-              form_with(
-                url: event_game_seats_path(@event, @game),
-                method: :post,
-                data: { controller: "role-sync" }
-              ) do |f|
-                div(class: "flex flex-col gap-4 sm:flex-row sm:items-center") do
-                  f.select :hero_id, hero_options,
-                    { prompt: "Select your hero" },
-                    class: "flex-1 rounded-md border-gray-300",
-                    required: true,
-                    data: {
-                      action: "change->role-sync#updateRole",
-                      role_sync_target: "heroSelect"
-                    }
-
-                  f.hidden_field :role_selection, data: { role_sync_target: "roleField" }
-
-                  f.submit "Purchase Seat ($#{@event.ticket_price})",
-                    class: "px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md cursor-pointer"
-                end
+          # Seats info
+          div do
+            div(class: "text-sm font-serif font-medium text-blue-900/80 mb-2") { "Table Status" }
+            div(class: "font-serif text-blue-900") do
+              plain "#{@game.seat_count} #{'seat'.pluralize(@game.seat_count)} • "
+              if @available_seats > 0
+                span(class: "text-emerald-700 font-medium") { "#{@available_seats} available" }
+              else
+                span(class: "text-rose-700 font-medium") { "Full" }
               end
-            else
-              link_to("Create a Hero First", new_hero_path,
-                class: "block w-full text-center rounded-md px-4 py-2 bg-gray-400 text-white font-medium")
             end
-          end
-        elsif @available_seats > 0 && @event.upcoming?
-          div(class: "mt-6 pt-6 border-t border-gray-200") do
-            link_to("Sign In to Purchase", new_session_path,
-              class: "block w-full text-center rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium")
           end
         end
       end
 
       # Seated players
       if @seats.any?
-        div(class: "bg-white rounded-lg shadow-md p-8") do
-          h2(class: "font-bold text-2xl mb-6") { "Seated Players" }
-          div(class: "space-y-3") do
+        div(class: "border border-black/10 rounded-sm bg-white/70 p-6") do
+          h2(class: "font-display text-2xl text-blue-900 mb-6") { "Seated Players" }
+          div(class: "space-y-4") do
             @seats.each do |seat|
               render_seat(seat)
             end
           end
+        end
+      else
+        div(class: "border border-black/10 rounded-sm bg-white/70 p-8 text-center") do
+          p(class: "font-serif text-blue-900/60") { "No players seated yet" }
         end
       end
     end
@@ -114,21 +87,68 @@ class Views::Games::Show < Views::Base
   private
 
   def render_seat(seat)
-    div(class: "flex items-center justify-between border-b border-gray-200 pb-3") do
-      div(class: "flex items-center") do
-        span(class: "text-2xl mr-3") { "🎭" }
-        div do
-          if seat.hero
-            div(class: "font-semibold") { seat.hero.name }
-            if seat.user
-              div(class: "text-sm text-gray-600") { "Played by #{seat.user.display_name}" }
+    div(class: "border border-black/10 rounded-sm p-5 bg-amber-50/50") do
+      div(class: "flex items-start justify-between gap-4") do
+        # Player and Hero info
+        div(class: "flex-1") do
+          # Player details
+          div(class: "mb-4") do
+            div(class: "font-display text-xl text-blue-900 mb-1") { seat.user.display_name }
+            if seat.user.pronouns.present?
+              div(class: "text-sm font-serif text-blue-900/70") { seat.user.pronouns }
             end
-          elsif seat.user
-            div(class: "font-semibold") { seat.user.display_name }
-            div(class: "text-sm text-gray-600") { "Hero TBD" }
+            if seat.user.email.present?
+              div(class: "text-sm font-serif text-blue-900/60 mt-1") { seat.user.email }
+            end
+          end
+
+          # Hero details
+          if seat.hero
+            div(class: "mb-4 pb-4 border-t border-black/10 pt-4") do
+              div(class: "flex items-center gap-2 mb-2") do
+                i(class: "fa-solid fa-mask text-purple-500")
+                div(class: "font-serif font-semibold text-blue-900") { seat.hero.name }
+              end
+              if seat.hero.pronouns.present?
+                div(class: "text-sm font-serif text-blue-900/70 mb-1") { seat.hero.pronouns }
+              end
+              if seat.hero.role.present?
+                div(class: "text-sm font-serif text-blue-900/70 capitalize") { "Role: #{seat.hero.role.humanize}" }
+              end
+            end
+          end
+
+          # User bio
+          if seat.user.bio.present?
+            div(class: "pt-4 border-t border-black/10") do
+              div(class: "text-sm font-serif font-semibold text-blue-900/80 mb-2") { "Bio:" }
+              div(class: "prose prose-sm max-w-none font-serif text-blue-900/70") do
+                render seat.user.bio
+              end
+            end
+          end
+        end
+
+        # Checkin button (only for today's games)
+        if @is_today && can_check_in?(seat)
+          render Views::Components::CheckinButton.new(seat: seat, variant: :card)
+        elsif @is_today && seat.checked_in?
+          div(class: "text-right") do
+            div(class: "text-sm font-serif font-semibold text-emerald-700 flex items-center gap-1") do
+              i(class: "fa-solid fa-check")
+              plain "Checked in"
+            end
+            if seat.checked_in_at
+              div(class: "text-xs font-serif text-blue-900/60 mt-1") { seat.checked_in_at.strftime("%I:%M %p") }
+            end
           end
         end
       end
     end
+  end
+
+  def can_check_in?(seat)
+    return true if @current_user&.admin?
+    @current_user&.id == @game.gm_id
   end
 end

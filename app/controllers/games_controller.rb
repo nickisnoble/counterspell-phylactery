@@ -1,23 +1,21 @@
 class GamesController < ApplicationController
-  allow_unauthenticated_access
+  before_action :require_gm_or_admin!
   before_action :set_game
 
   def show
     @event = @game.event
-    unless @event.visible_to?(authenticated? ? Current.user : nil)
-      redirect_to events_path, alert: "This event is not yet available for viewing"
-      return
-    end
-
     @available_seats = @game.seat_count - @game.seats.where.not(user_id: nil).count
     @seats = @game.seats.includes(:user, :hero).where.not(user_id: nil)
+    @is_today = @event.date == Date.today
 
     render Views::Games::Show.new(
       game: @game,
       event: @event,
       available_seats: @available_seats,
       seats: @seats,
-      current_user: authenticated? ? Current.user : nil
+      current_user: Current.user,
+      is_today: @is_today,
+      is_gm_or_admin: true
     )
   end
 

@@ -3,10 +3,12 @@ class Event < ApplicationRecord
 
   belongs_to :location
   has_many :games, dependent: :destroy
+  has_many :seats, through: :games
   has_many :event_emails, dependent: :destroy
   has_rich_text :description
 
   accepts_nested_attributes_for :games, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :seats
 
   validates :date, presence: true
   validates :ticket_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true

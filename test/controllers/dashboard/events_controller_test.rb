@@ -103,6 +103,26 @@ class Dashboard::EventsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to dashboard_events_path
   end
 
+  test "update can reassign seats to different games" do
+    login_with_otp(@admin.email)
+    game1 = Game.create!(event: @event, gm: @gm, seat_count: 5)
+    gm2 = User.create!(email: "gm2@test.com", system_role: "gm", display_name: "GM 2")
+    game2 = Game.create!(event: @event, gm: gm2, seat_count: 5)
+
+    seat = Seat.create!(game: game1, user: @player)
+
+    patch dashboard_event_path(@event), params: {
+      event: {
+        name: @event.name,
+        seats_attributes: {
+          "0" => { id: seat.id, game_id: game2.id }
+        }
+      }
+    }
+
+    assert_equal game2.id, seat.reload.game_id
+  end
+
   private
 
   def sign_in_as(user)

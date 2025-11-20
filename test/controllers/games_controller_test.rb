@@ -14,33 +14,81 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     @game = @event.games.create!(gm: @gm, seat_count: 5)
   end
 
-  test "should show game for upcoming event" do
+  test "should redirect to login when not authenticated" do
+    get event_game_path(@event, @game)
+    assert_redirected_to new_session_path
+  end
+
+  test "should redirect players to root" do
+    player = User.create!(email: "regular@test.com", system_role: "player", display_name: "Regular Player")
+    login_with_otp(player.email)
+    get event_game_path(@event, @game)
+    assert_redirected_to root_path
+  end
+
+  test "should show game for GMs with available seats" do
+    login_with_otp(@gm.email)
     get event_game_path(@event, @game)
     assert_response :success
   end
 
-  test "should redirect for planning event when not authenticated" do
-    @event.update!(status: "planning")
-    get event_game_path(@event, @game)
-    assert_redirected_to events_path
-  end
+  test "should show full player details for GMs" do
+    suffix = SecureRandom.hex(4)
+    ancestry = Trait.create!(name: "Test Ancestry #{suffix}", type: "Ancestry", description: "Test")
+    background = Trait.create!(name: "Test Background #{suffix}", type: "Background", description: "Test")
+    char_class = Trait.create!(name: "Test Class #{suffix}", type: "Class", description: "Test")
 
-  test "should show game with available seats count" do
+    player = User.create!(email: "player@test.com", system_role: "player", display_name: "Test Player", pronouns: "they/them")
+    hero = Hero.new(name: "Test Hero #{suffix}", pronouns: "she/her", role: "striker")
+    hero.traits = [ancestry, background, char_class]
+    hero.save!
+    @game.seats.create!(user: player, hero: hero)
+
+    login_with_otp(@gm.email)
     get event_game_path(@event, @game)
     assert_response :success
   end
 
-  test "show page purchase form provides role selection for selected hero" do
+  test "should show full player details for admins" do
+    suffix = SecureRandom.hex(4)
+    ancestry = Trait.create!(name: "Admin Test Ancestry #{suffix}", type: "Ancestry", description: "Test")
+    background = Trait.create!(name: "Admin Test Background #{suffix}", type: "Background", description: "Test")
+    char_class = Trait.create!(name: "Admin Test Class #{suffix}", type: "Class", description: "Test")
+
+    admin = User.create!(email: "admin@test.com", system_role: "admin", display_name: "Admin")
+    player = User.create!(email: "player2@test.com", system_role: "player", display_name: "Test Player 2", pronouns: "they/them")
+    hero = Hero.new(name: "Admin Test Hero #{suffix}", pronouns: "she/her", role: "striker")
+    hero.traits = [ancestry, background, char_class]
+    hero.save!
+    @game.seats.create!(user: player, hero: hero)
+
+    login_with_otp(admin.email)
+    get event_game_path(@event, @game)
+    assert_response :success
+  end
+
+  test "should redirect regular players trying to access game show" do
+    player = User.create!(email: "player3@test.com", system_role: "player", display_name: "Test Player 3")
+    login_with_otp(player.email)
+    get event_game_path(@event, @game)
+    assert_redirected_to root_path
+  end
+
+  test "should show checkin button for today's games" do
+    @event.update!(date: Date.today)
+    player = User.create!(email: "player4@test.com", system_role: "player", display_name: "Test Player 4")
+    @game.seats.create!(user: player)
+
+    login_with_otp(@gm.email)
+    get event_game_path(@event, @game)
+    assert_response :success
+  end
+
+  test "players cannot access game show purchase form" do
     player = User.create!(email: "player@test.com", system_role: "player", display_name: "Player")
-    hero = heroes(:one)
     login_with_otp(player.email)
 
     get event_game_path(@event, @game)
-    assert_response :success
-
-    assert_select "form[action='#{event_game_seats_path(@event, @game)}'][data-controller='role-sync']" do
-      assert_select "select[name='hero_id'] option[data-role='#{hero.role}'][value='#{hero.id}']"
-      assert_select "input[type='hidden'][name='role_selection']"
-    end
+    assert_redirected_to root_path
   end
 end
