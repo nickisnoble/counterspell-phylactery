@@ -78,6 +78,17 @@ class SeatPurchaseFormTest < ActiveSupport::TestCase
     assert_includes form.errors[:hero_id], "can't be blank"
   end
 
+  test "requires role" do
+    form = SeatPurchaseForm.new(
+      game_id: @game.id,
+      user_id: @player.id,
+      hero_id: @striker.id
+    )
+
+    assert_not form.valid?
+    assert_includes form.errors[:role], "can't be blank"
+  end
+
   test "hero must match selected role" do
     form = SeatPurchaseForm.new(
       game_id: @game.id,

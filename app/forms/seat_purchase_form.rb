@@ -8,7 +8,7 @@ class SeatPurchaseForm
   attribute :role, :string
 
   validates :game_id, :user_id, presence: true
-  validates :hero_id, presence: true
+  validates :hero_id, :role, presence: true
   validate :role_matches_hero
   validate :role_not_full
   validate :hero_available

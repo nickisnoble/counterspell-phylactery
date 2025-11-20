@@ -66,22 +66,13 @@ class SeatsController < ApplicationController
   end
 
   def success
-    # NOTE: This provides immediate user feedback after Stripe redirect.
-    # The Stripe webhook (StripeWebhooksController#checkout_session_completed) is the
-    # authoritative source of truth that verifies payment and creates the seat.
-    # This callback may fire before the webhook, so we optimistically create the seat
-    # for better UX. Both use find_or_initialize_by to prevent duplicates.
-    @seat = @game.seats.find_or_initialize_by(
-      user: Current.user,
-      hero_id: params[:hero_id]
-    )
+    seat = @game.seats.find_by(user: Current.user, hero_id: params[:hero_id])
 
-    if @seat.new_record?
-      @seat.stripe_payment_intent_id = params[:payment_intent]
-      @seat.save!
+    if seat
+      redirect_to event_game_seat_path(@event, @game, seat), notice: "Seat purchased successfully!"
+    else
+      redirect_to event_path(@event), notice: "Thanks! We'll email you as soon as your seat is confirmed."
     end
-
-    redirect_to event_game_seat_path(@event, @game, @seat), notice: "Seat purchased successfully!"
   end
 
   private
