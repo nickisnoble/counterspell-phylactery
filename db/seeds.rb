@@ -63,45 +63,6 @@ ancestry = <<~ANCESTRIES
 ANCESTRIES
 
 
-character_class = <<~CLASS
-- name: "Bard / Troubadour"
-  description: "Troubadours play music to bolster their allies."
-- name: "Bard / Wordsmith"
-  description: "Wordsmiths use clever wordplay and captivate crowds."
-- name: "Druid / Warden of the Elements"
-  description: "Wardens of the Elements embody the natural elements of the wild."
-- name: "Druid / Warden of Renewal"
-  description: "Wardens of Renewal embody the natural elements of the wild."
-- name: "Guardian / Stalwart"
-  description: "Stalwarts take heavy blows and keep fighting."
-- name: "Guardian / Vengeance"
-  description: "Vengeances strike down enemies who harm them or their allies."
-- name: "Ranger / Beastbound"
-  description: "Beastbounds form a deep bond with an animal ally."
-- name: "Ranger / Wayfinder"
-  description: "Wayfinders hunt their prey and strike with deadly force."
-- name: "Rogue / Nightwalker"
-  description: "Nightwalkers manipulate shadows to maneuver through the environment."
-- name: "Rogue / Syndicate"
-  description: "Syndicates have a web of contacts everywhere they go."
-- name: "Seraph / Divine Wielder"
-  description: "Divine Wielders dominate the battlefield with a legendary weapon."
-- name: "Seraph / Winged Sentinel"
-  description: "Winged Sentinels take flight and strike crushing blows from the sky."
-- name: "Sorcerer / Elemental Origin"
-  description: "Elemental Origins channel the raw power of a particular element."
-- name: "Sorcerer / Primal Origin"
-  description: "Primal Origins extend the versatility of their spells in powerful ways."
-- name: "Warrior / Call of the Brave"
-  description: "Call of the Brave use the might of their enemies to fuel their own power."
-- name: "Warrior / Call of the Slayer"
-  description: "Call of the Slayers strike down adversaries with immense force."
-- name: "Wizard / School of Knowledge"
-  description: "School of Knowledge wizards gain a keen understanding of the world around them."
-- name: "Wizard / School of War"
-  description: "School of War wizards utilize trained magic for violence."
-CLASS
-
 background = <<~BACKGROUND
 - name: Highborne
   description: Being part of a highborne community means you're accustomed to a life of elegance, opulence, and prestige within the upper echelons of society. They place great value on titles and possessions, and their status often grants them power and influence, controlling the political and economic status of the areas in which they live.
@@ -143,7 +104,6 @@ BACKGROUND
 
 datasets = {
   "Ancestry"       => ancestry,
-  "Class"          => character_class,
   "Background"     => background
 }
 
@@ -351,106 +311,106 @@ heroes_data = [
   {
     name: "Carina Croftblade",
     pronouns: "She/Her",
-    role: "fighter",
-    traits: ["Freynor", "Seraph / Divine Wielder", "Highborne"],
+    role: "striker",
+    traits: ["Freynor", "Highborne"],
     backstory: "Royarch Carina Croftblade, eldest warrior princess of the ruling Rukon Frey family, was somehow sent 2,000 years into the future during a great battle. As much as she exudes royal mannerisms and inherent leadership, strangers have a hard time believing her true origins. She's so far been unsuccessful in proving her lineage and taking her rightful place on the throne. Is she ready to navigate an unfamiliar future to reclaim her purpose in a world that has moved on?"
   },
   {
     name: "Cricket",
     pronouns: "They/Them",
     role: "protector",
-    traits: ["Ornath", "Guardian / Stalwart", "Orderborne"],
+    traits: ["Ornath", "Orderborne"],
     backstory: "Cricket is a sentient suit of armor contruct, who speaks and moves with robot-like precision. They were originally charged with protecting the capital city of a mediterranean-esque island, where they spent many happy years with a close-knit team of guards. Cricket's reward for 10 years of loyal service is a sabbatical to better understand the world, learn about new cultures, and catalog various societal norms. They are intensely curious about how things work, why things are, and protecting others from harm."
   },
   {
     name: "Garrick Ironheart",
     pronouns: "He/Him",
-    role: "fighter",
-    traits: ["Vark", "Warrior / Call of the Brave", "Seaborne"],
+    role: "striker",
+    traits: ["Vark", "Seaborne"],
     backstory: "Garrick Ironheart may be short in stature, but his ingenious battle mentality, and innovative ideas, make an outsized impact on the world around him. Garrick descends from a noble line of Varks, a proud and mighty people, who were scattered from their mountain home into either lowland or seabound societies around 2,000 years ago. As a representative of the seabound society, The Undertide Dominion, Garrick has volunteered to explore the surface world, bringing back knowledge to improve his people's lives under the ocean."
   },
   {
     name: "Tya Sharkbreaker",
     pronouns: "He/Him",
     role: "protector",
-    traits: ["Vark", "Warrior / Call of the Slayer", "Seaborne"],
+    traits: ["Vark", "Seaborne"],
     backstory: "Growing up on the icy and remote island of Torvryn, Tya Sharkbreaker just wanted to be like his father and brother, lifelong fishermen who proved their worth with a day's catch. But when a then-childhood Tya's scheme to prove himself cost his father's life to save him, things were never the same. Driven by a need to prove his father's final sacrifice was worth his life, Tya now roams the seas, taking on the world's most dangerous jobs just to erase the memories of that fateful day."
   },
   {
     name: "Uliana \"Uli\" Gryphenor",
     pronouns: "She/Her",
     role: "strategist",
-    traits: ["Calderaan", "Wizard / School of Knowledge", "Loreborne"],
+    traits: ["Calderaan", "Loreborne"],
     backstory: "Uliana \"Uli\" Gryphenor led a quiet life once. She and her partner ran a cozy bookshop in Vire, a progressive and well-kept city off the coast, for many happy years. But when her partner was mysteriously murdered over an ancient missing book, Uli was jolted her from a quiet, semi-retired life, and began a journey of self-taught wizardry. Today, Uli roams the world searching for clues as to her partner's murderer, knowing time is always of the essence."
   },
   {
     name: "Maz Minrah",
     pronouns: "They/Them",
     role: "strategist",
-    traits: ["Vark", "Bard / Troubadour", "Orderborne"],
+    traits: ["Vark", "Orderborne"],
     backstory: "Maz Minrah is a descendant of a long family line of high-achieving healers, who always play by the rules. Maz's academic prowess has recently paid off, as they have accepted membership of the most prestigious guild upholding the ideals of healing through music and magic, The Dancing Gale. Maz feels ready to take on today's toughest challenges, but is slowly finding out that acing a test doesn't always translate into success in the real world."
   },
   {
     name: "Orion Tyrosson",
     pronouns: "He/Him",
-    role: "fighter",
-    traits: ["Freynor", "Ranger / Beastbound", "Wildborne"],
+    role: "striker",
+    traits: ["Freynor", "Wildborne"],
     backstory: "Orion Tyrosson is a ranger from the small village of Widemeadow. Founded by \"Landers,\" individuals who deepy mistrust magic users, Widemeadow's inhabitants are extremely tight-knit and self-reliant. But when a devastating curse hits the village's water supply, Orion begins an arduous journey to seek help. Little does he know, the very thing he refuses to embrace may be exactly what he needs to survive."
   },
   {
     name: "Jackie Greaves",
     pronouns: "She/Her",
-    role: "wild_card",
-    traits: ["Vark", "Sorcerer / Elemental Origin", "Wanderborne"],
+    role: "charmer",
+    traits: ["Vark", "Wanderborne"],
     backstory: "Jackie Greaves is a Vark, a people who were famously and tragically scattered from their mountain home around 2,000 years ago. But unlike other Varks, who proudly recall where their families settled in the years since, Jackie cannot. For her bubbly and dreamy personality covers amnesia – a deep uncertainty of who she is, and why she sees the concept of death as more fascinating than frightening. But despite this mystery, Jackie's inherent powers make her a strong healer and brave fighter in the battles to come."
   },
   {
     name: "Elisia Moonflower",
     pronouns: "She/Her",
     role: "strategist",
-    traits: ["Freynor", "Druid / Warden of Renewal", "Wildborne"],
+    traits: ["Freynor", "Wildborne"],
     backstory: "Elisia Moonflower was found and raised in the forest under the care of a group of wandering druids called \"The Moon Covenant.\" Through them, she learned a unique brand of riftweaving magic, built from honoring the passage of time on the planet's three moons. But the druids' teachings came with a warning: an ancient prophesy foretelling that Elisia should hide away from the world in order to save the world from a disastrous fate. Little did they know, Elisia has a rebellious streak."
   },
   {
     name: "Warp Rigbee",
     pronouns: "He/Him",
     role: "strategist",
-    traits: ["Calderaan", "Sorcerer / Primal Origin", "Highborne"],
+    traits: ["Calderaan", "Highborne"],
     backstory: "Warp Rigbee, a cheeky and witty fellow from a rather serious family, just wanted to bring a little joy into his stuffy life. For years, he would shed his family name, and sneak into the city in disguise as a street magician, just to entertain passers by. With plenty of money to his name, Warp desired the best of both worlds: the ability to maintain his familial standing, while also becoming a famous performer fit for the Royarchs themselves. But when his parents found out and cut him off without a penny, Warp is beginning to understand just how difficult life on the street can be."
   },
   {
     name: "Denn",
     pronouns: "He/Him",
-    role: "wild_card",
-    traits: ["Kiplin", "Rogue / Syndicate", "Slyborne"],
+    role: "charmer",
+    traits: ["Kiplin", "Slyborne"],
     backstory: "Denn is a Kiplin, an ancestry that resembles a humanoid opossum, complete with a prehensile tail. He uses a combination of nimble dexterity and street smarts to survive in world's largest city, Chellesot. As an orphan, Denn is most loyal to his found family, and lacks the typical Kiplin mannerisms of truth-telling in favor of a scrappy, means-to-an-end mentality. While he would never admit it, Denn yearns for a deeper understanding of his native Kiplin family, a connection he has never known."
   },
   {
     name: "Stacey Batton",
     pronouns: "She/Her",
-    role: "fighter",
-    traits: ["Caldeynor", "Warrior / Call of the Brave", "Orderborne"],
+    role: "striker",
+    traits: ["Caldeynor", "Orderborne"],
     backstory: "Stacey Batton's life has been a series of unfortunate events. First her parents separated, leaving her in the care of her mother, who soon after, tragically passed. And while her father tried his best, moving her to the biggest city on the planet, Chellesot, where they set up a successful blacksmithing business, Stacey couldn't help but feel disconnected and lonely from those around her. But when her father suddenly went missing, leaving behind a cryptic message, she's forced to rediscover her long-lost dreams of traveling the universe."
   },
   {
     name: "Raanmaar",
     pronouns: "He/Him",
     role: "strategist",
-    traits: ["Rax", "Druid / Warden of the Elements", "Wildborne"],
+    traits: ["Rax", "Wildborne"],
     backstory: "Raanmaar is a traveling druidic herbalist and gardener, from the distant moon of Rax, a place far wilder and stranger than your imagination. A peace-loving individual who bears a resemblance to a giant ram, Raanmaar belies his intimidating looks with a deep, soft-spoken voice of great power. By day, Raanmaar's magical poetry and song breathes life into the natural world, while by night, his recurring prophetic dreams of preventing a great cataclysm keep him wide awake."
   },
   {
     name: "Inara Darkstar",
     pronouns: "She/Her",
-    role: "wild_card",
-    traits: ["Freynor", "Wizard / School of War", "Orderborne"],
+    role: "charmer",
+    traits: ["Freynor", "Orderborne"],
     backstory: "Inara Darkstar had it all, once. A comfortable home, an honored family name that preceded her, and privilege that granted her access to the best schools. Inara had happily accepted a place among The Dancing Gale guild, a prestigious group of bards who heal the world with music. But when she found out her family's success was only made possible through a powerful crime group, the Machine Syndicate, she gave up her guildship to seek revenge for her family's honor."
   },
   {
     name: "Meechi Sirans",
     pronouns: "They/Them",
     role: "strategist",
-    traits: ["Merivian", "Ranger / Wayfinder", "Seaborne"],
+    traits: ["Merivian", "Seaborne"],
     backstory: "Meechi Sirans, a daring Merivian navigator from the underwater capital of Raelinith Thal, \"borrowed\" a special Terrasuit meant only for testing and never gave it back. Now living on land, this quick-witted, seahorse-like riftweaver uses their natural gift for navigation and charm to guide airships and explorers across the world's hidden leylines while quietly fearing the day someone demands the suit's, and their own, return under the ocean. Restless, ingenious, and impossible to pin down, Meechi has found a new world above the water and isn't able to go back anytime soon."
   }
 ]

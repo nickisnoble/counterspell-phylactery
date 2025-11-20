@@ -43,14 +43,12 @@ class Views::Heroes::Form < Views::Base
       end
 
       div(class: "my-5") do
-        form.label :role
-        div(class: "mt-2") do
-          form.collection_radio_buttons :role, Hero.roles.keys, :to_s, ->(r) { r.titleize } do |b|
-            div do
-              raw b.radio_button
-              raw b.label
-            end
-          end
+        form.label :role, class: "block text-sm font-medium text-gray-700 mb-3"
+        div(class: "grid grid-cols-2 md:grid-cols-4 gap-4") do
+          render_role_option(form, "striker", "fa-sword", "Striker")
+          render_role_option(form, "protector", "fa-shield", "Protector")
+          render_role_option(form, "charmer", "fa-masks-theater", "Charmer")
+          render_role_option(form, "strategist", "fa-chess-knight", "Strategist")
         end
       end
 
@@ -105,6 +103,21 @@ class Views::Heroes::Form < Views::Base
 
       div do
         form.submit class: "btn"
+      end
+    end
+  end
+
+  private
+
+  def render_role_option(form, role, icon, label)
+    div(class: "relative") do
+      form.radio_button :role, role, class: "peer sr-only", id: "hero_role_#{role}"
+
+      raw label_tag("hero_role_#{role}", class: "flex flex-col items-center cursor-pointer rounded-sm border border-black/10 p-4 transition hover:border-purple-500 hover:bg-white bg-white/50 peer-checked:border-purple-500 peer-checked:bg-purple-50") do
+        div(class: "mb-2") do
+          i(class: "#{icon} fa-duotone text-3xl text-purple-500")
+        end
+        span(class: "font-serif font-semibold text-sm text-blue-900") { label }
       end
     end
   end

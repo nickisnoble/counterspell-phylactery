@@ -5,7 +5,6 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
     @hero = heroes(:one)
     @ancestry_trait = traits(:ancestry)
     @background_trait = traits(:background)
-    @class_trait = traits(:class_trait)
 
     # Set up authentication using the helper
     be_authenticated_as_admin!
@@ -28,7 +27,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
         hero: {
           name: "Unique Hero Name",
           pronouns: "They/Them",
-          role: "fighter"
+          role: "striker"
         }
       }
     end
@@ -36,7 +35,6 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     assert_match /must include Ancestry/, response.body
     assert_match /must include Background/, response.body
-    assert_match /must include Class/, response.body
   end
 
   test "should create hero and associate selected traits" do
@@ -48,8 +46,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
           role: "strategist"
         },
         trait_ids_ancestry: @ancestry_trait.id,
-        trait_ids_background: @background_trait.id,
-        trait_ids_class: @class_trait.id
+        trait_ids_background: @background_trait.id
       }
     end
 
@@ -57,19 +54,16 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to hero_url(hero)
 
     # Verify trait associations
-    assert_equal 3, hero.traits.count
+    assert_equal 2, hero.traits.count
     assert_includes hero.traits, @ancestry_trait
     assert_includes hero.traits, @background_trait
-    assert_includes hero.traits, @class_trait
 
     # Verify one trait of each required type
     ancestry_traits = hero.traits.where(type: "ANCESTRY")
     background_traits = hero.traits.where(type: "BACKGROUND")
-    class_traits = hero.traits.where(type: "CLASS")
 
     assert_equal 1, ancestry_traits.count
     assert_equal 1, background_traits.count
-    assert_equal 1, class_traits.count
   end
 
   test "should show hero" do
@@ -87,7 +81,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
       hero: {
         name: "Updated Name",
         pronouns: "They/Them",
-        role: "wild_card"
+        role: "charmer"
       }
     }
 
@@ -95,7 +89,7 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
     @hero.reload
     assert_equal "Updated Name", @hero.name
     assert_equal "They/Them", @hero.pronouns
-    assert_equal "wild_card", @hero.role
+    assert_equal "charmer", @hero.role
   end
 
   test "should destroy hero" do
@@ -114,11 +108,10 @@ class HeroesControllerTest < ActionDispatch::IntegrationTest
         hero: {
           name: "Trait Parse Test #{Time.current.to_i}",
           pronouns: "He/Him",
-          role: "fighter"
+          role: "striker"
         },
         trait_ids_ancestry: @ancestry_trait.id.to_s,
-        trait_ids_background: "", # Empty should be ignored, causing validation failure
-        trait_ids_class: @class_trait.id.to_s
+        trait_ids_background: "" # Empty should be ignored, causing validation failure
       }
     end
 

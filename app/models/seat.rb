@@ -1,16 +1,16 @@
 class Seat < ApplicationRecord
+  include SeatBroadcasting
+
   belongs_to :game
   belongs_to :user, optional: true
   belongs_to :hero, optional: true
 
   validate :hero_unique_per_game, if: :hero_id?
+  validate :max_two_per_role_per_game, if: :hero_id?
   validate :one_association_per_event, if: :user_id?
   validate :seat_capacity_not_exceeded, if: :user_id?
 
   before_create :set_purchased_at, if: :user_id?
-
-  # Broadcast seat changes to event subscribers
-  after_commit :broadcast_seat_update, on: [:create, :update]
 
   def checked_in?
     checked_in_at.present?
@@ -48,6 +48,21 @@ class Seat < ApplicationRecord
     end
   end
 
+  def max_two_per_role_per_game
+    return unless game && hero&.role
+
+    # Count how many seats at this game have heroes with the same role
+    same_role_count = game.seats
+      .joins(:hero)
+      .where(heroes: { role: hero.role })
+      .where.not(id: id)
+      .count
+
+    if same_role_count >= 2
+      errors.add(:hero, "role #{hero.role.humanize} already has 2 players at this table")
+    end
+  end
+
   def one_association_per_event
     return unless game && user
 
@@ -78,15 +93,5 @@ class Seat < ApplicationRecord
 
   def set_purchased_at
     self.purchased_at ||= Time.current
-  end
-
-  def broadcast_seat_update
-    return unless game&.event && user_id
-
-    # Only broadcast on meaningful changes
-    return unless saved_change_to_checked_in_at? || saved_change_to_user_id? || saved_change_to_hero_id?
-
-    # Broadcast a refresh to anyone viewing this event
-    broadcast_refresh_to(game.event)
   end
 end

@@ -26,7 +26,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     char_class = Trait.create!(type: "CLASS", name: "User Test Class #{SecureRandom.hex(4)}")
     @hero = Hero.create!(
       name: "User Test Hero #{SecureRandom.hex(4)}",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, char_class]
     )
     @seat = @game.seats.create!(user: @user, hero: @hero)
@@ -64,11 +64,43 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         pronouns: "she/her"
       }
     }
-    assert_redirected_to events_path
+    # Should redirect to root_path since no return_to is set
+    assert_redirected_to root_path
     @user.reload
     assert_equal "Updated Name", @user.display_name
     assert_equal "Updated bio", @user.bio.to_plain_text.strip
     assert_equal "she/her", @user.pronouns
+  end
+
+  test "should redirect to saved url after profile completion" do
+    # Create new user without display_name
+    new_user = User.create!(email: "newuser@example.com")
+
+    # Setup event and game
+    upcoming_event = Event.create!(
+      name: "Upcoming Event",
+      date: Date.today + 7.days,
+      location: @location,
+      status: "upcoming",
+      ticket_price: 25
+    )
+    upcoming_game = upcoming_event.games.create!(gm: @gm, seat_count: 5)
+
+    # Try to access protected page (sets return_to)
+    get new_event_game_seat_path(upcoming_event, upcoming_game)
+
+    # Login (should redirect to profile edit)
+    post session_path, params: { email: new_user.email }
+    code = User.find_by(email: new_user.email).auth_code
+    post validate_session_path, params: { code: code }
+
+    # Update profile
+    patch user_path(new_user), params: {
+      user: { display_name: "New User" }
+    }
+
+    # Should redirect to the seat purchase page
+    assert_redirected_to new_event_game_seat_path(upcoming_event, upcoming_game)
   end
 
   test "update with blank display_name is valid" do

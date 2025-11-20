@@ -73,7 +73,7 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     char_class = Trait.create!(name: "Test Class", type: "Class", description: "Test")
 
     # Create heroes with traits
-    hero1 = Hero.new(name: "Hero One", pronouns: "They/Them", role: "fighter")
+    hero1 = Hero.new(name: "Hero One", pronouns: "They/Them", role: "striker")
     hero1.traits = [ancestry, background, char_class]
     hero1.save!
 

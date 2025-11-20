@@ -22,7 +22,7 @@ class EventReminderJobTest < ActiveJob::TestCase
     class_trait = Trait.create!(type: "CLASS", name: "Test Class #{Time.current.to_i}")
     @hero = Hero.create!(
       name: "Test Hero #{Time.current.to_i}",
-      role: "fighter",
+      role: "striker",
       traits: [ancestry, background, class_trait]
     )
     @seat = @game.seats.create!(user: @player, hero: @hero, purchased_at: Time.current)
