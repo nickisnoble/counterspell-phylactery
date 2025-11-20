@@ -1,0 +1,76 @@
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f4f4f4;">
+  <tr>
+    <td align="center" style="padding:20px 10px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:640px; background-color:#ffffff; border-collapse:collapse;">
+        <tr>
+          <td style="padding:24px 24px 8px 24px; font-size:24px; font-weight:bold; font-family:'Helvetica Neue', Arial, sans-serif; color:#000;">
+            <%= @broadcast.subject %>
+          </td>
+        </tr>
+
+        <% if @broadcast.body.present? %>
+          <tr>
+            <td style="padding:0 24px 16px 24px; font-size:14px; line-height:1.6; font-family:'Helvetica Neue', Arial, sans-serif; color:#000;">
+              <%= @broadcast.body %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @seat.present? %>
+          <tr>
+            <td style="padding:16px 24px; background-color:#f0fdf4; border-top:1px solid #e5e7eb; border-bottom:1px solid #e5e7eb; font-family:'Helvetica Neue', Arial, sans-serif;">
+              <div style="font-size:18px; font-weight:bold; color:#166534; margin-bottom:8px;">Your Seat is Confirmed!</div>
+              <div style="margin-bottom:12px; color:#0f172a;">Use this QR code to check in at the event:</div>
+              <div style="text-align:center; padding:12px 0;">
+                <%= @seat.qr_code_svg %>
+              </div>
+              <div style="text-align:center; margin:12px 0;">
+                <a href="<%= add_utm_params(@seat.qr_code_url, content: 'checkin_button') %>" style="display:inline-block; padding:10px 18px; background-color:#16a34a; color:#ffffff; text-decoration:none; border-radius:4px;">Check-in Link</a>
+              </div>
+              <% if @seat.hero.present? %>
+                <div style="font-size:14px; color:#0f172a; margin-top:8px;">
+                  <strong>Hero:</strong> <%= @seat.hero.name %>
+                </div>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @event.present? %>
+          <tr>
+            <td style="padding:16px 24px; background-color:#f9f9f9; border-top:1px solid #e5e7eb; border-bottom:1px solid #e5e7eb; font-family:'Helvetica Neue', Arial, sans-serif;">
+              <div style="font-size:18px; font-weight:bold; margin-bottom:8px;">Event Details</div>
+              <div style="font-size:14px; line-height:1.6; color:#0f172a;">
+                <strong><%= @event.name %></strong><br>
+                <%= @event.date.strftime('%A, %B %d, %Y') %><br>
+                <% if @event.start_time %>
+                  <%= @event.start_time.strftime('%I:%M %p') %> - <%= @event.end_time&.strftime('%I:%M %p') %><br>
+                <% end %>
+                <%= @event.location.name %><br>
+                <%= @event.location.address %>
+              </div>
+              <div style="margin-top:12px;">
+                <a href="<%= add_utm_params(event_url(@event), content: 'event_button') %>" style="display:inline-block; padding:10px 18px; background-color:#6366f1; color:#ffffff; text-decoration:none; border-radius:4px;">View Event</a>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td style="padding:16px 24px 8px 24px;">
+            <hr style="border:0; border-top:1px solid #e5e7eb; margin:0;">
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding:8px 24px 24px 24px; font-size:12px; color:#666666; font-family:'Helvetica Neue', Arial, sans-serif;">
+            <a href="<%= add_utm_params(broadcast_url(@broadcast), content: 'view_browser') %>" style="color:#6366f1; text-decoration:none;">View in browser</a>
+            <% if @broadcast.marketing? %>
+              | <a href="<%= add_utm_params(unsubscribe_url(token: @user.unsubscribe_token), content: 'unsubscribe') %>" style="color:#6366f1; text-decoration:none;">Unsubscribe</a>
+            <% end %>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
