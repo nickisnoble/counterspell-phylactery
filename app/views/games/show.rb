@@ -61,11 +61,24 @@ class Views::Games::Show < Views::Base
           div(class: "mt-6 pt-6 border-t border-gray-200") do
             user_heroes = Hero.all
             if user_heroes.any?
-              form_with(url: event_game_seats_path(@event, @game), method: :post) do |f|
-                div(class: "flex gap-4") do
-                  f.select :hero_id, user_heroes.map { |h| [h.name, h.id] },
+              hero_options = user_heroes.map { |hero| [hero.name, hero.id, { data: { role: hero.role } }] }
+
+              form_with(
+                url: event_game_seats_path(@event, @game),
+                method: :post,
+                data: { controller: "role-sync" }
+              ) do |f|
+                div(class: "flex flex-col gap-4 sm:flex-row sm:items-center") do
+                  f.select :hero_id, hero_options,
                     { prompt: "Select your hero" },
-                    class: "flex-1 rounded-md border-gray-300"
+                    class: "flex-1 rounded-md border-gray-300",
+                    required: true,
+                    data: {
+                      action: "change->role-sync#updateRole",
+                      role_sync_target: "heroSelect"
+                    }
+
+                  f.hidden_field :role_selection, data: { role_sync_target: "roleField" }
 
                   f.submit "Purchase Seat ($#{@event.ticket_price})",
                     class: "px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md cursor-pointer"

@@ -29,4 +29,18 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     get event_game_path(@event, @game)
     assert_response :success
   end
+
+  test "show page purchase form provides role selection for selected hero" do
+    player = User.create!(email: "player@test.com", system_role: "player", display_name: "Player")
+    hero = heroes(:one)
+    login_with_otp(player.email)
+
+    get event_game_path(@event, @game)
+    assert_response :success
+
+    assert_select "form[action='#{event_game_seats_path(@event, @game)}'][data-controller='role-sync']" do
+      assert_select "select[name='hero_id'] option[data-role='#{hero.role}'][value='#{hero.id}']"
+      assert_select "input[type='hidden'][name='role_selection']"
+    end
+  end
 end
