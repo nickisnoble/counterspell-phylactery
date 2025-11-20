@@ -10,6 +10,7 @@ class SeatTest < ActiveSupport::TestCase
     @player2 = User.create!(email: "player2@test.com", system_role: "player", display_name: "Player Two")
     @game = Game.create!(event: events(:one), gm: @gm, seat_count: 5)
     clear_broadcasts_for(events(:one))
+    clear_broadcasts_for(events(:two))
   end
 
   test "requires game" do
@@ -107,10 +108,12 @@ class SeatTest < ActiveSupport::TestCase
     new_game = Game.create!(event: events(:one), gm: other_gm, seat_count: 5)
 
     clear_broadcasts_for(events(:one))
+    clear_broadcasts_for(events(:two))
 
-    assert_turbo_stream_broadcasts events(:one) do
-      seat.update!(game: new_game)
-    end
+    seat.update!(game: new_game)
+
+    assert_turbo_stream_broadcasts events(:one)
+    assert_no_turbo_stream_broadcasts events(:two)
   end
 
   test "does not broadcast when seat has no user" do

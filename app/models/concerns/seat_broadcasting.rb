@@ -11,42 +11,50 @@ module SeatBroadcasting
 
   def broadcast_seat_changes
     return unless game&.event && user_id
-    return unless saved_change_to_checked_in_at? || saved_change_to_user_id? || saved_change_to_hero_id? || saved_change_to_game_id?
 
-    # Broadcast to event show pages (full refresh)
-    broadcast_refresh_to(game.event)
+    relevant_changes = saved_changes.slice("checked_in_at", "user_id", "hero_id", "game_id")
+    return if relevant_changes.empty?
 
-    # Broadcast targeted updates to wizard pages (current and previous game, if seat moved)
     games_to_broadcast = [game]
 
-    if saved_change_to_game_id?
-      old_game_id, = previous_changes["game_id"]
-      old_game = Game.find_by(id: old_game_id)
-      games_to_broadcast << old_game if old_game
+    if relevant_changes["game_id"]
+      old_game_id, = relevant_changes["game_id"]
+      games_to_broadcast << Game.find_by(id: old_game_id)
     end
 
-    games_to_broadcast.compact.uniq.each { |game_ctx| broadcast_wizard_updates_for(game_ctx) }
+    games_to_broadcast.compact.uniq.each do |game_context|
+      broadcast_refresh_to(game_context.event)
+      broadcast_wizard_updates_for(game_context)
+    end
   end
 
   def broadcast_wizard_updates
     broadcast_wizard_updates_for(game)
   end
 
-  def broadcast_wizard_updates_for(game_ctx)
-    role_counts = game_ctx.seats.joins(:hero).where.not(hero_id: nil).group("heroes.role").count
-    taken_hero_ids = game_ctx.seats.where.not(hero_id: nil).pluck(:hero_id)
-    available_heroes = Hero.where.not(id: taken_hero_ids).order(:name).to_a
+  def broadcast_wizard_updates_for(game_context)
+    role_counts = role_counts_for(game_context)
+    available_heroes = available_heroes_for(game_context)
 
     broadcast_replace_to(
-      game_ctx.event,
-      target: "game_#{game_ctx.id}_role_selection",
-      renderable: Views::Seats::RoleSelection.new(game: game_ctx, role_counts: role_counts)
+      game_context.event,
+      target: "game_#{game_context.id}_role_selection",
+      renderable: Views::Seats::RoleSelection.new(game: game_context, role_counts: role_counts)
     )
 
     broadcast_replace_to(
-      game_ctx.event,
-      target: "game_#{game_ctx.id}_hero_selection",
-      renderable: Views::Seats::HeroSelection.new(game: game_ctx, available_heroes: available_heroes)
+      game_context.event,
+      target: "game_#{game_context.id}_hero_selection",
+      renderable: Views::Seats::HeroSelection.new(game: game_context, available_heroes: available_heroes)
     )
+  end
+
+  def role_counts_for(game_context)
+    game_context.seats.joins(:hero).where.not(hero_id: nil).group("heroes.role").count
+  end
+
+  def available_heroes_for(game_context)
+    taken_hero_ids = game_context.seats.where.not(hero_id: nil).pluck(:hero_id)
+    Hero.where.not(id: taken_hero_ids).order(:name).to_a
   end
 end
